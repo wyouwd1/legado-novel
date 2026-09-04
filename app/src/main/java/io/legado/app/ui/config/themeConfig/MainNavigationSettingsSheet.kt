@@ -35,7 +35,6 @@ fun MainNavigationSettingsSheet(
     show: Boolean,
     settings: AppShellSettings,
     onDismissRequest: () -> Unit,
-    onSetVisible: (String, Boolean) -> Unit,
     onSetOrder: (String) -> Unit,
     onSetDefault: (String) -> Unit,
     onRequestNavigationIcon: (String) -> Unit,
@@ -60,28 +59,8 @@ fun MainNavigationSettingsSheet(
         }
     }
 
-    fun isRouteVisible(route: String): Boolean = when (route) {
-        MainDestination.Home.route -> settings.showHome
-        MainDestination.Explore.route -> settings.showDiscovery
-        MainDestination.Rss.route -> settings.showRss
-        else -> true
-    }
-
-    fun getVisibilityForRoute(route: String): Boolean = isRouteVisible(route)
-
-    fun setVisibilityForRoute(route: String, visible: Boolean) {
-        onSetVisible(route, visible)
-        if (!visible) {
-            val item = navigationItems.find { it.route == route } ?: return
-            navigationItems = navigationItems.filter { it.route != route } + item
-            onSetOrder(navigationItems.joinToString(",") { it.route })
-        }
-    }
-
-    val visibleItems = navigationItems.filter { isRouteVisible(it.route) }
-    val hiddenItems = navigationItems.filter { !isRouteVisible(it.route) }
     val selectedDefault = settings.defaultHomePage.takeIf { route ->
-        visibleItems.any { it.route == route }
+        navigationItems.any { it.route == route }
     } ?: MainDestination.Bookshelf.route
 
     AppModalBottomSheet(
@@ -97,8 +76,8 @@ fun MainNavigationSettingsSheet(
             CompactDropdownSettingItem(
                 title = stringResource(R.string.default_home_page),
                 selectedValue = selectedDefault,
-                displayEntries = visibleItems.map { stringResource(it.labelId) }.toTypedArray(),
-                entryValues = visibleItems.map { it.route }.toTypedArray(),
+                displayEntries = navigationItems.map { stringResource(it.labelId) }.toTypedArray(),
+                entryValues = navigationItems.map { it.route }.toTypedArray(),
                 onValueChange = onSetDefault,
             )
             CompactDropdownSettingItem(
@@ -110,15 +89,9 @@ fun MainNavigationSettingsSheet(
             )
             Spacer(modifier = Modifier.padding(bottom = 4.dp))
             val customIconCount = listOf(
-                settings.navIconHome,
                 settings.navIconBookshelf,
-                settings.navIconExplore,
-                settings.navIconRss,
                 settings.navIconMy,
-                settings.navIconHomeSelected,
                 settings.navIconBookshelfSelected,
-                settings.navIconExploreSelected,
-                settings.navIconRssSelected,
                 settings.navIconMySelected,
             ).count { it.isNotEmpty() }
             CompactClickableSettingItem(
@@ -139,17 +112,17 @@ fun MainNavigationSettingsSheet(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 items(
-                    items = visibleItems,
+                    items = navigationItems,
                     key = { it.route },
                 ) { destination ->
                     ReorderableSelectionItem(
                         state = reorderableState,
                         key = destination.route,
-                        reorderIndex = visibleItems.indexOf(destination),
-                        reorderItemCount = visibleItems.size,
+                        reorderIndex = navigationItems.indexOf(destination),
+                        reorderItemCount = navigationItems.size,
                         onMoveItem = { from, to ->
-                            val fromItem = visibleItems[from]
-                            val toItem = visibleItems[to]
+                            val fromItem = navigationItems[from]
+                            val toItem = navigationItems[to]
                             navigationItems = navigationItems.toMutableList().apply {
                                 move(indexOf(fromItem), indexOf(toItem))
                             }
@@ -158,28 +131,7 @@ fun MainNavigationSettingsSheet(
                         title = stringResource(destination.labelId),
                         isEnabled = true,
                         containerColor = LegadoTheme.colorScheme.onSheetContent,
-                        onEnabledChange = {
-                            setVisibilityForRoute(destination.route, false)
-                        },
                     )
-                }
-                if (hiddenItems.isNotEmpty()) {
-                    items(
-                        items = hiddenItems,
-                        key = { it.route },
-                    ) { destination ->
-                        ReorderableSelectionItem(
-                            state = reorderableState,
-                            key = destination.route,
-                            title = stringResource(destination.labelId),
-                            isEnabled = false,
-                            canReorder = false,
-                            containerColor = LegadoTheme.colorScheme.onSheetContent,
-                            onEnabledChange = {
-                                setVisibilityForRoute(destination.route, true)
-                            },
-                        )
-                    }
                 }
             }
         }

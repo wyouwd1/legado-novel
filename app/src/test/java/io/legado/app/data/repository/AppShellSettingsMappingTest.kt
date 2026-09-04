@@ -8,7 +8,7 @@ import org.junit.Test
 class AppShellSettingsMappingTest {
 
     @Test
-    fun `AppShell 28 键写读映射逐字段对应`() {
+    fun `AppShell 键写读映射逐字段对应`() {
         appShellMappingSamples().forEach { expected ->
             assertEquals(expected.expectedPrefMap(), expected.toPrefMap())
             assertEquals(
@@ -19,23 +19,21 @@ class AppShellSettingsMappingTest {
     }
 
     @Test
-    fun `导航可见性与默认首页通过真实原子路径单批写入`() {
+    fun `默认首页通过真实原子路径单批写入`() {
         val values = captureAtomicUpdateValues(
-            current = AppShellSettings(showHome = true, defaultHomePage = "home"),
+            current = AppShellSettings(defaultHomePage = "bookshelf"),
             read = { it.toAppShellSettings() },
             toPrefMap = AppShellSettings::toPrefMap,
             transform = {
                 it.copy(
-                    showHome = false,
-                    defaultHomePage = "bookshelf",
+                    defaultHomePage = "my",
                 )
             },
         )
 
         assertEquals(
             mapOf(
-                PreferKey.showHome to false,
-                PreferKey.defaultHomePage to "bookshelf",
+                PreferKey.defaultHomePage to "my",
             ),
             values,
         )
@@ -51,23 +49,14 @@ private fun appShellMappingSamples(): List<AppShellSettings> {
         labelVisibilityMode = "label-mode",
         defaultHomePage = "default-page",
         mainNavigationOrder = "navigation-order",
-        navIconHome = "icon-home",
         navIconBookshelf = "icon-bookshelf",
-        navIconExplore = "icon-explore",
-        navIconRss = "icon-rss",
         navIconMy = "icon-my",
-        navIconHomeSelected = "icon-home-selected",
         navIconBookshelfSelected = "icon-bookshelf-selected",
-        navIconExploreSelected = "icon-explore-selected",
-        navIconRssSelected = "icon-rss-selected",
         navIconMySelected = "icon-my-selected",
         launcherIcon = "launcher-icon",
     )
     return listOf(
         base,
-        base.copy(showHome = false),
-        base.copy(showDiscovery = false),
-        base.copy(showRss = false),
         base.copy(showStatusBar = false),
         base.copy(swipeAnimation = false),
         base.copy(predictiveBackEnabled = false),
@@ -82,9 +71,6 @@ private fun AppShellSettings.expectedPrefMap(): Map<String, Any?> = mapOf(
     PreferKey.themeMode to themeMode,
     PreferKey.fontScale to fontScale,
     PreferKey.composeEngine to composeEngine,
-    PreferKey.showHome to showHome,
-    PreferKey.showDiscovery to showDiscovery,
-    PreferKey.showRss to showRss,
     PreferKey.showStatusBar to showStatusBar,
     PreferKey.swipeAnimation to swipeAnimation,
     PreferKey.isPredictiveBackEnabled to predictiveBackEnabled,
@@ -96,15 +82,9 @@ private fun AppShellSettings.expectedPrefMap(): Map<String, Any?> = mapOf(
     PreferKey.defaultHomePage to defaultHomePage,
     PreferKey.mainNavigationOrder to mainNavigationOrder,
     PreferKey.navExtended to navExtended,
-    PreferKey.navIconHome to navIconHome,
     PreferKey.navIconBookshelf to navIconBookshelf,
-    PreferKey.navIconExplore to navIconExplore,
-    PreferKey.navIconRss to navIconRss,
     PreferKey.navIconMy to navIconMy,
-    PreferKey.navIconHomeSelected to navIconHomeSelected,
     PreferKey.navIconBookshelfSelected to navIconBookshelfSelected,
-    PreferKey.navIconExploreSelected to navIconExploreSelected,
-    PreferKey.navIconRssSelected to navIconRssSelected,
     PreferKey.navIconMySelected to navIconMySelected,
     PreferKey.launcherIcon to launcherIcon,
 )

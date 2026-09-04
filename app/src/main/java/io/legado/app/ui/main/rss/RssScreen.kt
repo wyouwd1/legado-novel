@@ -73,6 +73,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RssRouteScreen(
     viewModel: RssViewModel = koinViewModel(),
+    onBackClick: (() -> Unit)? = null,
     onOpenSort: (sourceUrl: String, sortUrl: String?, key: String?) -> Unit,
     onOpenRead: (
         title: String?,
@@ -146,6 +147,7 @@ fun RssRouteScreen(
     RssScreen(
         state = uiState,
         onIntent = viewModel::onIntent,
+        onBackClick = onBackClick,
     )
 }
 
@@ -154,6 +156,7 @@ fun RssRouteScreen(
 fun RssScreen(
     state: RssUiState,
     onIntent: (RssIntent) -> Unit,
+    onBackClick: (() -> Unit)? = null,
 ) {
     var sourceToDeleteUrl by rememberSaveable { mutableStateOf<String?>(null) }
     val sourceToDelete = remember(sourceToDeleteUrl, state.items) {
@@ -164,7 +167,7 @@ fun RssScreen(
             title = stringResource(R.string.rss),
             state = state,
             subtitle = state.group.ifEmpty { stringResource(R.string.all) },
-            onBackClick = null,
+            onBackClick = onBackClick,
             onSearchToggle = { onIntent(RssIntent.ToggleSearch(it)) },
             onSearchQueryChange = { onIntent(RssIntent.Search(it)) },
             searchPlaceholder = stringResource(R.string.search_rss_source),

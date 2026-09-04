@@ -99,14 +99,7 @@ private fun buildMainUiState(
     appShell: AppShellSettings,
     theme: ThemeSettings,
 ): MainUiState {
-    val destinations = MainDestination.ordered(appShell.mainNavigationOrder).filter {
-        when (it) {
-            MainDestination.Home -> appShell.showHome
-            MainDestination.Explore -> appShell.showDiscovery
-            MainDestination.Rss -> appShell.showRss
-            else -> true
-        }
-    }
+    val destinations = MainDestination.ordered(appShell.mainNavigationOrder)
     return MainUiState(
         destinations = destinations.toImmutableList(),
         defaultHomePage = appShell.defaultHomePage,
@@ -115,15 +108,9 @@ private fun buildMainUiState(
         useFloatingBottomBarLiquidGlass = appShell.useFloatingBottomBarLiquidGlass,
         labelVisibilityMode = appShell.labelVisibilityMode,
         navExtended = appShell.navExtended,
-        navIconHome = appShell.navIconHome,
         navIconBookshelf = appShell.navIconBookshelf,
-        navIconExplore = appShell.navIconExplore,
-        navIconRss = appShell.navIconRss,
         navIconMy = appShell.navIconMy,
-        navIconHomeSelected = appShell.navIconHomeSelected,
         navIconBookshelfSelected = appShell.navIconBookshelfSelected,
-        navIconExploreSelected = appShell.navIconExploreSelected,
-        navIconRssSelected = appShell.navIconRssSelected,
         navIconMySelected = appShell.navIconMySelected,
         deepPersonalizationActive = theme.appTheme == "12" && theme.enableDeepPersonalization,
         secondaryThemeColor = theme.secondaryThemeColor,

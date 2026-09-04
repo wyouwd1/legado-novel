@@ -52,13 +52,13 @@ class ThemePackageManagerRollbackTest {
             deleteRecursively()
             mkdirs()
         }
-        val oldNav = File(navDir, "home.png").apply { writeBytes("old-nav".toByteArray()) }
+        val oldNav = File(navDir, "bookshelf.png").apply { writeBytes("old-nav".toByteArray()) }
         val oldFont = File(fontDir, "theme_font.ttf").apply {
             writeBytes("old-font".toByteArray())
         }
         val oldSettings = ThemeExportData(
             appTheme = "old",
-            navIconHome = oldNav.absolutePath,
+            navIconBookshelf = oldNav.absolutePath,
             appFontPath = oldFont.absolutePath,
         )
         val settingsGateway = FailingThemeSettingsGateway(oldSettings)
@@ -74,7 +74,7 @@ class ThemePackageManagerRollbackTest {
                     ThemeExportData(
                         appTheme = "new",
                         assets = mapOf(
-                            "navIconHome" to EncoderUtils.base64Encode("new-nav".toByteArray()),
+                            "navIconBookshelf" to EncoderUtils.base64Encode("new-nav".toByteArray()),
                             "appFontPath" to EncoderUtils.base64Encode("new-font".toByteArray()),
                         ),
                     )
@@ -87,7 +87,7 @@ class ThemePackageManagerRollbackTest {
         assertTrue(result.isFailure)
         assertArrayEquals("old-nav".toByteArray(), oldNav.readBytes())
         assertArrayEquals("old-font".toByteArray(), oldFont.readBytes())
-        assertEquals(listOf("home.png"), navDir.listFiles().orEmpty().map(File::getName))
+        assertEquals(listOf("bookshelf.png"), navDir.listFiles().orEmpty().map(File::getName))
         assertEquals(listOf("theme_font.ttf"), fontDir.listFiles().orEmpty().map(File::getName))
         assertEquals(oldSettings, settingsGateway.current)
     }

@@ -67,10 +67,6 @@ sealed interface ThemeConfigIntent {
     data class SetMiuixMonet(val enabled: Boolean) : ThemeConfigIntent
     data class SetDynamicColors(val enabled: Boolean) : ThemeConfigIntent
     data class SetBlurEnabled(val enabled: Boolean) : ThemeConfigIntent
-    data class SetMainDestinationVisible(
-        val route: String,
-        val visible: Boolean,
-    ) : ThemeConfigIntent
     data class SetMainNavigationOrder(val routes: String) : ThemeConfigIntent
     data class SetDefaultHomePage(val route: String) : ThemeConfigIntent
     data class SelectLauncherIcon(val value: String) : ThemeConfigIntent

@@ -22,5 +22,4 @@ object CoverConfig {
     val coverShowNameN get() = settings.showNameDark
     val coverShowAuthorN get() = settings.showAuthorDark
     val coverInfoOrientation get() = settings.infoOrientation
-    val exploreFilterState get() = settings.exploreFilterState
 }

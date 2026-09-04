@@ -102,7 +102,6 @@ object MainNavigator {
                 if (
                     currentRoute == MainRouteHome ||
                     currentRoute is MainRouteBookInfo ||
-                    currentRoute is MainRouteExploreShow ||
                     currentRoute is MainRouteBookSourceManage ||
                     currentRoute is MainRouteSearch
                 ) {
@@ -118,24 +117,8 @@ object MainNavigator {
                 if (
                     currentRoute == MainRouteHome ||
                     currentRoute is MainRouteSearch ||
-                    currentRoute is MainRouteExploreShow ||
                     currentRoute is MainRouteBookInfo ||
                     currentRoute is MainRouteCache
-                ) {
-                    backStack.add(route)
-                } else {
-                    backStack.clear()
-                    backStack.add(MainRouteHome)
-                    backStack.add(route)
-                }
-            }
-
-            is MainRouteExploreShow -> {
-                if (
-                    currentRoute == MainRouteHome ||
-                    currentRoute is MainRouteBookInfo ||
-                    currentRoute is MainRouteSearch ||
-                    currentRoute is MainRouteExploreShow
                 ) {
                     backStack.add(route)
                 } else {
@@ -372,16 +355,6 @@ object MainNavigator {
                         bookUrl = bookUrl,
                         origin = intent.getStringExtra(MainIntent.EXTRA_BOOK_ORIGIN),
                         coverPath = intent.getStringExtra(MainIntent.EXTRA_BOOK_COVER)
-                    )
-                } ?: MainRouteHome
-
-            MainRouteConst.ROUTE_EXPLORE_SHOW -> intent?.getStringExtra(MainIntent.EXTRA_SOURCE_URL)
-                ?.takeIf { it.isNotBlank() }
-                ?.let { sourceUrl ->
-                    MainRouteExploreShow(
-                        title = intent.getStringExtra(MainIntent.EXTRA_EXPLORE_NAME),
-                        sourceUrl = sourceUrl,
-                        exploreUrl = intent.getStringExtra(MainIntent.EXTRA_EXPLORE_URL),
                     )
                 } ?: MainRouteHome
 

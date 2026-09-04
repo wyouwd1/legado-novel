@@ -18,8 +18,6 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.Bookmark
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.HighlightTagRule
-import io.legado.app.data.entities.HomepageCustomSet
-import io.legado.app.data.entities.HomepageModule
 import io.legado.app.data.entities.KeyboardAssist
 import io.legado.app.data.entities.ReplaceRule
 import io.legado.app.data.entities.RssSource
@@ -227,16 +225,6 @@ object Restore : KoinComponent {
                     appDb.keyboardAssistsDao.insert(*it.toTypedArray())
                 } catch (_: SQLiteConstraintException) {
                 }
-            }
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageModules")) {
-            fileToListT<HomepageModule>(path, "homepageModules.json")?.let {
-                appDb.homepageModuleDao.replaceAll(it)
-            }
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageCustomSets")) {
-            fileToListT<HomepageCustomSet>(path, "homepageCustomSets.json")?.let {
-                appDb.homepageCustomSetDao.replaceAll(it)
             }
         }
         if (BackupConfig.dbIsNotIgnored("highlightRule")) {

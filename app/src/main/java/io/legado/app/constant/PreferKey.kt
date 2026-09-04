@@ -41,10 +41,7 @@ object PreferKey {
     const val precisionSearch = "precisionSearch"
     const val prevKeys = "prevKeyCodes"
     const val nextKeys = "nextKeyCodes"
-    const val showHome = "showHome"
-    const val showDiscovery = "showDiscovery"
     const val enableReview = "enableReview"
-    const val showRss = "showRss"
     const val mainNavigationOrder = "mainNavigationOrder"
     const val navExtended = "navExtended"
     const val showStatusBar = "showStatusBar"
@@ -334,9 +331,6 @@ object PreferKey {
     const val titleBarMode = "titleBarMode"
     const val shouldShowExpandButton = "shouldShowExpandButton"
 
-    const val exploreFilterState = "explore_filter_state"
-
-
     const val defaultSourceChangeAll = "defaultSourceChangeAll"
 
     const val showTip = "showTip"
@@ -353,18 +347,11 @@ object PreferKey {
     const val customTagColors = "customTagColors"
     const val enableCustomTagColors = "enableCustomTagColors"
     const val navIconBookshelf = "navIconBookshelf"
-    const val navIconExplore = "navIconExplore"
-    const val navIconRss = "navIconRss"
     const val navIconMy = "navIconMy"
-    const val navIconHomeSelected = "navIconHomeSelected"
     const val navIconBookshelfSelected = "navIconBookshelfSelected"
-    const val navIconExploreSelected = "navIconExploreSelected"
-    const val navIconRssSelected = "navIconRssSelected"
     const val navIconMySelected = "navIconMySelected"
 
     const val aiRewritePresets = "aiRewritePresets"
-
-    const val navIconHome = "navIconHome"
 
     // Lab
     const val labEnabled = "labEnabled"

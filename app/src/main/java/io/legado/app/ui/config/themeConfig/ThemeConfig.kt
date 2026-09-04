@@ -38,9 +38,6 @@ object ThemeConfig {
     val customMode get() = theme.customMode
     val fontScale get() = shell.fontScale
     val appFontPath get() = theme.appFontPath
-    val showHome get() = shell.showHome
-    val showDiscovery get() = shell.showDiscovery
-    val showRss get() = shell.showRss
     val showStatusBar get() = shell.showStatusBar
     val swipeAnimation get() = shell.swipeAnimation
     val showBottomView get() = shell.showBottomView

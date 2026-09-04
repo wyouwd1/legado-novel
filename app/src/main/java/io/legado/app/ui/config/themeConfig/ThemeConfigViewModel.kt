@@ -134,7 +134,6 @@ class ThemeConfigViewModel(
             is ThemeConfigIntent.SetMiuixMonet -> setMiuixMonet(intent.enabled)
             is ThemeConfigIntent.SetDynamicColors -> setDynamicColors(intent.enabled)
             is ThemeConfigIntent.SetBlurEnabled -> setBlurEnabled(intent.enabled)
-            is ThemeConfigIntent.SetMainDestinationVisible -> setMainDestinationVisible(intent)
             is ThemeConfigIntent.SetMainNavigationOrder -> updateAppShell {
                 it.copy(mainNavigationOrder = intent.routes)
             }
@@ -287,39 +286,6 @@ class ThemeConfigViewModel(
         }
     }
 
-    private fun setMainDestinationVisible(intent: ThemeConfigIntent.SetMainDestinationVisible) {
-        val transform: (AppShellSettings) -> AppShellSettings = when (intent.route) {
-            MainDestination.Home.route -> { current ->
-                current.copy(
-                    showHome = intent.visible,
-                    defaultHomePage = current.fallbackHomePage(intent),
-                )
-            }
-            MainDestination.Explore.route -> { current ->
-                current.copy(
-                    showDiscovery = intent.visible,
-                    defaultHomePage = current.fallbackHomePage(intent),
-                )
-            }
-            MainDestination.Rss.route -> { current ->
-                current.copy(
-                    showRss = intent.visible,
-                    defaultHomePage = current.fallbackHomePage(intent),
-                )
-            }
-            else -> return
-        }
-        updateAppShell(transform = transform)
-    }
-
-    private fun AppShellSettings.fallbackHomePage(
-        intent: ThemeConfigIntent.SetMainDestinationVisible,
-    ): String = if (!intent.visible && defaultHomePage == intent.route) {
-        MainDestination.Bookshelf.route
-    } else {
-        defaultHomePage
-    }
-
     private fun selectLauncherIcon(value: String) {
         viewModelScope.launch {
             appShellSettingsGateway.update { it.copy(launcherIcon = value) }
@@ -331,37 +297,15 @@ class ThemeConfigViewModel(
         val current = appShellSettingsGateway.currentSettings
         val oldPath = current.navIconPath(intent.destination)
         val transform: (AppShellSettings) -> AppShellSettings = when (intent.destination) {
-            MainDestination.Home.route -> { settings ->
-                settings.copy(navIconHome = intent.path)
-            }
             MainDestination.Bookshelf.route -> { settings ->
                 settings.copy(navIconBookshelf = intent.path)
-            }
-            MainDestination.Explore.route -> { settings ->
-                settings.copy(navIconExplore = intent.path)
-            }
-            MainDestination.Rss.route -> { settings ->
-                settings.copy(navIconRss = intent.path)
             }
             MainDestination.My.route -> { settings ->
                 settings.copy(navIconMy = intent.path)
             }
-            "${MainDestination.Home.route}:selected" -> { settings ->
-                settings.copy(navIconHomeSelected = intent.path)
-            }
-
             "${MainDestination.Bookshelf.route}:selected" -> { settings ->
                 settings.copy(navIconBookshelfSelected = intent.path)
             }
-
-            "${MainDestination.Explore.route}:selected" -> { settings ->
-                settings.copy(navIconExploreSelected = intent.path)
-            }
-
-            "${MainDestination.Rss.route}:selected" -> { settings ->
-                settings.copy(navIconRssSelected = intent.path)
-            }
-
             "${MainDestination.My.route}:selected" -> { settings ->
                 settings.copy(navIconMySelected = intent.path)
             }
@@ -382,29 +326,17 @@ class ThemeConfigViewModel(
     }
 
     private fun AppShellSettings.navIconPath(destination: String): String = when (destination) {
-        MainDestination.Home.route -> navIconHome
         MainDestination.Bookshelf.route -> navIconBookshelf
-        MainDestination.Explore.route -> navIconExplore
-        MainDestination.Rss.route -> navIconRss
         MainDestination.My.route -> navIconMy
-        "${MainDestination.Home.route}:selected" -> navIconHomeSelected
         "${MainDestination.Bookshelf.route}:selected" -> navIconBookshelfSelected
-        "${MainDestination.Explore.route}:selected" -> navIconExploreSelected
-        "${MainDestination.Rss.route}:selected" -> navIconRssSelected
         "${MainDestination.My.route}:selected" -> navIconMySelected
         else -> ""
     }
 
     private fun AppShellSettings.navIconFileUsage(path: String): Int = listOf(
-        navIconHome,
         navIconBookshelf,
-        navIconExplore,
-        navIconRss,
         navIconMy,
-        navIconHomeSelected,
         navIconBookshelfSelected,
-        navIconExploreSelected,
-        navIconRssSelected,
         navIconMySelected,
     ).count { it == path }
 

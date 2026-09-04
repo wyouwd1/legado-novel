@@ -14,8 +14,6 @@ import io.legado.app.data.dao.CookieDao
 import io.legado.app.data.dao.ExactChapterPageCountDao
 import io.legado.app.data.dao.HighlightRuleDao
 import io.legado.app.data.dao.HighlightTagRuleDao
-import io.legado.app.data.dao.HomepageCustomSetDao
-import io.legado.app.data.dao.HomepageModuleDao
 import io.legado.app.data.dao.KeyboardAssistsDao
 import io.legado.app.data.dao.ReadRecordDao
 import io.legado.app.data.dao.ReplaceRuleDao
@@ -63,8 +61,6 @@ val appDatabaseModule = module {
     factory<ExactChapterPageCountDao> { get<AppDatabase>().exactChapterPageCountDao }
     factory<KeyboardAssistsDao> { get<AppDatabase>().keyboardAssistsDao }
     factory<ServerDao> { get<AppDatabase>().serverDao }
-    factory<HomepageModuleDao> { get<AppDatabase>().homepageModuleDao }
-    factory<HomepageCustomSetDao> { get<AppDatabase>().homepageCustomSetDao }
     factory<HighlightRuleDao> { get<AppDatabase>().highlightRuleDao }
     factory<HighlightTagRuleDao> { get<AppDatabase>().highlightTagRuleDao }
     factory<TagGroupRuleDao> { get<AppDatabase>().tagGroupRuleDao }

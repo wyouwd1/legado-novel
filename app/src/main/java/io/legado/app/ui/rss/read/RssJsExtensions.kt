@@ -186,23 +186,6 @@ open class RssJsExtensions(activity: AppCompatActivity?, source: BaseSource?) : 
                         }
                     }
                 }
-
-                "explore" -> {
-                    val toSource = origin?.let { o ->
-                        appDb.bookSourceDao.getBookSource(o)
-                    } ?: (source as? BookSource) ?: return@launch
-                    val sourceUrl = toSource.bookSourceUrl
-                    withContext(Main) {
-                        activity.startActivity(
-                            MainActivity.createExploreShowIntent(
-                                context = activity,
-                                exploreName = title,
-                                sourceUrl = sourceUrl,
-                                exploreUrl = url
-                            )
-                        )
-                    }
-                }
             }
         }
     }

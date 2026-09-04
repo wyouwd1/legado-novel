@@ -22,18 +22,6 @@ class BookSourceRepository(private val bookSourceDao: BookSourceDao) {
         return bookSourceDao.flowGroups()
     }
 
-    fun flowHomepageModules(): Flow<List<BookSource>> {
-        return bookSourceDao.flowHomepageModules()
-    }
-
-    fun flowExploreSources(): Flow<List<BookSource>> {
-        return bookSourceDao.flowExploreSources()
-    }
-
-    fun flowExploreSourceParts(): Flow<List<BookSourcePart>> {
-        return bookSourceDao.flowExploreSourceParts()
-    }
-
     suspend fun getBookSource(sourceUrl: String): BookSource? {
         return withContext(Dispatchers.IO) {
             bookSourceDao.getBookSource(sourceUrl)
@@ -180,14 +168,6 @@ class BookSourceRepository(private val bookSourceDao: BookSourceDao) {
 
     suspend fun getAllNoGroup(): List<BookSource> = withContext(Dispatchers.IO) {
         bookSourceDao.allNoGroup
-    }
-
-    suspend fun getAllExploreEnabled(): List<BookSource> = withContext(Dispatchers.IO) {
-        bookSourceDao.allEnabledExplore
-    }
-
-    suspend fun getAllExploreDisabled(): List<BookSource> = withContext(Dispatchers.IO) {
-        bookSourceDao.allDisabledExplore
     }
 
     suspend fun getByGroup(group: String): List<BookSource> = withContext(Dispatchers.IO) {

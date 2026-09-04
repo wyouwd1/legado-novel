@@ -82,33 +82,6 @@ interface BookSourceDao {
     @Query("select * from book_sources_part where enabled = 0 order by customOrder asc")
     fun flowDisabled(): Flow<List<BookSourcePart>>
 
-    @Query(
-        """select * from book_sources
-        where enabled = 1 and enabledExplore = 1 and homepageModules is not null
-        order by customOrder asc"""
-    )
-    fun flowHomepageModules(): Flow<List<BookSource>>
-
-    @Query(
-        """select * from book_sources
-        where enabled = 1 and enabledExplore = 1
-        order by customOrder asc"""
-    )
-    fun flowExploreSources(): Flow<List<BookSource>>
-
-    @Query(
-        """select * from book_sources_part
-        where enabled = 1 and enabledExplore = 1
-        order by customOrder asc"""
-    )
-    fun flowExploreSourceParts(): Flow<List<BookSourcePart>>
-
-    @Query(
-        """select * from book_sources_part
-        where enabledExplore = 1 and hasExploreUrl = 1 order by customOrder asc"""
-    )
-    fun flowExplore(): Flow<List<BookSourcePart>>
-
     @Query("select * from book_sources_part where hasLoginUrl = 1 order by customOrder asc")
     fun flowLogin(): Flow<List<BookSourcePart>>
 
@@ -119,34 +92,6 @@ interface BookSourceDao {
     )
     fun flowNoGroup(): Flow<List<BookSourcePart>>
 
-    @Query("select * from book_sources_part where enabledExplore = 1 order by customOrder asc")
-    fun flowEnabledExplore(): Flow<List<BookSourcePart>>
-
-    @Query("select * from book_sources_part where enabledExplore = 0 order by customOrder asc")
-    fun flowDisabledExplore(): Flow<List<BookSourcePart>>
-
-    @Query(
-        """select * from book_sources_part 
-        where enabledExplore = 1 
-        and hasExploreUrl = 1 
-        and (bookSourceGroup like '%' || :key || '%' 
-            or bookSourceName like '%' || :key || '%') 
-        order by customOrder asc"""
-    )
-    fun flowExplore(key: String): Flow<List<BookSourcePart>>
-
-    @Query(
-        """select * from book_sources_part 
-        where enabledExplore = 1 
-        and hasExploreUrl = 1 
-        and (bookSourceGroup = :key
-            or bookSourceGroup like :key || ',%' 
-            or bookSourceGroup like  '%,' || :key
-            or bookSourceGroup like  '%,' || :key || ',%') 
-        order by customOrder asc"""
-    )
-    fun flowGroupExplore(key: String): Flow<List<BookSourcePart>>
-
     @Query("select distinct bookSourceGroup from book_sources where trim(bookSourceGroup) <> ''")
     fun flowGroupsUnProcessed(): Flow<List<String>>
 
@@ -155,15 +100,6 @@ interface BookSourceDao {
         where enabled = 1 and trim(bookSourceGroup) <> ''"""
     )
     fun flowEnabledGroupsUnProcessed(): Flow<List<String>>
-
-    @Query(
-        """select distinct bookSourceGroup from book_sources 
-        where enabledExplore = 1 
-        and trim(exploreUrl) <> '' 
-        and trim(bookSourceGroup) <> ''
-        order by customOrder"""
-    )
-    fun flowExploreGroupsUnProcessed(): Flow<List<String>>
 
     @Query(
         """select * from book_sources 
@@ -245,12 +181,6 @@ interface BookSourceDao {
         where bookSourceGroup is null or bookSourceGroup = '' or bookSourceGroup like '%未分组%'"""
     )
     val allNoGroup: List<BookSource>
-
-    @get:Query("select * from book_sources where enabledExplore = 1 order by customOrder")
-    val allEnabledExplore: List<BookSource>
-
-    @get:Query("select * from book_sources where enabledExplore = 0 order by customOrder")
-    val allDisabledExplore: List<BookSource>
 
     @get:Query("select * from book_sources where loginUrl is not null and loginUrl != ''")
     val allLogin: List<BookSource>
@@ -401,12 +331,6 @@ interface BookSourceDao {
 
     fun flowGroups(): Flow<List<String>> {
         return flowGroupsUnProcessed().map { list ->
-            dealGroups(list)
-        }.flowOn(IO)
-    }
-
-    fun flowExploreGroups(): Flow<List<String>> {
-        return flowExploreGroupsUnProcessed().map { list ->
             dealGroups(list)
         }.flowOn(IO)
     }

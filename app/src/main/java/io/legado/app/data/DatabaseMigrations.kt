@@ -26,7 +26,17 @@ object DatabaseMigrations {
             migration_105_106,
             migration_106_107,
             migration_107_108,
+            migration_108_109,
         )
+    }
+
+    // ③首页/发现域删除：DROP 首页模块两表（homepage_modules、homepage_custom_sets）。
+    // 书源发现相关 JSON 字段保留在 book_sources 表，仅删除首页模块系统。
+    private val migration_108_109 = object : Migration(108, 109) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `homepage_modules`")
+            db.execSQL("DROP TABLE IF EXISTS `homepage_custom_sets`")
+        }
     }
 
     // ①漫画域删除：无漫画专用表，仅删除书架虚拟分组“漫画”（groupId = -7）。

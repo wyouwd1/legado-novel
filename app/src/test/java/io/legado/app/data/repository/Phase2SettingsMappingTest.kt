@@ -111,7 +111,6 @@ class Phase2SettingsMappingTest {
             textColorDark = 0xFF334455.toInt(),
             shadowColorDark = 0xFF445566.toInt(),
             infoOrientation = "1",
-            exploreFilterState = 3,
             defaultCover = "content://cover/light",
             defaultCoverDark = "content://cover/dark",
         )

@@ -171,23 +171,6 @@ fun CoverConfigScreen(
                 )
             }
 
-            SplicedColumnGroup(title = stringResource(R.string.network_book_badge_setting)) {
-                DropdownListSettingItem(
-                    title = stringResource(R.string.network_book_badge_setting),
-                    selectedValue = settings.exploreFilterState.toString(),
-                    displayEntries = arrayOf(
-                        stringResource(R.string.filter_show_all),
-                        stringResource(R.string.filter_hide_in_shelf),
-                        stringResource(R.string.filter_hide_same_name_author),
-                        stringResource(R.string.filter_show_not_in_shelf_only)
-                    ),
-                    entryValues = arrayOf("0", "1", "2", "3"),
-                    onValueChange = { value ->
-                        onIntent(CoverConfigIntent.SetExploreFilterState(value.toInt()))
-                    }
-                )
-            }
-
             SplicedColumnGroup(title = stringResource(R.string.day)) {
                 ClickableSettingItem(
                     title = stringResource(R.string.text_color),

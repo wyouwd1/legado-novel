@@ -34,15 +34,9 @@ object ThemeImportExport {
             "largeContainerBackgroundImageDark" to data.largeContainerBackgroundImageDark,
             "itemBackgroundImageLight" to data.itemBackgroundImageLight,
             "itemBackgroundImageDark" to data.itemBackgroundImageDark,
-            "navIconHome" to data.navIconHome,
             "navIconBookshelf" to data.navIconBookshelf,
-            "navIconExplore" to data.navIconExplore,
-            "navIconRss" to data.navIconRss,
             "navIconMy" to data.navIconMy,
-            "navIconHomeSelected" to data.navIconHomeSelected,
             "navIconBookshelfSelected" to data.navIconBookshelfSelected,
-            "navIconExploreSelected" to data.navIconExploreSelected,
-            "navIconRssSelected" to data.navIconRssSelected,
             "navIconMySelected" to data.navIconMySelected,
             "appFontPath" to data.appFontPath,
         )
@@ -128,20 +122,11 @@ object ThemeImportExport {
                     ?: data.itemBackgroundImageLight,
                 itemBackgroundImageDark = embeddedAssets.paths["itemBackgroundImageDark"]
                     ?: data.itemBackgroundImageDark,
-                navIconHome = embeddedAssets.paths["navIconHome"] ?: data.navIconHome,
                 navIconBookshelf = embeddedAssets.paths["navIconBookshelf"]
                     ?: data.navIconBookshelf,
-                navIconExplore = embeddedAssets.paths["navIconExplore"] ?: data.navIconExplore,
-                navIconRss = embeddedAssets.paths["navIconRss"] ?: data.navIconRss,
                 navIconMy = embeddedAssets.paths["navIconMy"] ?: data.navIconMy,
-                navIconHomeSelected = embeddedAssets.paths["navIconHomeSelected"]
-                    ?: data.navIconHomeSelected,
                 navIconBookshelfSelected = embeddedAssets.paths["navIconBookshelfSelected"]
                     ?: data.navIconBookshelfSelected,
-                navIconExploreSelected = embeddedAssets.paths["navIconExploreSelected"]
-                    ?: data.navIconExploreSelected,
-                navIconRssSelected = embeddedAssets.paths["navIconRssSelected"]
-                    ?: data.navIconRssSelected,
                 navIconMySelected = embeddedAssets.paths["navIconMySelected"]
                     ?: data.navIconMySelected,
                 appFontPath = embeddedAssets.paths["appFontPath"] ?: data.appFontPath,
@@ -307,9 +292,6 @@ object ThemeImportExport {
             bottomBarOpacity = root.int("I", 100),
             enableCustomTagColors = root.boolean("J"),
             customTagColorsJson = root.nullableString("K"),
-            showHome = root.boolean("L", true),
-            showDiscovery = root.boolean("M", true),
-            showRss = root.boolean("N", true),
             showStatusBar = root.boolean("O", true),
             swipeAnimation = root.boolean("P", true),
             showBottomView = root.boolean("Q", true),
@@ -318,10 +300,7 @@ object ThemeImportExport {
             tabletInterface = root.string("T", "auto"),
             labelVisibilityMode = root.string("U", "auto"),
             defaultHomePage = root.string("V", "bookshelf"),
-            navIconHome = root.string("W"),
             navIconBookshelf = root.string("X"),
-            navIconExplore = root.string("Y"),
-            navIconRss = root.string("Z"),
             navIconMy = root.string("a0"),
             useMiuixMonet = root.boolean("b0"),
             useFlexibleTopAppBar = root.boolean("c0", true),

@@ -72,8 +72,6 @@ object BackupConfig {
     private const val dbKeySourceSub = "sourceSub"
     private const val dbKeyTxtTocRule = "txtTocRule"
     private const val dbKeyKeyboardAssists = "keyboardAssists"
-    private const val dbKeyHomepageModules = "homepageModules"
-    private const val dbKeyHomepageCustomSets = "homepageCustomSets"
     private const val dbKeyHighlightRule = "highlightRule"
     private const val dbKeyHighlightTagRule = "highlightTagRule"
     private const val dbKeyTagGroupRule = "tagGroupRule"
@@ -83,7 +81,6 @@ object BackupConfig {
         dbKeyBookmark, dbKeyBookGroup, dbKeyBookSource, dbKeyRssSource,
         dbKeyRssStar, dbKeyReplaceRule, dbKeyReadRecord, dbKeySearchHistory,
         dbKeySourceSub, dbKeyTxtTocRule, dbKeyKeyboardAssists,
-dbKeyHomepageModules, dbKeyHomepageCustomSets,
         dbKeyHighlightRule, dbKeyHighlightTagRule, dbKeyTagGroupRule, dbKeyServer
     )
 
@@ -99,8 +96,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
         appCtx.getString(R.string.source_sub),
         appCtx.getString(R.string.txt_toc_rule),
         appCtx.getString(R.string.keyboard_assists),
-        appCtx.getString(R.string.homepage_modules),
-        appCtx.getString(R.string.homepage_custom_sets),
         appCtx.getString(R.string.highlight_rule_config),
         appCtx.getString(R.string.highlight_tag_config),
         appCtx.getString(R.string.tag_group_rules),
@@ -132,7 +127,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
         themeConfigKey,
         coverConfigKey,
         PreferKey.bookshelfLayout,
-        PreferKey.showRss,
         PreferKey.threadCount,
         localBookKey
     )
@@ -144,7 +138,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
         appCtx.getString(R.string.theme_config),
         appCtx.getString(R.string.cover_config),
         appCtx.getString(R.string.bookshelf_layout),
-        appCtx.getString(R.string.show_rss),
         appCtx.getString(R.string.thread_count),
         appCtx.getString(R.string.local_book)
     )
@@ -156,7 +149,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
         themeConfigKey,
         coverConfigKey,
         PreferKey.bookshelfLayout,
-        PreferKey.showRss,
         PreferKey.threadCount,
         localBookKey
     )
@@ -168,7 +160,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
         appCtx.getString(R.string.theme_config),
         appCtx.getString(R.string.cover_config),
         appCtx.getString(R.string.bookshelf_layout),
-        appCtx.getString(R.string.show_rss),
         appCtx.getString(R.string.thread_count),
         appCtx.getString(R.string.local_book)
     )
@@ -358,7 +349,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
                 backupIgnoreCoverConfig && coverPrefKeys.contains(key) -> false
                 backupIgnoreBookshelfLayout && bookshelfPrefKeys.contains(key) -> false
                 PreferKey.themeMode == key && backupIgnoreThemeMode -> false
-                PreferKey.showRss == key && backupIgnoreShowRss -> false
                 PreferKey.threadCount == key && backupIgnoreThreadCount -> false
                 else -> true
             }
@@ -369,7 +359,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
             ignoreCoverConfig && coverPrefKeys.contains(key) -> false
             ignoreBookshelfLayout && bookshelfPrefKeys.contains(key) -> false
             PreferKey.themeMode == key && ignoreThemeMode -> false
-            PreferKey.showRss == key && ignoreShowRss -> false
             PreferKey.threadCount == key && ignoreThreadCount -> false
             else -> true
         }
@@ -385,8 +374,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
         get() = ignoreConfig[coverConfigKey] == true
     val ignoreBookshelfLayout: Boolean
         get() = ignoreConfig[PreferKey.bookshelfLayout] == true
-    val ignoreShowRss: Boolean
-        get() = ignoreConfig[PreferKey.showRss] == true
     val ignoreThreadCount: Boolean
         get() = ignoreConfig[PreferKey.threadCount] == true
     val ignoreLocalBook: Boolean
@@ -402,8 +389,6 @@ dbKeyHomepageModules, dbKeyHomepageCustomSets,
         get() = backupIgnoreConfig[coverConfigKey] == true
     val backupIgnoreBookshelfLayout: Boolean
         get() = backupIgnoreConfig[PreferKey.bookshelfLayout] == true
-    val backupIgnoreShowRss: Boolean
-        get() = backupIgnoreConfig[PreferKey.showRss] == true
     val backupIgnoreThreadCount: Boolean
         get() = backupIgnoreConfig[PreferKey.threadCount] == true
     val backupIgnoreLocalBook: Boolean

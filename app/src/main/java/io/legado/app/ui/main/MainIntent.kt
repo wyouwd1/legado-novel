@@ -17,12 +17,10 @@ object MainIntent {
     const val EXTRA_BOOK_COVER = "coverPath"
     const val EXTRA_IN_BOOKSHELF = "inBookshelf"
     const val EXTRA_CHAPTER_CHANGED = "chapterChanged"
-    const val EXTRA_EXPLORE_NAME = "exploreName"
     const val EXTRA_SOURCE_URL = "sourceUrl"
     const val EXTRA_BOOK_SOURCE_IMPORT = "bookSourceImport"
     const val EXTRA_SOURCE_LOGIN_TYPE = "source_login_type"
     const val EXTRA_SOURCE_LOGIN_KEY = "source_login_key"
-    const val EXTRA_EXPLORE_URL = "exploreUrl"
     const val EXTRA_WEB_VIEW_TITLE = "title"
     const val EXTRA_WEB_VIEW_URL = "url"
     const val EXTRA_WEB_VIEW_SOURCE_ORIGIN = "sourceOrigin"
@@ -240,20 +238,6 @@ object MainIntent {
             putExtra(EXTRA_BOOK_URL, bookUrl)
             putExtra(EXTRA_BOOK_ORIGIN, origin)
             putExtra(EXTRA_BOOK_COVER, coverPath)
-        }
-    }
-
-    fun createExploreShowIntent(
-        context: Context,
-        exploreName: String? = null,
-        sourceUrl: String,
-        exploreUrl: String? = null,
-    ): Intent {
-        return createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_EXPLORE_SHOW)
-            putExtra(EXTRA_EXPLORE_NAME, exploreName)
-            putExtra(EXTRA_SOURCE_URL, sourceUrl)
-            putExtra(EXTRA_EXPLORE_URL, exploreUrl)
         }
     }
 

@@ -555,11 +555,6 @@ id: "deleteUrl",
         id: 'enabled',
         type: 'Boolean',
       },
-      {
-        title: '启用发现',
-        id: 'enabledExplore',
-        type: 'Boolean',
-      },
       // {
       //   title: "启用段评",
       //   id: "enabledReview",

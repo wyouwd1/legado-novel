@@ -79,8 +79,6 @@ object Backup {
             "sourceSub.json",
             "txtTocRule.json",
             "keyboardAssists.json",
-            "homepageModules.json",
-            "homepageCustomSets.json",
             "highlightRule.json",
             "highlightTagRule.json",
             "tagGroupRule.json",
@@ -181,16 +179,6 @@ object Backup {
         }
         if (BackupConfig.dbIsNotIgnored("keyboardAssists", true)) {
             writeListToJson(appDb.keyboardAssistsDao.all, "keyboardAssists.json", backupPath)
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageModules", true)) {
-            writeListToJson(appDb.homepageModuleDao.getAll(), "homepageModules.json", backupPath)
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageCustomSets", true)) {
-            writeListToJson(
-                appDb.homepageCustomSetDao.getAll(),
-                "homepageCustomSets.json",
-                backupPath
-            )
         }
         if (BackupConfig.dbIsNotIgnored("highlightRule", true)) {
             writeListToJson(appDb.highlightRuleDao.getAll(), "highlightRule.json", backupPath)

@@ -1,5 +1,7 @@
 package io.legado.app.ui.main.my
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -20,7 +22,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
-import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.ContentCopy
@@ -30,20 +31,30 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.RssFeed
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Source
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Subscriptions
 import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.legado.app.R
+import io.legado.app.lib.permission.Permissions
+import io.legado.app.lib.permission.PermissionsCompat
 import io.legado.app.ui.book.bookmark.AllBookmarkActivity
 import io.legado.app.ui.book.toc.rule.TxtTocRuleActivity
 import io.legado.app.ui.file.FileManageActivity
@@ -57,6 +68,10 @@ import io.legado.app.ui.widget.components.settingItem.SwitchSettingItem
 import io.legado.app.ui.widget.components.topbar.GlassMediumFlexibleTopAppBar
 import io.legado.app.ui.widget.components.topbar.GlassTopAppBarDefaults
 import io.legado.app.ui.widget.components.topbar.TopBarActionButton
+import io.legado.app.utils.isContentScheme
+import io.legado.app.utils.takePersistablePermissionSafely
+import io.legado.app.utils.toastOnUi
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -68,6 +83,81 @@ fun MyRouteScreen(
     onNavigate: (PrefClickEvent) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var pendingBackupDestination by remember {
+        mutableStateOf<MyBackupDestination?>(null)
+    }
+    val backupDirectoryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree(),
+    ) { uri ->
+        val destination = pendingBackupDestination
+        pendingBackupDestination = null
+        if (uri != null && destination != null) {
+            uri.takePersistablePermissionSafely(context)
+            val path = if (uri.isContentScheme()) {
+                uri.toString()
+            } else {
+                uri.path.orEmpty()
+            }
+            if (path.isNotEmpty()) {
+                viewModel.onIntent(
+                    MyIntent.BackupDirectorySelected(
+                        destination = destination,
+                        path = path,
+                    )
+                )
+            }
+        }
+    }
+    val restoreFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        uri?.let {
+            viewModel.onIntent(MyIntent.RestoreLocalFileSelected(it.toString()))
+        }
+    }
+
+    LaunchedEffect(viewModel, context) {
+        viewModel.effects.collectLatest { effect ->
+            when (effect) {
+                is MyEffect.SelectBackupDirectory -> {
+                    pendingBackupDestination = effect.destination
+                    runCatching { backupDirectoryLauncher.launch(null) }
+                }
+
+                is MyEffect.RequestBackupStoragePermission -> {
+                    PermissionsCompat.Builder()
+                        .addPermissions(*Permissions.Group.STORAGE)
+                        .rationale(R.string.tip_perm_request_storage)
+                        .onGranted {
+                            viewModel.onIntent(
+                                MyIntent.BackupDirectorySelected(
+                                    destination = effect.destination,
+                                    path = effect.path,
+                                )
+                            )
+                        }
+                        .request()
+                }
+
+                MyEffect.SelectRestoreFile -> {
+                    restoreFileLauncher.launch(arrayOf("application/zip"))
+                }
+
+                is MyEffect.ShowMessage -> {
+                    val message = buildString {
+                        append(context.getString(effect.messageRes))
+                        effect.detail?.takeIf { it.isNotBlank() }?.let {
+                            append('\n')
+                            append(it)
+                        }
+                    }
+                    context.toastOnUi(message)
+                }
+            }
+        }
+    }
+
     MyScreen(
         state = uiState,
         onIntent = viewModel::onIntent,
@@ -130,6 +220,50 @@ fun MyScreen(
                         onIntent(MyIntent.ToggleWebService)
                     },
                     onNavigate = onNavigate
+                )
+            }
+
+            MyBackupCard(
+                latestBackup = state.latestBackup,
+                isLoading = state.isBackupLoading,
+                isLoadError = state.isBackupLoadError,
+                isActionRunning = state.isBackupActionRunning,
+                onBackup = { onIntent(MyIntent.BackupClick) },
+                onRestore = { onIntent(MyIntent.RestoreClick) },
+                onOpenSettings = { onNavigate(PrefClickEvent.OpenBackupSettings) },
+                onRetry = { onIntent(MyIntent.RetryBackupInfo) },
+            )
+
+            SplicedColumnGroup(
+                title = stringResource(R.string.rss),
+            ) {
+                ClickableSettingItem(
+                    title = stringResource(R.string.rss_source),
+                    imageVector = Icons.Default.RssFeed,
+                    onClick = {
+                        onNavigate(PrefClickEvent.OpenRssHome)
+                    }
+                )
+                ClickableSettingItem(
+                    title = stringResource(R.string.rss_feed_management),
+                    imageVector = Icons.Default.Subscriptions,
+                    onClick = {
+                        onNavigate(PrefClickEvent.OpenRssSourceManage)
+                    }
+                )
+                ClickableSettingItem(
+                    title = stringResource(R.string.favorite),
+                    imageVector = Icons.Default.Star,
+                    onClick = {
+                        onNavigate(PrefClickEvent.OpenRssFavorites)
+                    }
+                )
+                ClickableSettingItem(
+                    title = stringResource(R.string.rule_subscription),
+                    imageVector = Icons.Default.Sell,
+                    onClick = {
+                        onNavigate(PrefClickEvent.OpenRuleSub)
+                    }
                 )
             }
 
@@ -226,6 +360,11 @@ fun MyScreen(
             }
         }
     }
+
+    MyBackupSheets(
+        state = state,
+        onIntent = onIntent,
+    )
 }
 
 

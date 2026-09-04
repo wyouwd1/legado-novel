@@ -58,15 +58,9 @@ class ThemePackageManager(
         private const val ASSET_CONTAINER_LARGE_DARK = "container.large.dark"
         private const val ASSET_CONTAINER_ITEM_LIGHT = "container.item.light"
         private const val ASSET_CONTAINER_ITEM_DARK = "container.item.dark"
-        private const val ASSET_NAV_HOME = "navigation.home"
         private const val ASSET_NAV_BOOKSHELF = "navigation.bookshelf"
-        private const val ASSET_NAV_EXPLORE = "navigation.explore"
-        private const val ASSET_NAV_RSS = "navigation.rss"
         private const val ASSET_NAV_MY = "navigation.my"
-        private const val ASSET_NAV_HOME_SELECTED = "navigation.home.selected"
         private const val ASSET_NAV_BOOKSHELF_SELECTED = "navigation.bookshelf.selected"
-        private const val ASSET_NAV_EXPLORE_SELECTED = "navigation.explore.selected"
-        private const val ASSET_NAV_RSS_SELECTED = "navigation.rss.selected"
         private const val ASSET_NAV_MY_SELECTED = "navigation.my.selected"
         private const val ASSET_FONT = "font.app"
     }
@@ -152,18 +146,10 @@ class ThemePackageManager(
                                 localAssets[ASSET_CONTAINER_LARGE_DARK],
                             itemBackgroundImageLight = localAssets[ASSET_CONTAINER_ITEM_LIGHT],
                             itemBackgroundImageDark = localAssets[ASSET_CONTAINER_ITEM_DARK],
-                            navIconHome = localAssets[ASSET_NAV_HOME].orEmpty(),
                             navIconBookshelf = localAssets[ASSET_NAV_BOOKSHELF].orEmpty(),
-                            navIconExplore = localAssets[ASSET_NAV_EXPLORE].orEmpty(),
-                            navIconRss = localAssets[ASSET_NAV_RSS].orEmpty(),
                             navIconMy = localAssets[ASSET_NAV_MY].orEmpty(),
-                            navIconHomeSelected = localAssets[ASSET_NAV_HOME_SELECTED].orEmpty(),
                             navIconBookshelfSelected =
                                 localAssets[ASSET_NAV_BOOKSHELF_SELECTED].orEmpty(),
-                            navIconExploreSelected =
-                                localAssets[ASSET_NAV_EXPLORE_SELECTED].orEmpty(),
-                            navIconRssSelected =
-                                localAssets[ASSET_NAV_RSS_SELECTED].orEmpty(),
                             navIconMySelected = localAssets[ASSET_NAV_MY_SELECTED].orEmpty(),
                             appFontPath = localAssets[ASSET_FONT],
                             coverDefaultImage = "",
@@ -326,16 +312,10 @@ class ThemePackageManager(
                 largeContainerBackgroundImageDark = localAssets[ASSET_CONTAINER_LARGE_DARK],
                 itemBackgroundImageLight = localAssets[ASSET_CONTAINER_ITEM_LIGHT],
                 itemBackgroundImageDark = localAssets[ASSET_CONTAINER_ITEM_DARK],
-                navIconHome = localAssets[ASSET_NAV_HOME].orEmpty(),
                 navIconBookshelf = localAssets[ASSET_NAV_BOOKSHELF].orEmpty(),
-                navIconExplore = localAssets[ASSET_NAV_EXPLORE].orEmpty(),
-                navIconRss = localAssets[ASSET_NAV_RSS].orEmpty(),
                 navIconMy = localAssets[ASSET_NAV_MY].orEmpty(),
-                navIconHomeSelected = localAssets[ASSET_NAV_HOME_SELECTED].orEmpty(),
                 navIconBookshelfSelected =
                     localAssets[ASSET_NAV_BOOKSHELF_SELECTED].orEmpty(),
-                navIconExploreSelected = localAssets[ASSET_NAV_EXPLORE_SELECTED].orEmpty(),
-                navIconRssSelected = localAssets[ASSET_NAV_RSS_SELECTED].orEmpty(),
                 navIconMySelected = localAssets[ASSET_NAV_MY_SELECTED].orEmpty(),
                 appFontPath = localAssets[ASSET_FONT],
                 assets = null,
@@ -441,16 +421,10 @@ class ThemePackageManager(
                         localAssets[ASSET_CONTAINER_LARGE_DARK],
                     itemBackgroundImageLight = localAssets[ASSET_CONTAINER_ITEM_LIGHT],
                     itemBackgroundImageDark = localAssets[ASSET_CONTAINER_ITEM_DARK],
-                    navIconHome = localAssets[ASSET_NAV_HOME].orEmpty(),
                     navIconBookshelf = localAssets[ASSET_NAV_BOOKSHELF].orEmpty(),
-                    navIconExplore = localAssets[ASSET_NAV_EXPLORE].orEmpty(),
-                    navIconRss = localAssets[ASSET_NAV_RSS].orEmpty(),
                     navIconMy = localAssets[ASSET_NAV_MY].orEmpty(),
-                    navIconHomeSelected = localAssets[ASSET_NAV_HOME_SELECTED].orEmpty(),
                     navIconBookshelfSelected =
                         localAssets[ASSET_NAV_BOOKSHELF_SELECTED].orEmpty(),
-                    navIconExploreSelected = localAssets[ASSET_NAV_EXPLORE_SELECTED].orEmpty(),
-                    navIconRssSelected = localAssets[ASSET_NAV_RSS_SELECTED].orEmpty(),
                     navIconMySelected = localAssets[ASSET_NAV_MY_SELECTED].orEmpty(),
                     appFontPath = localAssets[ASSET_FONT],
                     coverDefaultImage = "",
@@ -560,34 +534,16 @@ class ThemePackageManager(
                 null,
                 "assets/container/item/dark",
             ),
-            "navIconHome" to AssetSource(ASSET_NAV_HOME, null, "assets/navigation/home"),
             "navIconBookshelf" to AssetSource(
                 ASSET_NAV_BOOKSHELF,
                 null,
                 "assets/navigation/bookshelf",
             ),
-            "navIconExplore" to AssetSource(ASSET_NAV_EXPLORE, null, "assets/navigation/explore"),
-            "navIconRss" to AssetSource(ASSET_NAV_RSS, null, "assets/navigation/rss"),
             "navIconMy" to AssetSource(ASSET_NAV_MY, null, "assets/navigation/my"),
-            "navIconHomeSelected" to AssetSource(
-                ASSET_NAV_HOME_SELECTED,
-                null,
-                "assets/navigation/home-selected",
-            ),
             "navIconBookshelfSelected" to AssetSource(
                 ASSET_NAV_BOOKSHELF_SELECTED,
                 null,
                 "assets/navigation/bookshelf-selected",
-            ),
-            "navIconExploreSelected" to AssetSource(
-                ASSET_NAV_EXPLORE_SELECTED,
-                null,
-                "assets/navigation/explore-selected",
-            ),
-            "navIconRssSelected" to AssetSource(
-                ASSET_NAV_RSS_SELECTED,
-                null,
-                "assets/navigation/rss-selected",
             ),
             "navIconMySelected" to AssetSource(
                 ASSET_NAV_MY_SELECTED,
@@ -756,10 +712,8 @@ class ThemePackageManager(
                     File(context.getExternalFilesDir(null) ?: context.filesDir, "theme_assets")
                 }
 
-                ASSET_NAV_HOME, ASSET_NAV_BOOKSHELF, ASSET_NAV_EXPLORE,
-                ASSET_NAV_RSS, ASSET_NAV_MY,
-                ASSET_NAV_HOME_SELECTED, ASSET_NAV_BOOKSHELF_SELECTED,
-                ASSET_NAV_EXPLORE_SELECTED, ASSET_NAV_RSS_SELECTED,
+                ASSET_NAV_BOOKSHELF, ASSET_NAV_MY,
+                ASSET_NAV_BOOKSHELF_SELECTED,
                 ASSET_NAV_MY_SELECTED -> File(context.filesDir, "nav_icons")
 
                 ASSET_FONT -> File(context.filesDir, "fonts")
@@ -986,15 +940,9 @@ class ThemePackageManager(
         largeContainerBackgroundImageDark = null,
         itemBackgroundImageLight = null,
         itemBackgroundImageDark = null,
-        navIconHome = "",
         navIconBookshelf = "",
-        navIconExplore = "",
-        navIconRss = "",
         navIconMy = "",
-        navIconHomeSelected = "",
         navIconBookshelfSelected = "",
-        navIconExploreSelected = "",
-        navIconRssSelected = "",
         navIconMySelected = "",
         appFontPath = null,
         coverDefaultImage = "",
@@ -1030,34 +978,16 @@ class ThemePackageManager(
             config.itemBackgroundImageDark,
             "assets/container/item/dark",
         ),
-        AssetSource(ASSET_NAV_HOME, config.navIconHome, "assets/navigation/home"),
         AssetSource(
             ASSET_NAV_BOOKSHELF,
             config.navIconBookshelf,
             "assets/navigation/bookshelf",
         ),
-        AssetSource(ASSET_NAV_EXPLORE, config.navIconExplore, "assets/navigation/explore"),
-        AssetSource(ASSET_NAV_RSS, config.navIconRss, "assets/navigation/rss"),
         AssetSource(ASSET_NAV_MY, config.navIconMy, "assets/navigation/my"),
-        AssetSource(
-            ASSET_NAV_HOME_SELECTED,
-            config.navIconHomeSelected,
-            "assets/navigation/home-selected",
-        ),
         AssetSource(
             ASSET_NAV_BOOKSHELF_SELECTED,
             config.navIconBookshelfSelected,
             "assets/navigation/bookshelf-selected",
-        ),
-        AssetSource(
-            ASSET_NAV_EXPLORE_SELECTED,
-            config.navIconExploreSelected,
-            "assets/navigation/explore-selected",
-        ),
-        AssetSource(
-            ASSET_NAV_RSS_SELECTED,
-            config.navIconRssSelected,
-            "assets/navigation/rss-selected",
         ),
         AssetSource(
             ASSET_NAV_MY_SELECTED,
@@ -1157,15 +1087,9 @@ class ThemePackageManager(
                 ASSET_CONTAINER_LARGE_DARK -> "largeContainerBackgroundImageDark"
                 ASSET_CONTAINER_ITEM_LIGHT -> "itemBackgroundImageLight"
                 ASSET_CONTAINER_ITEM_DARK -> "itemBackgroundImageDark"
-                ASSET_NAV_HOME -> "navIconHome"
                 ASSET_NAV_BOOKSHELF -> "navIconBookshelf"
-                ASSET_NAV_EXPLORE -> "navIconExplore"
-                ASSET_NAV_RSS -> "navIconRss"
                 ASSET_NAV_MY -> "navIconMy"
-                ASSET_NAV_HOME_SELECTED -> "navIconHomeSelected"
                 ASSET_NAV_BOOKSHELF_SELECTED -> "navIconBookshelfSelected"
-                ASSET_NAV_EXPLORE_SELECTED -> "navIconExploreSelected"
-                ASSET_NAV_RSS_SELECTED -> "navIconRssSelected"
                 ASSET_NAV_MY_SELECTED -> "navIconMySelected"
                 ASSET_FONT -> "appFontPath"
                 else -> key

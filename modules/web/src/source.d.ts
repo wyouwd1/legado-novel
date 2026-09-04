@@ -44,8 +44,6 @@ type BookSoure = BaseSource & {
   customOrder: number
   // 是否启用
   enabled: boolean
-  // 启用发现
-  enabledExplore: boolean
   // 登录检测js
   loginCheckJs?: string
   // 封面解密js

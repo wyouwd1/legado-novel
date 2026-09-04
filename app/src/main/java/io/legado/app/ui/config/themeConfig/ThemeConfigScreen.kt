@@ -862,9 +862,6 @@ fun ThemeConfigScreen(
         show = state.activeSheet == ThemeConfigSheet.MainNavigation,
         settings = appShell,
         onDismissRequest = { onIntent(ThemeConfigIntent.DismissSheet) },
-        onSetVisible = { route, visible ->
-            onIntent(ThemeConfigIntent.SetMainDestinationVisible(route, visible))
-        },
         onSetOrder = { onIntent(ThemeConfigIntent.SetMainNavigationOrder(it)) },
         onSetDefault = { onIntent(ThemeConfigIntent.SetDefaultHomePage(it)) },
         onRequestNavigationIcon = { onIntent(ThemeConfigIntent.RequestNavigationIcon(it)) },

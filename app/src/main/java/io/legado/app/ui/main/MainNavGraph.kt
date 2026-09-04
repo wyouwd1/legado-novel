@@ -34,9 +34,6 @@ import io.legado.app.ui.about.AboutEffect
 import io.legado.app.ui.about.AboutScreen
 import io.legado.app.ui.about.AboutViewModel
 import io.legado.app.ui.book.cache.manage.BookCacheManageRouteScreen
-import io.legado.app.ui.book.explore.ExploreShowIntent
-import io.legado.app.ui.book.explore.ExploreShowRouteScreen
-import io.legado.app.ui.book.explore.ExploreShowViewModel
 import io.legado.app.ui.book.import.local.ImportBookRouteScreen
 import io.legado.app.ui.book.import.remote.RemoteBookRouteScreen
 import io.legado.app.ui.book.info.BookInfoRouteScreen
@@ -78,6 +75,7 @@ import io.legado.app.ui.login.SourceLoginIntent
 import io.legado.app.ui.login.SourceLoginRoute
 import io.legado.app.ui.login.SourceLoginType
 import io.legado.app.ui.login.SourceLoginViewModel
+import io.legado.app.ui.main.rss.RssRouteScreen
 import io.legado.app.ui.rss.article.MainRouteRssSort
 import io.legado.app.ui.rss.article.RssSortRouteScreen
 import io.legado.app.ui.rss.favorites.RssFavoritesRouteScreen
@@ -202,6 +200,34 @@ fun MainActivity.mainEntryProvider(
             onSearch = { onNavigateToRoute(MainRouteSearch(null, it.toString())) },
         )
     }
+    entry<MainRouteRssHome> {
+        RssRouteScreen(
+            onBackClick = onNavigateBack,
+            onOpenSort = { sourceUrl, sortUrl, key ->
+                onNavigateToRoute(
+                    MainRouteRssSort(sourceUrl = sourceUrl, sortUrl = sortUrl, key = key)
+                )
+            },
+            onOpenRead = { title, origin, link, openUrl, startPage ->
+                onNavigateToRoute(
+                    MainRouteRssRead(
+                        title = title,
+                        origin = origin,
+                        link = link,
+                        openUrl = openUrl,
+                        startPage = startPage,
+                    )
+                )
+            },
+            onOpenRuleSub = { onNavigateToRoute(MainRouteRuleSub) },
+            onOpenFavorites = { onNavigateToRoute(MainRouteRssFavorites) },
+            onOpenLogin = {
+                onNavigateToRoute(MainRouteSourceLogin(SourceLoginType.RssSource, it))
+            },
+            onOpenSourceEdit = { onNavigateToRoute(MainRouteRssSourceEdit(it)) },
+            onOpenSourceManage = { onNavigateToRoute(MainRouteRssSourceManage) },
+        )
+    }
     entry<MainRouteRssSourceManage> {
         RssSourceRouteScreen(
             onBackClick = onNavigateBack,
@@ -263,9 +289,6 @@ fun MainActivity.mainEntryProvider(
                     )
                 )
             },
-            onNavigateToScopedSearch = { scopeRaw ->
-                onNavigateToRoute(MainRouteSearch(key = null, scopeRaw = scopeRaw))
-            },
             onNavigateToRemoteImport = {
                 onNavigateToRoute(MainRouteImportRemote)
             },
@@ -301,49 +324,14 @@ fun MainActivity.mainEntryProvider(
                     )
                 )
             },
-            onNavigateToExploreShow = { title, sourceUrl, exploreUrl ->
-                onNavigateToRoute(
-                    MainRouteExploreShow(
-                        title = title,
-                        sourceUrl = sourceUrl,
-                        exploreUrl = exploreUrl
-                    )
-                )
-            },
-            onNavigateToSourceLogin = { type, sourceUrl ->
-                onNavigateToRoute(MainRouteSourceLogin(type, sourceUrl))
-            },
             onNavigateToBookSourceManage = {
                 onNavigateToRoute(MainRouteBookSourceManage())
-            },
-            onNavigateToBookSourceEdit = {
-                onNavigateToRoute(MainRouteBookSourceEdit(it))
             },
             onNavigateToRssSourceManage = {
                 onNavigateToRoute(MainRouteRssSourceManage)
             },
-            onNavigateToRssSourceEdit = {
-                onNavigateToRoute(MainRouteRssSourceEdit(it))
-            },
-            onNavigateToRssSort = { sourceUrl, sortUrl, key ->
-                onNavigateToRoute(
-                    MainRouteRssSort(
-                        sourceUrl = sourceUrl,
-                        sortUrl = sortUrl,
-                        key = key
-                    )
-                )
-            },
-            onNavigateToRssRead = { title, origin, link, openUrl, startPage ->
-                onNavigateToRoute(
-                    MainRouteRssRead(
-                        title = title,
-                        origin = origin,
-                        link = link,
-                        openUrl = openUrl,
-                        startPage = startPage
-                    )
-                )
+            onNavigateToRssHome = {
+                onNavigateToRoute(MainRouteRssHome)
             },
             onNavigateToRssFavorites = {
                 onNavigateToRoute(MainRouteRssFavorites)
@@ -353,9 +341,6 @@ fun MainActivity.mainEntryProvider(
             },
             onNavigateToReadRecord = {
                 onNavigateToRoute(MainRouteReadRecord)
-            },
-            onNavigateToReadRecordOverview = {
-                onNavigateToRoute(MainRouteReadRecordOverview)
             },
             onNavigateToHighlightTagRule = {
                 onNavigateToRoute(MainRouteHighlightTagRule)
@@ -767,8 +752,8 @@ fun MainActivity.mainEntryProvider(
         metadata = NavDisplay.transitionSpec {
             val from = initialState.key
             val fromStr = from.toString()
-            if (from is MainRouteHome || from is MainRouteExploreShow || from is MainRouteSearch ||
-                fromStr.startsWith("MainRouteHome") || fromStr.startsWith("MainRouteExploreShow") || fromStr.startsWith(
+            if (from is MainRouteHome || from is MainRouteSearch ||
+                fromStr.startsWith("MainRouteHome") || fromStr.startsWith(
                     "MainRouteSearch"
                 )
             ) {
@@ -778,8 +763,8 @@ fun MainActivity.mainEntryProvider(
         } + NavDisplay.popTransitionSpec {
             val to = targetState.key
             val toStr = to.toString()
-            if (to is MainRouteHome || to is MainRouteExploreShow || to is MainRouteSearch ||
-                toStr.startsWith("MainRouteHome") || toStr.startsWith("MainRouteExploreShow") || toStr.startsWith(
+            if (to is MainRouteHome || to is MainRouteSearch ||
+                toStr.startsWith("MainRouteHome") || toStr.startsWith(
                     "MainRouteSearch"
                 )
             ) {
@@ -792,8 +777,8 @@ fun MainActivity.mainEntryProvider(
             } else {
                 val to = targetState.key
                 val toStr = to.toString()
-                if (to is MainRouteHome || to is MainRouteExploreShow || to is MainRouteSearch ||
-                    toStr.startsWith("MainRouteHome") || toStr.startsWith("MainRouteExploreShow") || toStr.startsWith(
+                if (to is MainRouteHome || to is MainRouteSearch ||
+                    toStr.startsWith("MainRouteHome") || toStr.startsWith(
                         "MainRouteSearch"
                     )
                 ) {
@@ -835,36 +820,6 @@ fun MainActivity.mainEntryProvider(
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = LocalNavAnimatedContentScope.current,
             sharedCoverKey = route.sharedCoverKey ?: bookCoverSharedElementKey(route.bookUrl),
-        )
-    }
-
-    entry<MainRouteExploreShow> { route ->
-        val exploreViewModel = koinViewModel<ExploreShowViewModel>()
-
-        LaunchedEffect(route.sourceUrl, route.exploreUrl, exploreViewModel) {
-            exploreViewModel.onIntent(
-                ExploreShowIntent.InitData(route.sourceUrl, route.exploreUrl)
-            )
-        }
-
-        ExploreShowRouteScreen(
-            viewModel = exploreViewModel,
-            title = route.title ?: "探索",
-            onBack = { onNavigateBack() },
-            onBookClick = { book, sharedCoverKey ->
-                onNavigateToRoute(
-                    MainRouteBookInfo(
-                        name = book.name,
-                        author = book.author,
-                        bookUrl = book.bookUrl,
-                        origin = book.origin,
-                        coverPath = book.coverUrl,
-                        sharedCoverKey = sharedCoverKey
-                    )
-                )
-            },
-            sharedTransitionScope = sharedTransitionScope,
-            animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         )
     }
 
