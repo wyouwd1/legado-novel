@@ -195,7 +195,7 @@ fun ReadBookRouteScreen(
             state.isShowingSearchResult -> viewModel.onIntent(ReadBookIntent.ExitSearch)
             state.isAutoPage -> viewModel.onIntent(ReadBookIntent.StopAutoPage)
             state.menuState.canNavigateBack -> viewModel.onIntent(ReadBookIntent.ReadMenuBack)
-            else -> viewModel.onIntent(ReadBookIntent.CloseReadBook())
+            else -> viewModel.onIntent(ReadBookIntent.CloseReadBook)
         }
     }
     DisposableEffect(controller) {
@@ -203,13 +203,6 @@ fun ReadBookRouteScreen(
         onDispose {
             controller.onComposeRendererDetached()
             controller.clearAppThemeOverride()
-        }
-    }
-
-    LaunchedEffect(viewModel, controller, lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            controller.onEffectsReady()
-            controller.handleEffect(ReadBookEffect.UpContent(0, false))
         }
     }
 

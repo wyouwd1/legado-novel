@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import io.legado.app.ui.main.MainActivity
 
 class SharedReceiverActivity : AppCompatActivity() {
 

@@ -232,7 +232,6 @@ val verifyConfigArchitecture = tasks.register<VerifyConfigArchitectureTask>(
             "io/legado/app/help/config/LocalConfig.kt" to 3,
             "io/legado/app/help/config/ThemeConfigStore.kt" to 8,
             "io/legado/app/help/storage/Restore.kt" to 2,
-            "io/legado/app/receiver/MediaButtonReceiver.kt" to 2,
             "io/legado/app/service/WebService.kt" to 2,
             "io/legado/app/ui/association/ImportReplaceRuleDialog.kt" to 1,
             "io/legado/app/ui/book/explore/ExploreShowViewModel.kt" to 2,
@@ -251,8 +250,6 @@ val verifyConfigArchitecture = tasks.register<VerifyConfigArchitectureTask>(
             // R2.1 已清零：ReadBookViewModel 的书籍/目录读写全部经 BookRepository。
             // 保留 0 值条目让棘轮继续盯着这个文件——新增一处直连就报红。
             "io/legado/app/ui/book/read/ReadBookViewModel.kt" to 0,
-            // 护栏缺席期间（MAD-3 未合并窗口）main 新增的直连，随合并冻结，清理归 Track A/F2
-            "io/legado/app/ui/book/readaloud/cloudtts/CloudTtsViewModel.kt" to 13,
         )
     )
     // 非 ViewModel 的 UI 层文件直连 DAO 的历史债，只冻结不修复；

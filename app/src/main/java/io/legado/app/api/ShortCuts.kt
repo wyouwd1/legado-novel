@@ -1,6 +1,7 @@
 package io.legado.app.api
 
 import android.content.Context
+import android.content.Intent
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
