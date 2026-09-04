@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import splitties.init.appCtx
 
 @Stable
 data class MyUiState(
@@ -111,7 +112,7 @@ sealed interface MyEffect {
 
     data object SelectRestoreFile : MyEffect
     data class ShowMessage(
-        @param:StringRes val messageRes: Int,
+        val message: String,
         val detail: String? = null,
     ) : MyEffect
 }
@@ -208,11 +209,13 @@ class MyViewModel(
         if (backup == null) {
             _effects.tryEmit(
                 MyEffect.ShowMessage(
-                    if (_uiState.value.isBackupLoadError) {
-                        R.string.home_webdav_backup_load_error
-                    } else {
-                        R.string.home_no_webdav_backup
-                    }
+                    appCtx.getString(
+                        if (_uiState.value.isBackupLoadError) {
+                            R.string.home_webdav_backup_load_error
+                        } else {
+                            R.string.home_no_webdav_backup
+                        }
+                    )
                 )
             )
             return
@@ -263,7 +266,7 @@ class MyViewModel(
                     }
                     backupRestoreUseCase.backup(path, destination.mode)
                 }.onSuccess {
-                    _effects.emit(MyEffect.ShowMessage(R.string.backup_success))
+                    _effects.emit(MyEffect.ShowMessage(appCtx.getString(R.string.backup_success)))
                     if (destination != MyBackupDestination.Local) {
                         refreshLatestBackup()
                     }
@@ -271,8 +274,8 @@ class MyViewModel(
                     if (error is CancellationException) throw error
                     _effects.emit(
                         MyEffect.ShowMessage(
-                            messageRes = R.string.backup_error,
-                            detail = error.localizedMessage,
+                            appCtx.getString(R.string.backup_error),
+                            error.localizedMessage,
                         )
                     )
                 }
@@ -291,13 +294,13 @@ class MyViewModel(
                 runCatching {
                     backupRestoreUseCase.restoreLocal(uri)
                 }.onSuccess {
-                    _effects.emit(MyEffect.ShowMessage(R.string.restore_success))
+                    _effects.emit(MyEffect.ShowMessage(appCtx.getString(R.string.restore_success)))
                 }.onFailure { error ->
                     if (error is CancellationException) throw error
                     _effects.emit(
                         MyEffect.ShowMessage(
-                            messageRes = R.string.restore_error,
-                            detail = error.localizedMessage,
+                            appCtx.getString(R.string.restore_error),
+                            error.localizedMessage,
                         )
                     )
                 }
@@ -318,13 +321,13 @@ class MyViewModel(
                 runCatching {
                     webDavBackupUseCase.restore(backup.name)
                 }.onSuccess {
-                    _effects.emit(MyEffect.ShowMessage(R.string.restore_success))
+                    _effects.emit(MyEffect.ShowMessage(appCtx.getString(R.string.restore_success)))
                 }.onFailure { error ->
                     if (error is CancellationException) throw error
                     _effects.emit(
                         MyEffect.ShowMessage(
-                            messageRes = R.string.restore_error,
-                            detail = error.localizedMessage,
+                            appCtx.getString(R.string.restore_error),
+                            error.localizedMessage,
                         )
                     )
                 }

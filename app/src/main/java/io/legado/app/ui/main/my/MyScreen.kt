@@ -146,7 +146,7 @@ fun MyRouteScreen(
 
                 is MyEffect.ShowMessage -> {
                     val message = buildString {
-                        append(context.getString(effect.messageRes))
+                        append(effect.message)
                         effect.detail?.takeIf { it.isNotBlank() }?.let {
                             append('\n')
                             append(it)
