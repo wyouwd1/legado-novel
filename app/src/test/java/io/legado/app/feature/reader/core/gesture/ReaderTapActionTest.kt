@@ -6,7 +6,7 @@ import org.junit.Test
 class ReaderTapActionTest {
     private val grid = ReaderTapActionGrid(
         ReaderTapAction.PREVIOUS_CHAPTER,
-        ReaderTapAction.READ_ALOUD_PREVIOUS_PARAGRAPH,
+        ReaderTapAction.OPEN_CHAPTER_LIST,
         ReaderTapAction.NEXT_CHAPTER,
         ReaderTapAction.PREVIOUS_PAGE,
         ReaderTapAction.MENU,
@@ -20,7 +20,7 @@ class ReaderTapActionTest {
     fun `nine regions resolve independently using legacy 33 and 66 percent boundaries`() {
         val expected = listOf(
             ReaderTapAction.PREVIOUS_CHAPTER,
-            ReaderTapAction.READ_ALOUD_PREVIOUS_PARAGRAPH,
+            ReaderTapAction.OPEN_CHAPTER_LIST,
             ReaderTapAction.NEXT_CHAPTER,
             ReaderTapAction.PREVIOUS_PAGE,
             ReaderTapAction.MENU,
@@ -39,8 +39,8 @@ class ReaderTapActionTest {
 
     @Test
     fun `legacy values preserve every configurable action and reject invalid input`() {
-        (-1..13).forEach { value ->
-            assertEquals(value, ReaderTapAction.fromLegacyValue(value).legacyValue)
+        ReaderTapAction.entries.forEach { action ->
+            assertEquals(action, ReaderTapAction.fromLegacyValue(action.legacyValue))
         }
         assertEquals(ReaderTapAction.NONE, ReaderTapAction.fromLegacyValue(99))
         assertEquals(ReaderTapAction.NONE, grid.actionAt(-1f, 50f, 100f, 100f))
@@ -49,10 +49,10 @@ class ReaderTapActionTest {
 
     @Test
     fun `settings adapter keeps the supplied cell order`() {
-        val mapped = ReaderTapActionGrid.fromLegacyValues(2, 2, 1, 2, 0, 1, 2, 1, 13)
+        val mapped = ReaderTapActionGrid.fromLegacyValues(2, 2, 1, 2, 0, 1, 2, 1, 12)
 
         assertEquals(ReaderTapAction.PREVIOUS_PAGE, mapped.actionAt(10f, 10f, 90f, 90f))
         assertEquals(ReaderTapAction.MENU, mapped.actionAt(45f, 45f, 90f, 90f))
-        assertEquals(ReaderTapAction.TOGGLE_READ_ALOUD_PAUSE, mapped.actionAt(80f, 80f, 90f, 90f))
+        assertEquals(ReaderTapAction.SYNC_PROGRESS, mapped.actionAt(80f, 80f, 90f, 90f))
     }
 }
