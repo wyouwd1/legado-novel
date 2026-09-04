@@ -455,8 +455,8 @@ BookKnowledgeGateway，删除顺序：听书片先行）。
 |---|---|---|---|---|
 | ②听书 TTS+AudioPlay | **✅ 完成** | bcc486dfc（-23,470 行）+ c46f6a965（文档）+ 28a14650a/ac74b2057/71e78d995（修复 r1-r2）+ 352786b71（lint）+ ec0a749a9（测试） | 远程 gate5 **BUILD SUCCESSFUL**：compile/test(855通过+3 ignored)/lint(0 error)/verifyConfigArchitecture/assemble 全绿；残留 grep 仅剩迁移史 SQL | APK 三 ABI 各 **−1,716,153 B**（arm64 66,285,458→64,569,305）；DB 104→105 DROP 6 表；schema 105.json 已生成 |
 | ⑤词典/翻译 | **✅ 完成** | d50118c25（105 文件，-4,871 行）+ c6234bbf9（import 修复） | 远程 gate7 **BUILD SUCCESSFUL** 全绿；残留 grep 仅迁移史；schema 106.json 不含 dictRules | 本片 **−1,034,055 B**；累计 vs 基线 **−2,750,208 B（−4.15%）**；DB 105→106 |
-| ⑦+④知识+AI | 🔄 进行中 | — | — | — |
-| ①漫画 | ⏳ | — | — | — |
+| ⑦+④知识+AI | **✅ 完成** | c804fa983（154 文件，-25,524 行）+ 67efafda5（import 修复） | 远程 gate9 **BUILD SUCCESSFUL** 全绿；被删类 APK 级验证 0 命中；方法数 552,986（−46,856 vs 基线）；schema 107.json 生成 | DB 106→107 DROP 13 表 + 清 book_content_processes AI 行；自动分组应用半部保留无入口；APK 字节未动（收尾 clean 构建复核） |
+| ①漫画 | 🔄 进行中 | — | — | — |
 | ⑥关联书籍 | ⏳ | — | — | — |
 | ③首页/发现 | ⏳ | — | — | — |
 | ⑧欢迎页 | ⏳ | — | — | — |
