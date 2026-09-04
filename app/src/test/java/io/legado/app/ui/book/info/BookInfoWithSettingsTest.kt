@@ -11,7 +11,7 @@ import org.junit.Test
 class BookInfoWithSettingsTest {
 
     /**
-     * 回归：打开详情页时屏幕状态会被整体重置为默认值（背景 "on"、showMangaUi true）。
+     * 回归：打开详情页时屏幕状态会被整体重置为默认值（背景 "on"）。
      * 只要设置由 withSettings 从 gateway 派生叠加，重置后的默认屏幕状态就无法覆盖用户设置。
      */
     @Test
@@ -25,15 +25,13 @@ class BookInfoWithSettingsTest {
                 bookInfoFollowCoverColor = false,
             ),
             cover = CoverSettings(loadOnlyOnWifi = true),
-            other = OtherSettings(showMangaUi = false),
+            other = OtherSettings(),
         )
 
         assertEquals("off", result.bookInfoNetworkCoverBackground)
         assertEquals("off_for_default", result.bookInfoDefaultCoverBackground)
         assertFalse(result.bookInfoFollowCoverColor)
         assertTrue(result.loadCoverOnlyOnWifi)
-        // 修复前被漏掉、仍会复发的字段
-        assertFalse(result.showMangaUi)
     }
 
     @Test

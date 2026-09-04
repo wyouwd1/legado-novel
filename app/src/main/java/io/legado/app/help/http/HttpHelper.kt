@@ -2,11 +2,7 @@ package io.legado.app.help.http
 
 import io.legado.app.constant.AppConst
 import io.legado.app.help.CacheManager
-import io.legado.app.help.glide.progress.ProgressManager.LISTENER
-import io.legado.app.help.glide.progress.ProgressResponseBody
 import io.legado.app.help.http.CookieManager.cookieJarHeader
-import io.legado.app.data.entities.BaseSource
-import io.legado.app.help.ConcurrentRateLimiter
 import io.legado.app.utils.NetworkUtils
 import okhttp3.Cache
 import okhttp3.ConnectionSpec
@@ -145,30 +141,8 @@ val okHttpClient: OkHttpClient by lazy {
     }
 }
 
-val okHttpClientManga by lazy {
-    okHttpClient.newBuilder().run {
-        cache(Cache(File(appCtx.cacheDir, "manga_cache"), 100L * 1024L * 1024L))
-        val interceptors = interceptors()
-        interceptors.add(1) { chain ->
-            val request = chain.request()
-            val response = chain.proceed(request)
-            val url = request.url.toString()
-            response.newBuilder()
-                .body(ProgressResponseBody(url, LISTENER, response.body))
-                .build()
-        }
-        interceptors.add(1) { chain ->
-            ConcurrentRateLimiter(chain.request().tag(BaseSource::class.java)).withLimitBlocking {
-                chain.proceed(chain.request())
-            }
-        }
-        build()
-    }
-}
-
 enum class HttpCacheType(val dirName: String, val maxSize: Long) {
     COVER("http_cache", 100L * 1024 * 1024),
-    MANGA("manga_cache", 100L * 1024 * 1024),
 }
 
 fun getHttpCacheSize(type: HttpCacheType): Long {
@@ -180,7 +154,6 @@ fun getHttpCacheSize(type: HttpCacheType): Long {
 fun clearHttpCache(type: HttpCacheType) {
     when (type) {
         HttpCacheType.COVER -> okHttpClient.cache?.delete()
-        HttpCacheType.MANGA -> okHttpClientManga.cache?.delete()
     }
 }
 

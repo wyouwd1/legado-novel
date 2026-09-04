@@ -42,7 +42,6 @@ import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookSource
 import io.legado.app.domain.gateway.BackupSettingsGateway
-import io.legado.app.domain.gateway.MangaSettingsGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.help.book.BookHelp
 import io.legado.app.help.config.LocalConfig
@@ -179,18 +178,6 @@ open class MainActivity : BaseComposeActivity() {
             chapterChanged = chapterChanged,
         )
 
-        fun createReadMangaIntent(
-            context: Context,
-            bookUrl: String? = null,
-            inBookshelf: Boolean = true,
-            chapterChanged: Boolean = false,
-        ): Intent = MainIntent.createReadMangaIntent(
-            context = context,
-            bookUrl = bookUrl,
-            inBookshelf = inBookshelf,
-            chapterChanged = chapterChanged,
-        )
-
         fun createSearchIntent(
             context: Context,
             key: String? = null,
@@ -217,7 +204,6 @@ open class MainActivity : BaseComposeActivity() {
 
     private val viewModel by viewModel<MainViewModel>()
     private val otherSettingsGateway by inject<OtherSettingsGateway>()
-    private val mangaSettingsGateway by inject<MangaSettingsGateway>()
     private val backupSettingsGateway by inject<BackupSettingsGateway>()
     private val routeEvents = MutableSharedFlow<RouteEvent>(extraBufferCapacity = 1)
     private var shouldApplyDefaultToRead = true
@@ -225,7 +211,6 @@ open class MainActivity : BaseComposeActivity() {
     private var latestBackStack: List<NavKey> = emptyList()
     internal var activeReadBookInputHandler: ReadBookInputHandler? = null
     internal var activeReadBookRoute: MainRouteReadBook? = null
-    internal var activeMangaKeyHandler: ((Int) -> Boolean)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -288,10 +273,6 @@ open class MainActivity : BaseComposeActivity() {
         val defaultToRead by defaultToReadFlow.collectAsStateWithLifecycle(
             otherSettingsGateway.currentSettings.defaultToRead,
         )
-        val mangaSettings by mangaSettingsGateway.settings.collectAsStateWithLifecycle(
-            mangaSettingsGateway.currentSettings,
-        )
-
         val useRail = when (tabletInterface) {
             "always" -> true
             "landscape" -> orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -413,7 +394,6 @@ open class MainActivity : BaseComposeActivity() {
                 entryProvider = mainEntryProvider(
                     backStack = backStack,
                     configuration = configuration,
-                    showMangaUi = mangaSettings.showMangaUi,
                     useRail = useRail,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     onNavigateToRoute = { route ->
@@ -599,7 +579,6 @@ open class MainActivity : BaseComposeActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (activeMangaKeyHandler?.invoke(keyCode) == true) return true
         if (activeReadBookInputHandler?.onKeyDown(keyCode, event) == true) return true
         return super.onKeyDown(keyCode, event)
     }

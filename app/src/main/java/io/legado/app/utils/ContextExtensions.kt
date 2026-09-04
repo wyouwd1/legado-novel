@@ -39,11 +39,9 @@ import io.legado.app.R
 import io.legado.app.constant.AppConst
 import io.legado.app.data.entities.Book
 import io.legado.app.help.IntentHelp
-import io.legado.app.help.book.isImage
 import io.legado.app.help.config.AppConfigStore
 import io.legado.app.help.config.SettingsWriter
 import io.legado.app.domain.gateway.BookshelfSettingsGateway
-import io.legado.app.domain.gateway.MangaSettingsGateway
 import io.legado.app.ui.main.MainActivity
 import io.legado.app.ui.main.bookshelf.BookShelfItem
 import kotlinx.coroutines.runBlocking
@@ -62,9 +60,6 @@ inline fun <reified A : Activity> Context.startActivity(configIntent: Intent.() 
     startActivity(intent)
 }
 
-private val mangaSettingsGateway
-    get() = GlobalContext.get().get<MangaSettingsGateway>()
-
 private val bookshelfSettingsGateway
     get() = GlobalContext.get().get<BookshelfSettingsGateway>()
 
@@ -72,16 +67,8 @@ fun Context.startActivityForBook(
     book: Book,
     configIntent: Intent.() -> Unit = {},
 ) {
-    val intent = when {
-        book.isImage && mangaSettingsGateway.currentSettings.showMangaUi ->
-            MainActivity.createReadMangaIntent(this, book.bookUrl)
-
-        else -> MainActivity.createReadBookIntent(this, book.bookUrl)
-    }
+    val intent = MainActivity.createReadBookIntent(this, book.bookUrl)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (book.isImage && mangaSettingsGateway.currentSettings.showMangaUi) {
-        intent.putExtra("bookUrl", book.bookUrl)
-    }
     intent.apply(configIntent)
     startActivity(intent)
 }
@@ -90,16 +77,8 @@ fun Context.startActivityForBook(
     book: BookShelfItem,
     configIntent: Intent.() -> Unit = {},
 ) {
-    val intent = when {
-        book.isImage && mangaSettingsGateway.currentSettings.showMangaUi ->
-            MainActivity.createReadMangaIntent(this, book.bookUrl)
-
-        else -> MainActivity.createReadBookIntent(this, book.bookUrl)
-    }
+    val intent = MainActivity.createReadBookIntent(this, book.bookUrl)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (book.isImage && mangaSettingsGateway.currentSettings.showMangaUi) {
-        intent.putExtra("bookUrl", book.bookUrl)
-    }
     intent.apply(configIntent)
     startActivity(intent)
 }

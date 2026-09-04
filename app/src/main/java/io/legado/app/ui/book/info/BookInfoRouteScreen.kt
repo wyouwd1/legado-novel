@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -22,8 +21,6 @@ import com.script.rhino.runScriptWithContext
 import io.legado.app.R
 import io.legado.app.constant.AppLog
 import io.legado.app.data.entities.BookGroup
-import io.legado.app.help.book.isImage
-import io.legado.app.help.book.isLocal
 import io.legado.app.model.SourceCallBack
 import io.legado.app.ui.book.info.edit.BookInfoEditActivity
 import io.legado.app.ui.book.toc.TocActivityResult
@@ -53,7 +50,6 @@ fun BookInfoRouteScreen(
     onOpenBookSourceEdit: (String) -> Unit,
     onOpenSourceLogin: (String) -> Unit,
     onOpenReader: (bookUrl: String, inBookshelf: Boolean, chapterChanged: Boolean) -> Unit = { _, _, _ -> },
-    onOpenMangaReader: (bookUrl: String, inBookshelf: Boolean, chapterChanged: Boolean) -> Unit = { _, _, _ -> },
     onNavigateToBookInfo: (name: String?, author: String?, bookUrl: String, origin: String?, coverPath: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToExploreShow: (title: String?, sourceUrl: String, exploreUrl: String?) -> Unit = { _, _, _ -> },
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -64,7 +60,6 @@ fun BookInfoRouteScreen(
     val activity = context as AppCompatActivity
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val showMangaUi by rememberUpdatedState(uiState.showMangaUi)
 
     val tocActivityResult = rememberLauncherForActivityResult(TocActivityResult()) {
         viewModel.onTocResult(it)
@@ -120,22 +115,11 @@ fun BookInfoRouteScreen(
                 }
 
                 is BookInfoEffect.OpenReader -> {
-                    when {
-                        !effect.book.isLocal && effect.book.isImage && showMangaUi -> {
-                            onOpenMangaReader(
-                                effect.book.bookUrl,
-                                effect.inBookshelf,
-                                effect.chapterChanged,
-                            )
-                        }
-                        else -> {
-                        onOpenReader(
-                            effect.book.bookUrl,
-                            effect.inBookshelf,
-                            effect.chapterChanged,
-                        )
-                        }
-                    }
+                    onOpenReader(
+                        effect.book.bookUrl,
+                        effect.inBookshelf,
+                        effect.chapterChanged,
+                    )
                 }
 
                 is BookInfoEffect.OpenToc -> tocActivityResult.launch(effect.bookUrl)

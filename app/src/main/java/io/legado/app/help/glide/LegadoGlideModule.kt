@@ -29,11 +29,6 @@ class LegadoGlideModule : AppGlideModule() {
         )
         registry.prepend(
             String::class.java,
-            InputStream::class.java,
-            LegadoDataUrlLoader.Factory()
-        )
-        registry.prepend(
-            String::class.java,
             File::class.java,
             FilePathLoader.Factory()
         )

@@ -7,13 +7,11 @@ import io.legado.app.domain.model.settings.DownloadCacheSettings
 data class DownloadCacheConfigUiState(
     val settings: DownloadCacheSettings = DownloadCacheSettings(),
     val coverCacheSizeMb: Double = 0.0,
-    val mangaCacheSizeMb: Double = 0.0,
     val dialog: DownloadCacheConfigDialog? = null,
 )
 
 enum class DownloadCacheConfigDialog {
     ClearCoverCache,
-    ClearMangaCache,
     ClearBookCache,
     ShrinkDatabase,
 }

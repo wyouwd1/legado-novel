@@ -8,7 +8,6 @@ import coil3.fetch.FetchResult
 import coil3.fetch.Fetcher
 import coil3.fetch.SourceFetchResult
 import coil3.request.Options
-import io.legado.app.data.appDb
 import io.legado.app.utils.ImageUtils
 import io.legado.app.utils.isWifiConnect
 import kotlinx.coroutines.CancellationException
@@ -64,9 +63,6 @@ class CoverFetcher(
 
     override suspend fun fetch(): FetchResult {
         val source = options.extras[CoverExtras.Source]
-        val isManga = options.extras[CoverExtras.Manga] == true
-        val mangaBook = options.extras[CoverExtras.MangaBookUrl]
-            ?.let { bookUrl -> withContext(Dispatchers.IO) { appDb.bookDao.getBook(bookUrl) } }
 
         if (url.startsWith("data:", true)) {
             val base64Data = url.substringAfter("base64,", "")
@@ -139,15 +135,11 @@ class CoverFetcher(
         }
 
         // Decrypt if needed (applies to both cached and network bytes)
-        val decodedBytes = if (ImageUtils.skipDecode(source, !isManga)) {
+        val decodedBytes = if (ImageUtils.skipDecode(source, true)) {
             rawBytes
         } else {
             withContext(Dispatchers.IO) {
-                if (isManga) {
-                    ImageUtils.decode(url, rawBytes, false, source, mangaBook)
-                } else {
-                    ImageUtils.decode(url, rawBytes, true, source)
-                }
+                ImageUtils.decode(url, rawBytes, true, source)
             } ?: throw IOException("图片解密失败")
         }
 
@@ -164,17 +156,14 @@ class CoverFetcher(
 
     class Factory(
         private val okHttpClient: OkHttpClient,
-        private val okHttpClientManga: OkHttpClient,
     ) : Fetcher.Factory<coil3.Uri> {
         override fun create(data: coil3.Uri, options: Options, imageLoader: ImageLoader): Fetcher? {
             val scheme = data.scheme
             if (scheme != "http" && scheme != "https" && scheme != "data") return null
 
-            val isManga = options.extras[CoverExtras.Manga] == true
             val loadOnlyWifi = options.extras[CoverExtras.LoadOnlyWifi] == true
-            val client = if (isManga) okHttpClientManga else okHttpClient
 
-            return CoverFetcher(data.toString(), options, client, loadOnlyWifi)
+            return CoverFetcher(data.toString(), options, okHttpClient, loadOnlyWifi)
         }
     }
 }

@@ -20,10 +20,4 @@ object CoverExtras {
 
     /** 仅 WiFi 时加载。 */
     val LoadOnlyWifi = Extras.Key<Boolean?>(null)
-
-    /** 漫画模式。 */
-    val Manga = Extras.Key<Boolean?>(null)
-
-    /** 漫画图片所属书籍。图片解密必须显式携带，不能读取全局阅读会话。 */
-    val MangaBookUrl = Extras.Key<String?>(null)
 }

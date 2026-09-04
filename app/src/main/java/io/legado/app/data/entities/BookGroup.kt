@@ -33,7 +33,6 @@ data class BookGroup(
         const val IdLocal = -2L
         const val IdNetNone = -4L
         const val IdLocalNone = -5L
-        const val IdManga = -7L
         const val IdText = -8L
         const val IdError = -11L
         const val IdReading = -20L
@@ -54,7 +53,6 @@ data class BookGroup(
             IdLocal -> GroupNameInfo(groupName, context.getString(R.string.local))
             IdNetNone -> GroupNameInfo(groupName, context.getString(R.string.net_no_group))
             IdLocalNone -> GroupNameInfo(groupName, context.getString(R.string.local_no_group))
-            IdManga -> GroupNameInfo(groupName, context.getString(R.string.manga))
             IdText -> GroupNameInfo(groupName, context.getString(R.string.noval))
             IdError -> GroupNameInfo(groupName, context.getString(R.string.update_book_fail))
             IdReading -> GroupNameInfo(groupName, context.getString(R.string.is_reading))

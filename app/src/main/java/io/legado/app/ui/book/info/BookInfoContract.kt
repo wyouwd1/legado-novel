@@ -48,7 +48,6 @@ data class BookInfoUiState(
     val loadCoverOnlyOnWifi: Boolean = false,
     val defaultCover: String = "",
     val defaultCoverDark: String = "",
-    val showMangaUi: Boolean = true,
 )
 
 @Stable

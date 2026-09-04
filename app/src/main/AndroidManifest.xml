@@ -195,21 +195,6 @@
             android:enableOnBackInvokedCallback="true"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
-        <!-- 阅读漫画界面 -->
-        <activity
-            android:name=".ui.book.manga.ReadMangaActivity"
-            android:configChanges="locale|layoutDirection|uiMode|screenLayout"
-            android:exported="false"
-            android:enableOnBackInvokedCallback="true"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="com.samsung.android.support.REMOTE_ACTION" />
-            </intent-filter>
-
-            <meta-data
-                android:name="com.samsung.android.support.REMOTE_ACTION"
-                android:resource="@xml/spen_remote_actions" />
-        </activity>
         <!-- 书籍详情页 -->
         <activity
             android:name=".ui.book.info.BookInfoActivity"

@@ -163,12 +163,6 @@ fun OtherConfigScreen(
                     checked = state.showAddToShelfAlert,
                     onCheckedChange = { onIntent(OtherConfigIntent.ShowAddToShelfAlertChanged(it)) }
                 )
-
-                SwitchSettingItem(
-                    title = stringResource(R.string.show_manga_ui),
-                    checked = state.showMangaUi,
-                    onCheckedChange = { onIntent(OtherConfigIntent.ShowMangaUiChanged(it)) }
-                )
             }
 
                 SplicedColumnGroup(title = stringResource(R.string.other_setting)) {

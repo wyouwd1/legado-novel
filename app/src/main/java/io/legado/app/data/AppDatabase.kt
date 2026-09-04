@@ -81,7 +81,7 @@ val appDb by lazy {
 }
 
 @Database(
-    version = 107,
+    version = 108,
     exportSchema = true,
     entities = [Book::class, BookGroup::class, BookSource::class, BookChapter::class,
         ReplaceRule::class, SearchBook::class, SearchKeyword::class, Cookie::class,
@@ -224,13 +224,6 @@ abstract class AppDatabase : RoomDatabase() {
                     where not exists (select * from book_groups where groupId = ${BookGroup.IdText})
                 """.trimIndent()
                 db.execSQL(insertBookGroupTextSql)
-                @Language("sql")
-                val insertBookGroupMangaSql = """
-                    insert into book_groups(groupId, groupName, 'order', show) 
-                    select ${BookGroup.IdManga}, '漫画', -25, 1
-                    where not exists (select * from book_groups where groupId = ${BookGroup.IdManga})
-                """.trimIndent()
-                db.execSQL(insertBookGroupMangaSql)
                 @Language("sql")
                 val insertGroupReading = """
                     insert into book_groups(groupId, groupName, 'order', show) 

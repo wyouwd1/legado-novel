@@ -423,11 +423,6 @@ data class Book(
         var startChapter: Int? = null,     // 用户设置的起始章节
         var dailyChapters: Int = 3,    // 用户设置的每日更新章节数
 
-        val mangaColorFilter: String? = null,
-        var mangaScrollMode: Int? = null,
-        var webtoonSidePaddingDp: Int? = null,
-        var mangaBackground: String? = null,
-
         var fixedType: Boolean = false, // 固定书籍类型,不随书源更新
 
     ) : Parcelable

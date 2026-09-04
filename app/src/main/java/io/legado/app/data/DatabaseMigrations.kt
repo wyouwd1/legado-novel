@@ -25,7 +25,17 @@ object DatabaseMigrations {
             migration_104_105,
             migration_105_106,
             migration_106_107,
+            migration_107_108,
         )
+    }
+
+    // ①漫画域删除：无漫画专用表，仅删除书架虚拟分组“漫画”（groupId = -7）。
+    // books.group 是正数用户分组位掩码，“漫画”分组是按 type & image 推导的虚拟分组，
+    // 书籍数据本身无需归位（image 书保留在书架，打开时回落文本阅读器）。
+    private val migration_107_108 = object : Migration(107, 108) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DELETE FROM `book_groups` WHERE groupId = -7")
+        }
     }
 
     private val migration_104_105 = object : Migration(104, 105) {

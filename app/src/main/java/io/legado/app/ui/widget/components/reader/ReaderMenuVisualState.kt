@@ -16,8 +16,8 @@ enum class ReaderMenuTintStyle {
 /**
  * Resolves reader-menu appearance from independent style and effect inputs.
  *
- * This deliberately contains no novel-, manga-, or settings-specific state so both readers can
- * share the same visual rules while keeping their actions and navigation separate.
+ * This deliberately contains no book-type- or settings-specific state so the reader menu keeps
+ * its visual rules independent of content actions and navigation.
  */
 @Immutable
 data class ReaderMenuVisualState(
