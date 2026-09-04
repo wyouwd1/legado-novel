@@ -172,23 +172,19 @@ class ReadBookDomainSplitBoundaryTest {
      *   `aiDelegate`——意图入口只能在 VM，每档两行（分支 + 转发）。
      *
      * 2664 → 2668：朗读域新增两个意图分支（安卓媒体控制 / 定时到点后读完本章），
-     * 合并自 PR #2024。朗读域早已是 `ReadAloudDelegate`——留在 VM 的只有两条 `when`
-     * 分支转发，各两行（分支 + 转发），与上方 `SetReadAloudSystemMediaCompat` 等兄弟
-     * 分支同款，逐行都摘不掉：意图入口只能在 VM。
+     * 合并自 PR #2024，共 4 行纯转发。该域已随切片②（移除听书朗读域）整体删除，
+     * 不再占用本线。
      *
      * 2668 → 2674：合并 PR #2089（阅读锚点）。新增 6 行全部是纯接线，逻辑在
-     * `ReadBook`（模型层）与 `ReadAloudDelegate`，逐行都摘不掉：
+     * `ReadBook`（模型层），逐行都摘不掉：
      *
      * - 阅读锚点：`OpenChapter`/`OpenChapterResult`/`SeekToChapter` 三个意图分支前置
      *   `saveReadingAnchorBeforeChapterJump()`、`RestoreLastBookProgress`/`KeepCurrentBookProgress`
      *   恢复/丢弃锚点并 `syncFromReadBook` 刷新锚点可用状态、`syncFromReadBook` 投影
      *   `readingAnchorAvailable`——锚点状态与跳转计数住在 `ReadBook`，UiState 与
      *   `_uiState.update` 只有 VM 能碰，意图入口与状态投影只能在 VM。
-     * - 朗读域：`ReadAloudFromHere` 意图分支一行转发 `ReadBook.readAloud()`、
-     *   `BackToSpeakingPosition` 转发 `ReadAloudDelegate.backToSpeakingPosition()`、
-     *   会话快照投影 `readAloudFollow`——与既有朗读分支同款。
-     * - `backToSpeakingPosition()` 本体（恢复跟随 + 跳章/跳字符）已下沉到
-     *   `ReadAloudDelegate`，未占本线额度。
+     * - 朗读域接线（从头朗读 / 回到朗读位置 / 朗读跟随投影）已随切片②删除，
+     *   不再占用本线。
      */
     @Test
     fun `ReadBookViewModel 不超过 R2 验收的 2674 行`() {
