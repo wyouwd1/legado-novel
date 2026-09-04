@@ -1956,7 +1956,6 @@
     <string name="reduce_stutter">減少進入閲讀介面時的卡頓，但會增加書籍載入時間。</string>
     <string name="refreshing">刷新中</string>
     <string name="regex_enabled">已啟用正則</string>
-    <string name="related_books">相關書籍（relatedBooks）</string>
     <string name="release_to_refresh">釋放刷新</string>
     <string name="reload">重新載入</string>
     <string name="replace_current_book">替換此書</string>

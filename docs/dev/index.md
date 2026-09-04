@@ -43,7 +43,6 @@
 | [认证与登录](./authentication)          | CookieJar、登录 UI 表单、登录 URL 脚本、登录检查       |
 | [发现 URL 配置](./discovery-url)       | 发现页入口 JSON 格式、分页变量、与首页模块的关系             |
 | [首页模块配置](../spec/homepage-modules) | `homepageModules` 字段规范：列表、轮播、排行榜等模块类型   |
-| [关联书籍配置](../spec/related-books)    | `ruleBookInfo.relatedBooks` 字段规范：相关书籍推荐 |
 
 ## 扩展功能
 

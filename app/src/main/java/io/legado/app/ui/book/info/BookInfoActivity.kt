@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import io.legado.app.base.BaseComposeActivity
 import io.legado.app.ui.login.SourceLoginType
 import io.legado.app.ui.main.MainActivity
-import io.legado.app.utils.startActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class BookInfoActivity : BaseComposeActivity() {
@@ -49,20 +48,6 @@ class BookInfoActivity : BaseComposeActivity() {
                         inBookshelf = inBookshelf,
                         chapterChanged = chapterChanged,
                     )
-                )
-            },
-            onNavigateToBookInfo = { name, author, bookUrl, origin, coverPath ->
-                startActivity<BookInfoActivity> {
-                    putExtra("bookUrl", bookUrl)
-                    putExtra("name", name)
-                    putExtra("author", author)
-                    putExtra("origin", origin)
-                    putExtra("coverPath", coverPath)
-                }
-            },
-            onNavigateToExploreShow = { title, sourceUrl, exploreUrl ->
-                startActivity(
-                    MainActivity.createExploreShowIntent(this, title, sourceUrl, exploreUrl)
                 )
             },
         )

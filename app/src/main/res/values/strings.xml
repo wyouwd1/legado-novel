@@ -1187,7 +1187,6 @@
     <string name="pref_anti_alias_summary">Anti-Aliasing when draw picture</string>
     <string name="upload_url">upload URL</string>
     <string name="download_url_rule">downloadUrlRule(downloadUrls)</string>
-    <string name="related_books">Related Books(relatedBooks)</string>
     <string name="clipboard_empty">Clipboard is empty</string>
     <string name="clipboard_empty_or_invalid">Clipboard is empty or has an invalid format</string>
     <string name="invalid_format">Invalid format</string>
@@ -2376,7 +2375,6 @@
     <string name="a11y_slider_value">%1$s, %2$s</string>
     <string name="a11y_percent_value">%1$d percent</string>
     <string name="a11y_book_cover_actions">Cover for %1$s. Opens cover picker. Long press to preview.</string>
-    <string name="a11y_related_books_more">More related books: %1$s</string>
     <string name="a11y_current_reading">Current reading position</string>
     <string name="a11y_vip_locked">VIP or locked</string>
     <string name="a11y_downloaded">Downloaded</string>

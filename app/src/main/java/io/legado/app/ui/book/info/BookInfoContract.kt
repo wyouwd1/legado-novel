@@ -5,12 +5,9 @@ import androidx.compose.runtime.Stable
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookSource
-import io.legado.app.data.entities.SearchBook
 import io.legado.app.data.entities.readRecord.ReadRecordTimelineDay
 import io.legado.app.domain.usecase.ChangeSourceMigrationOptions
 import io.legado.app.ui.widget.components.variable.VariableEditorUiState
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 const val READER_RESULT_DELETED = 100
 
@@ -34,7 +31,6 @@ data class BookInfoUiState(
     val inBookshelf: Boolean = false,
     val bookSource: BookSource? = null,
     val bookSourceUi: BookInfoSourceUi? = null,
-    val relatedBooks: ImmutableList<RelatedBooksUi> = persistentListOf(),
     val isTocLoading: Boolean = false,
     val isBusy: Boolean = false,
     val deleteAlertEnabled: Boolean = true,
@@ -112,14 +108,6 @@ data class BookInfoWebFile(
     override fun toString(): String = name
 }
 
-data class RelatedBooksUi(
-    val key: String,
-    val title: String,
-    val url: String,
-    val resolvedUrl: String,
-    val books: ImmutableList<SearchBook>,
-)
-
 sealed interface BookInfoIntent {
     data object DismissSheet : BookInfoIntent
     data object DismissDialog : BookInfoIntent
@@ -176,8 +164,6 @@ sealed interface BookInfoIntent {
         val openAfterImport: Boolean,
     ) : BookInfoIntent
 
-    data class RelatedBookClick(val book: SearchBook) : BookInfoIntent
-    data class RelatedBooksMore(val title: String, val url: String) : BookInfoIntent
     data class SetDefaultBookTreeUri(val value: String) : BookInfoIntent
 
     /** 简介 HTML 中 `<button>名称@onclick:脚本</button>` 的点击。 */
@@ -214,18 +200,6 @@ sealed interface BookInfoEffect {
         val source: BookSource?,
         val book: Book,
         val action: BookInfoCallbackAction,
-    ) : BookInfoEffect
-    data class NavigateToBookInfo(
-        val name: String?,
-        val author: String?,
-        val bookUrl: String,
-        val origin: String?,
-        val coverPath: String?,
-    ) : BookInfoEffect
-    data class NavigateToExploreShow(
-        val title: String?,
-        val sourceUrl: String,
-        val exploreUrl: String?,
     ) : BookInfoEffect
 
     /** 简介按钮/图片触发的书源 JS 执行，由宿主（持有 Activity）用 SourceLoginJsExtensions 运行。 */

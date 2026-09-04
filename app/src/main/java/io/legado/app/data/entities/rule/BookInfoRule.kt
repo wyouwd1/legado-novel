@@ -21,8 +21,7 @@ data class BookInfoRule(
     var tocUrl: String? = null,
     var wordCount: String? = null,
     var canReName: String? = null,
-    var downloadUrls: String? = null,
-    var relatedBooks: String? = null
+    var downloadUrls: String? = null
 ) : Parcelable {
 
     companion object {

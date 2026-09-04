@@ -1651,7 +1651,6 @@
 結果：三體 - 劉慈欣
 
 可以在變數前後新增固定文字。</string>
-    <string name="related_books">相關書籍（relatedBooks）</string>
     <string name="clipboard_empty">剪貼簿為空</string>
     <string name="clipboard_empty_or_invalid">剪貼簿為空或格式無效</string>
     <string name="invalid_format">無效格式</string>

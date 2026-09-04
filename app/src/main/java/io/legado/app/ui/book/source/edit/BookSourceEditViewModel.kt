@@ -376,7 +376,6 @@ class BookSourceEditViewModel(
                 f("ruleBookInfo.tocUrl", R.string.rule_toc_url),
                 f("ruleBookInfo.canReName", R.string.rule_can_re_name),
                 f("ruleBookInfo.downloadUrls", R.string.download_url_rule),
-                f("ruleBookInfo.relatedBooks", R.string.related_books),
             ),
             BookSourceEditTab.Toc to listOf(
                 f("ruleToc.preUpdateJs", R.string.pre_update_js),

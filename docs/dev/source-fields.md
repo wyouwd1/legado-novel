@@ -68,7 +68,6 @@
 | `coverUrl`     | 封面规则                                     |
 | `tocUrl`       | 目录 URL 规则（仅支持单个 URL）                     |
 | `canReName`    | 允许修改书名作者                                 |
-| `relatedBooks` | 关联书籍配置，见 [关联书籍配置](../spec/related-books) |
 
 ### 预处理规则 (`bookInfoInit`)
 

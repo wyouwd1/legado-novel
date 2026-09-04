@@ -832,12 +832,6 @@ fun MainActivity.mainEntryProvider(
                     )
                 )
             },
-            onNavigateToBookInfo = { name, author, bookUrl, origin, coverPath ->
-                onNavigateToRoute(MainRouteBookInfo(name, author, bookUrl, origin, coverPath))
-            },
-            onNavigateToExploreShow = { title, sourceUrl, exploreUrl ->
-                onNavigateToRoute(MainRouteExploreShow(title, sourceUrl, exploreUrl))
-            },
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = LocalNavAnimatedContentScope.current,
             sharedCoverKey = route.sharedCoverKey ?: bookCoverSharedElementKey(route.bookUrl),
