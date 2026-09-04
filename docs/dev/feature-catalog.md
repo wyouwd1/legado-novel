@@ -31,7 +31,6 @@
 | `ui/ai/chat`                             | `feature/ai-chat`           | Feature                       | AI provider/config 归 settings 或 data/platform，不放 Screen                      |
 | `ui/login`                               | `feature/source-login`      | Feature + host effect         | WebView/cookie/platform auth 通过 adapter                                      |
 | `ui/about`                               | `feature/about`             | Feature                       | 边界小，适合首个 package relocation 样板候选                                             |
-| `ui/welcome`                             | `feature/onboarding`        | Feature                       | 首次启动状态经 settings/domain contract                                             |
 | `ui/qrcode`                              | `feature/qr-scan`           | Feature + Android capability  | Camera/permission/result 留 host/platform                                     |
 | `ui/association`                         | `feature/file-association`  | Feature + Android capability  | 外部 Intent/URI 是兼容入口，不进入共享 contract                                           |
 | `ui/browser`                             | `platform/android/browser`  | platform capability           | 若出现独立用户流程再由 Feature 包装，不把 WebView 放 core UI                                  |

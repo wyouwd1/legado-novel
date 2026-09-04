@@ -240,7 +240,6 @@
     <string name="select_all_count">全選 (%1$d/%2$d)</string>
     <string name="select_cancel_count">取消全選 (%1$d/%2$d)</string>
     <string name="dark_theme">深色模式</string>
-    <string name="welcome">啟動頁</string>
     <string name="download_start">開始下載</string>
     <string name="download_cancel">取消下載</string>
     <string name="no_download">暫無任務</string>
@@ -1070,12 +1069,6 @@
     <string name="copy_all">拷贝所有</string>
     <string name="auto_complete">自动补全</string>
     <string name="sort_by_size">大小排序</string>
-    <string name="welcome_style">启动界面样式</string>
-    <string name="welcome_style_summary">启动界面图片和是否显示文字等</string>
-    <string name="show_welcome_text">显示文字</string>
-    <string name="welcome_text">阅读|享受美好时光</string>
-    <string name="custom_welcome">自定义欢迎页</string>
-    <string name="custom_welcome_summary">是否使用自定义欢迎页</string>
     <string name="show_icon">显示图标</string>
     <string name="show_default_book_icon">显示默认书籍图标</string>
     <string name="cache_export">缓存/导出</string>
@@ -1345,25 +1338,6 @@
     <string name="sure_cache_book">是否确认开始缓存？</string>
     <string name="auto_check_new_backup_t">自动检查新备份</string>
     <string name="auto_check_new_backup_s">打开软件时检查是否有新备份，有新备份时提示是否更新</string>
-    <string name="welcome_book_folder_tip">设置本地书籍保存目录，后续也可在设置中修改。</string>
-    <string name="welcome_book_folder_not_selected">未选择文件夹</string>
-    <string name="onboarding_title_welcome">欢迎</string>
-    <string name="onboarding_title_backup">备份与恢复</string>
-    <string name="onboarding_title_book_folder">书籍文件夹</string>
-    <string name="onboarding_title_theme">主题样式</string>
-    <string name="onboarding_summary_welcome">请先阅读应用的服务条款与用户协议。</string>
-    <string name="onboarding_summary_backup">此处可设置云同步与恢复应用备份。</string>
-    <string name="onboarding_summary_book_folder">请选择保存本地书籍的文件夹。</string>
-    <string name="onboarding_summary_theme">在这里设置您喜爱的样式。</string>
-    <string name="onboarding_next_agree">阅读并同意</string>
-    <string name="onboarding_next_step">下一步</string>
-    <string name="onboarding_next_done">完成</string>
-    <string name="onboarding_restoring">恢复中…</string>
-    <string name="onboarding_jianguoyun_limit">由于坚果云限制列出文件数量，部分备份可能未显示，请及时清理旧备份</string>
-    <string name="onboarding_restore_error_dialog">WebDavError\n%1$s\n将从本地备份恢复。</string>
-    <string name="onboarding_webdav_restore_error">WebDav恢复出错\n%1$s</string>
-    <string name="onboarding_webdav_test_error">WebDavError\n%1$s</string>
-    <string name="onboarding_local_restore_error">本地恢复出错\n%1$s</string>
     <string name="top_bar_opacity">頂欄不透明度</string>
     <string name="top_bar_opacity_summary">%d</string>
     <string name="bottom_bar_opacity">底欄不透明度</string>
@@ -1637,7 +1611,6 @@
     <string name="eye_protection_end_time">結束時間</string>
     <string name="firebase_enable_summary">允許應用使用 Google Firebase 進行崩潰和效能報告</string>
     <string name="firebase_enable_title">匿名統計</string>
-    <string name="first_read">請先閱讀服務條款和用戶協議</string>
     <string name="fixed_book_type">鎖定書籍類型</string>
     <string name="fixed_book_type_summary">書籍更新時不覆蓋書籍類型</string>
     <string name="floating_bottom_bar">懸浮底部導航欄</string>
@@ -2158,7 +2131,6 @@
     <string name="weekday_thu">週四</string>
     <string name="weekday_tue">週二</string>
     <string name="weekday_wed">週三</string>
-    <string name="welcome_title">歡迎！</string>
 
     <!-- 日夜間/深淺色主題切換提醒 -->
     <string name="auto_switch_theme_reminder_title">主題模式切換提醒</string>

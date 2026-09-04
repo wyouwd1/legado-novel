@@ -56,11 +56,9 @@ import io.legado.app.ui.book.read.ReadBookInputHandler
 import io.legado.app.ui.book.read.ReadBookRouteHost
 import io.legado.app.ui.book.read.page.entities.PageDirection
 import io.legado.app.ui.theme.LocalAppUiConfiguration
-import io.legado.app.ui.welcome.WelcomeActivity
 import io.legado.app.ui.widget.dialog.TextDialog
 import io.legado.app.utils.LogUtils
 import io.legado.app.utils.showDialogFragment
-import io.legado.app.utils.startActivity
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -211,7 +209,6 @@ open class MainActivity : BaseComposeActivity() {
         restoredReadBookRoute = savedInstanceState?.restoreReadBookRoute()
         super.onCreate(savedInstanceState)
 
-        if (checkStartupRoute()) return
         val shouldAutoCheckUpdate = startupUpdateCheckGate.consume(
             otherSettingsGateway.currentSettings.autoCheckUpdateOnStart
         )
@@ -403,17 +400,6 @@ open class MainActivity : BaseComposeActivity() {
             ) {
                 MainNavigator.navigateBack(this@MainActivity, backStack)
             }
-        }
-    }
-
-    private fun checkStartupRoute(): Boolean {
-        return when {
-            LocalConfig.isFirstOpenApp -> {
-                startActivity<WelcomeActivity>()
-                finish()
-                true
-            }
-            else -> false
         }
     }
 

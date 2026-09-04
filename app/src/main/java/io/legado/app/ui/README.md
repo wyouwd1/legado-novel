@@ -22,5 +22,4 @@
 * rss\article 订阅条目界面
 * rss\read 订阅阅读界面
 * rss\source 订阅源界面
-* welcome 欢迎界面
 * widget 自定义插件

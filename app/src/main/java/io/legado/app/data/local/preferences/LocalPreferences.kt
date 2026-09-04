@@ -21,7 +21,6 @@ object LocalPreferencesKeys {
     val READ_URL_IN_BROWSER = booleanPreferencesKey("read_url_in_browser")
     val LAST_BACKUP = longPreferencesKey("last_backup")
     val PASSWORD = stringPreferencesKey("password")
-    val PRIVACY_POLICY_OK = booleanPreferencesKey("privacy_policy_ok")
     val PERMISSION_CHECKED = booleanPreferencesKey("permission_checked")
 
     // ENABLE_READ_RECORD也许需要换个地方存，但先放这

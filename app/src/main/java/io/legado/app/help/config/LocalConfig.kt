@@ -51,19 +51,6 @@ by appCtx.getSharedPreferences("local", Context.MODE_PRIVATE) {
             }
         }
 
-    var privacyPolicyOk: Boolean
-        get() = runBlocking {
-            localPreferencesRepository.getPreference(LocalPreferencesKeys.PRIVACY_POLICY_OK, false)
-                .first()
-        }
-        set(value) {
-            runBlocking {
-                localPreferencesRepository.updatePreference(
-                    LocalPreferencesKeys.PRIVACY_POLICY_OK, value
-                )
-            }
-        }
-
     var navExtended: Boolean
         get() = getBoolean(PreferKey.navExtended)
         set(value) {
