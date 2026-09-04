@@ -460,11 +460,27 @@ BookKnowledgeGateway，删除顺序：听书片先行）。
 | ⑥关联书籍 | 🔄 进行中 | — | — | — |
 | ③首页/发现 | ⏳ | — | — | — |
 | ⑧欢迎页 | ⏳ | — | — | — |
-| 收尾 | ⏳ | — | — | — |
+| 收尾 | **✅ 完成** | 9dcea46a0（pref XML 死体系 6 文件全删 + PreferKey 9 常量 + strings 100 条 + CLAUDE/AGENTS 同步） | 远程 gate17 全绿 + **clean 全量重打包**；web 前端 pnpm build ✓ | 见下 |
+
+## 9. 最终交付（基线 9db5ae6d0 → 终态，clean 全量构建实测）
+
+| 指标 | 基线 | 终态 | delta |
+|---|---|---|---|
+| APK arm64-v8a（debug） | 66,285,458 B | **60,234,845 B** | **−6,050,613 B（−9.13%）** |
+| APK armeabi-v7a | 65,825,280 B | 59,774,667 B | −6,050,613 B |
+| APK universal | 72,856,707 B | 66,806,094 B | −6,050,613 B |
+| 方法数（dex 头汇总） | 599,842 | **538,978** | **−60,864（−10.15%）** |
+| `:app` 主源码 | 1650 .kt / 289,778 行 | 1336 .kt / 222,620 行 | −314 文件 / −67,158 行 |
+| git 全程 | — | 604 文件 | +5,577 / −77,609 行 |
+| AppDatabase | 104（50 表） | **109（29 实体）** | DROP 14 表 + 2 组数据清理 |
 
 **执行基础设施**：本地仓库（源码真相，实施 agent 只编辑不构建）；远程 test-env-wifi（192.168.31.217，
 rsync 同步，排除 local.properties/app/build/.gradle；门禁命令 `./gradlew :app:compileAppDebugKotlin
 testAppDebugUnitTest lintAppDebug verifyConfigArchitecture assembleAppDebug --continue --no-configuration-cache`）。
 
-**已知遗留（非本任务范围）**：AnalyzeRuleFastPathReproTest 3 个用例 @Ignore（复现 main 既有 AnalyzeRule
-NativeObject 快捷路径 bug，与功能删除无关；main 修复后删 @Ignore 转正）。
+**已知遗留（后续可选切片，均不阻塞）**：
+- `lib/prefs/` 15 个自定义 Preference 类及关联 layout/drawable/arrays 随 pref XML 删除后失活（Release 资源收缩兜底）
+- AnalyzeRuleFastPathReproTest 3 用例 @Ignore（复现 main 既有 AnalyzeRule 快捷路径 bug，main 修复后删注解转正）
+- MigrationTest.kt（androidTest）仍为骨架，多版本迁移链未做真机演练
+- DB 109 升级链（104→…→109）未在真机/Instrumentation 实测，仅 schema 编译期校验
+- baselineProfiles 生成物含旧符号（构建时再生，未手改）
