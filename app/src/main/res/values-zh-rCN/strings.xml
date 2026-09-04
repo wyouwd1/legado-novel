@@ -62,7 +62,6 @@
     <string name="replace">替换</string>
     <string name="replace_purify">替换净化</string>
     <string name="custom_export_section">自定义Epub导出章节</string>
-    <string name="replace_purify_desc">配置替换净化规则</string>
     <string name="not_available">暂无</string>
     <string name="enable">启用</string>
     <string name="replace_purify_search">搜索</string>
@@ -94,10 +93,8 @@
     <string name="book_source_manage_desc">新建 • 导入 • 编辑或管理书源</string>
     <string name="setting">设置</string>
     <string name="theme_setting">外观</string>
-    <string name="theme_setting_s">主题 • 深色模式 • 界面设置</string>
     <string name="dash_gap">虚线间隔</string>
     <string name="other_setting">高级</string>
-    <string name="other_setting_s">语言 • 其他设置</string>
     <string name="about">关于</string>
     <string name="donate">捐赠</string>
     <string name="exit">退出</string>
@@ -149,7 +146,6 @@
     <string name="backup_error">备份出错</string>
     <string name="restore_error">恢复出错</string>
     <string name="web_dav_set">WebDav 设置</string>
-    <string name="web_dav_set_import_old">WebDav 设置 • 导入旧版本数据</string>
     <string name="backup">备份</string>
     <string name="restore">恢复</string>
     <string name="backup_permission">备份请给予存储权限</string>
@@ -797,7 +793,6 @@
     <string name="go_back">上级</string>
     <string name="tone_colour">在线朗读音色</string>
     <string name="select_count">已选 %1$d / %2$d</string>
-    <string name="show_rss">显示订阅</string>
     <string name="service_stop">服务已停止</string>
     <string name="service_start">正在启动服务\n具体信息请查看通知栏</string>
     <string name="default_path">默认路径</string>
@@ -898,8 +893,6 @@
     <string name="alouding_disable">全文朗读中不能朗读选中文字</string>
     <string name="read_body_to_lh">扩展到刘海</string>
     <string name="toc_updateing">更新目录中</string>
-    <string name="media_button_on_exit_title">全程响应耳机按键</string>
-    <string name="media_button_on_exit_summary">即使退出软件也响应耳机按键</string>
     <string name="contributors">开发人员</string>
     <string name="contact">联系我们</string>
     <string name="license">开源许可</string>
@@ -1013,18 +1006,13 @@
     <string name="about_summary">公众号【开源阅读软件】</string>
     <string name="read_record">阅读记录</string>
     <string name="del_read_record">删除阅读记录</string>
-    <string name="read_record_summary">阅读时间记录</string>
     <string name="local_tts">本地 TTS</string>
     <string name="thread_count">线程数</string>
     <string name="all_read_time">总阅读时间</string>
     <string name="un_select_all">全不选</string>
     <string name="import_str">导入</string>
     <string name="export_str">导出</string>
-    <string name="save_theme_config">保存主题配置</string>
-    <string name="save_day_theme_summary">保存主题配置以供调用和分享</string>
     <string name="save_night_theme_summary">保存夜间主题配置以供调用和分享</string>
-    <string name="theme_list">主题列表</string>
-    <string name="theme_list_summary">使用、保存、导入或分享主题</string>
     <string name="select_theme">切换默认主题</string>
     <string name="sort_by_lastUpdateTime">更新时间排序</string>
     <string name="search_content">全文搜索</string>
@@ -1112,7 +1100,6 @@
     <string name="hide">隐藏</string>
     <string name="hide_when_status_bar_show">状态栏显示时隐藏</string>
     <string name="reverse_toc">反转目录</string>
-    <string name="show_discovery">显示发现</string>
     <string name="main_navigation_settings">首页与导航</string>
     <string name="main_navigation_settings_summary">配置首页、发现、订阅、默认主页和导航栏图标</string>
     <string name="navigation_order">导航顺序</string>
@@ -1160,7 +1147,6 @@
     <string name="set_book_variable">设置书籍变量</string>
     <string name="summary">注释</string>
     <string name="cover_config">封面设置</string>
-    <string name="cover_config_summary">通用封面规则及默认封面样式</string>
     <string name="cover_show_name">显示书名</string>
     <string name="cover_show_name_summary">封面上显示书名</string>
     <string name="cover_show_author">显示作者</string>
@@ -1203,7 +1189,6 @@
     <string name="hide_all">全不显示</string>
 
     <string name="book_tree_uri_t">书籍保存位置</string>
-    <string name="book_tree_uri_s">从其它应用打开的书籍保存位置</string>
     <string name="select_book_folder">选择保存书籍的文件夹</string>
     <string name="user_agent">用户代理</string>
     <string name="bg_alpha">背景透明度</string>
@@ -1314,8 +1299,6 @@
     <string name="like_source">赞</string>
     <string name="not_like_source">踩</string>
     <string name="async_load_image">异步加载图片</string>
-    <string name="ignore_audio_focus_title">忽略音频焦点</string>
-    <string name="ignore_audio_focus_summary">允许与其他应用同时播放音频</string>
     <string name="refresh_sort">刷新分类</string>
     <string name="cover_decode_js">封面解密（coverDecodeJs）</string>
     <string name="net_no_group">网络未分组</string>
@@ -1369,7 +1352,6 @@
     <string name="create">新建</string>
     <string name="url_rule">Url规则 (urlRule)</string>
     <string name="show_rule">显示规则 (showRule)</string>
-    <string name="config_txt_toc_rule">配置 TXT 目录规则</string>
     <string name="keep_group">保留分组</string>
     <string name="server_config">服务器配置</string>
     <string name="config_ignore">配置忽略</string>
@@ -1390,7 +1372,6 @@
     <string name="agree">同意</string>
     <string name="refuse">拒绝</string>
     <string name="file_manage">文件管理</string>
-    <string name="file_manage_summary">管理私有文件夹的文件</string>
     <string name="create_folder">创建文件夹</string>
     <string name="allow_drop_down_refresh">允许下拉刷新</string>
     <string name="private_group">设为隐私分组</string>
@@ -1500,8 +1481,6 @@
     <string name="pause_read_aloud_while_phone_calls_title">来电期间暂停朗读</string>
     <string name="pause_read_aloud_while_phone_calls_summary">在通话期间暂停朗读，需要读取手机状态权限</string>
     <string name="read_aloud_read_phone_state_permission_rationale">阅读需要读取手机状态实现来电期间暂停朗读功能</string>
-    <string name="read_aloud_by_media_button_title">耳机按键启动朗读</string>
-    <string name="read_aloud_by_media_button_summary">通过耳机按键来启动朗读</string>
     <string name="group_sources_by_domain">按域名分组显示</string>
     <string name="theme_config">主题配置</string>
     <string name="enable_auto_page_scroll">开启自动翻页</string>
@@ -1682,7 +1661,6 @@
     <string name="transparent_theme_alarm">透明主题请于设置背景图片后设置</string>
     <string name="seed_color_summary">使用种子颜色生成主题颜色</string>
     <string name="seed_color">种子色</string>
-    <string name="custom_mode">自定义模式</string>
     <string name="be_swiped">仍可滑动切换页面</string>
     <string name="show_bottom_nav">显示导航栏</string>
     <string name="floating_bottom_bar">悬浮底栏</string>
@@ -1715,7 +1693,6 @@
     <string name="seed_photo_summary">使用图片生成主题颜色</string>
     <string name="seed_photo_alart">若需使用种子颜色，请取消种子图片选择</string>
     <string name="click_to_delete">点击以删除或更改</string>
-    <string name="tip_custom_mode">由于主题引擎依赖Monet，对于低于Android12的设备，动态取色与自定义主题不会生效。</string>
     <string name="restart_required_message">此更改需要重启应用才能生效，是否立即重启？</string>
     <string name="restart_later_message">更改将在下次启动应用时生效</string>
     <string name="search_select_group">选择书源分组</string>
@@ -1727,7 +1704,6 @@
     <string name="text_shadow_y">Y轴距离</string>
     <string name="text_shadow_radius">阴影半径</string>
     <string name="text_shadow_color">阴影</string>
-    <string name="global_read_setting">阅读显示 • 漫画相关</string>
     <string name="screen_settings">屏幕显示与亮度</string>
     <string name="refresh_limit_books">%1$d 本</string>
     <string name="reading_behavior">阅读行为</string>
@@ -1801,7 +1777,6 @@
     <string name="reverse_volume_key_page">反转音量键翻页方向</string>
     <string name="palette_style">调色板样式</string>
     <string name="material_version">颜色规格</string>
-    <string name="tip_compose_set">这里的选项仅可以控制使用Compose重写的界面。对于禁用的选项，会在日后实现时开放，现在仅作占位。</string>
     <string name="is_blur_enable">启用控件模糊</string>
     <string name="use_underline">总是使用下划线表示强调文本</string>
     <string name="adapt_special_style">适配特殊样式</string>

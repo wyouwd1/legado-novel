@@ -78,14 +78,14 @@ This is a Material Design 3 fork of [Legado](https://github.com/gedoor/legado). 
 
 | Layer | Package | Role |
 |---|---|---|
-| Data | `data/` | Room DB (`AppDatabase`, version 85, ~22 DAOs, ~25 entities), repository implementations |
+| Data | `data/` | Room DB (`AppDatabase`, version 109, 26 DAOs, 29 entities), repository implementations |
 | Domain | `domain/` | Gateway interfaces, use cases (14), domain models — no framework dependencies |
 | UI | `ui/` | Jetpack Compose screens, Navigation 3 routes, ViewModels |
 
 Additional top-level packages:
 - **`help/`** — Infrastructure "glue": HTTP (OkHttp + Cronet), book content processing, backup/WebDAV, JS engine, config
-- **`model/`** — Runtime state coordinators (not entities): `ReadBook`, `AudioPlay`, `CacheBook`, `BookCover`, etc.
-- **`service/`** — Android foreground/background services (audio playback, TTS, download, web server)
+- **`model/`** — Runtime state coordinators (not entities): `ReadBook`, `CacheBook`, `BookCover`, etc.
+- **`service/`** — Android foreground/background services (download, cache book, web server, book source check, book export)
 - **`web/`** — Embedded HTTP server (Ktor) for remote bookshelf/source editing
 - **`lib/`** — Third-party library wrappers (MOBI parser, WebDAV client, legacy View theme system, cronet)
 - **`base/`** — Abstract Activity/Fragment/ViewModel base classes
@@ -103,7 +103,7 @@ startKoin {
 }
 ```
 
-- **`di/appDatabaseModule.kt`** — Singleton `AppDatabase` + factory bindings for all 22 DAOs
+- **`di/appDatabaseModule.kt`** — Singleton `AppDatabase` + factory bindings for 25 of the 26 DAOs (the last one, `SearchContentHistoryDao`, is a `single` in `appModule`)
 - **`di/appModule.kt`** — Singletons (repositories, use cases, gateways, Coil `ImageLoader`), `viewModelOf` / `viewModel { }` for all ViewModels, some parameterized definitions
 
 Gateways are bound to their repository implementations explicitly (e.g., `single<LocalBookGateway> { LocalBookRepository(get()) }`), not through `singleOf`.
@@ -363,7 +363,7 @@ For detailed Compose review conventions and migration patterns, see
 
 ## Rhino JavaScript Engine
 
-Book sources, RSS sources, and HTTP TTS use JavaScript rules. `initRhino()` in `App.kt` registers `NativeBaseSource` wrappers for `BookSource`, `RssSource`, `HttpTTS` (writable JS objects) and `ReadOnlyJavaObject` wrappers for rule entities. Rule parsing logic lives in `help/source/` and `model/analyzeRule/`.
+Book sources and RSS sources use JavaScript rules. `initRhino()` in `App.kt` registers `NativeBaseSource` wrappers for `BookSource` and `RssSource` (writable JS objects) and `ReadOnlyJavaObject` wrappers for rule entities. Rule parsing logic lives in `help/source/` and `model/analyzeRule/`.
 
 ## Important Constraints
 

@@ -63,7 +63,6 @@
     <string name="custom_export_section">Custom export chapter of epub</string>
     <string name="replace">Replace</string>
     <string name="replace_purify">Replacement Rules</string>
-    <string name="replace_purify_desc">Configure replacement rules</string>
     <string name="not_available">Not available now</string>
     <string name="enable">Enable</string>
     <string name="replace_purify_search">Search Replacement</string>
@@ -95,7 +94,6 @@
     <string name="book_source_manage_desc">Create/Import/Edit/Manage Book Sources</string>
     <string name="setting">Settings</string>
     <string name="theme_setting">Theme Settings</string>
-    <string name="theme_setting_s">Some settings related to interface or color</string>
     <string name="personalization_setting">Advanced Personalization</string>
     <string name="personalization_setting_s">Fine-tune fonts and other appearance details</string>
     <string name="theme_pack">Theme Management</string>
@@ -125,7 +123,6 @@
     <string name="dashed_border">Dashed</string>
     <string name="dash_gap">Dash Gap</string>
     <string name="other_setting">Other Settings</string>
-    <string name="other_setting_s">Language • Other Settings</string>
     <string name="about">About</string>
     <string name="donate">Donations</string>
     <string name="exit">Exit</string>
@@ -179,7 +176,6 @@
     <string name="backup_error">Backup failed</string>
     <string name="restore_error">Restore failed</string>
     <string name="web_dav_set">WebDAV settings</string>
-    <string name="web_dav_set_import_old">WebDAV settings • Import legacy data</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
     <string name="backup_permission">Backup needs storage permission</string>
@@ -828,7 +824,6 @@
     <string name="go_back">Go back</string>
     <string name="tone_colour">Online Speech tone</string>
     <string name="select_count">(%1$d/%2$d)</string>
-    <string name="show_rss">Show RSS Feeds</string>
     <string name="service_stop">Service stopped</string>
     <string name="service_start">Starting service\nChecking notification bar for details</string>
     <string name="default_path">Default path</string>
@@ -930,8 +925,6 @@
     <string name="alouding_disable">The selected text cannot be spoken in full text speech</string>
     <string name="read_body_to_lh">Extend to Cutout</string>
     <string name="toc_updateing">Updating Chapters</string>
-    <string name="media_button_on_exit_title">Headset Buttons Always Available</string>
-    <string name="media_button_on_exit_summary">Headset buttons are available even exit the app.</string>
     <string name="contributors">Contributors</string>
     <string name="contact">Contact</string>
     <string name="license">License</string>
@@ -1044,18 +1037,13 @@
     <string name="about_summary">WeChat official account [Open Source Reading]</string>
     <string name="read_record">Read Record</string>
     <string name="del_read_record">Delete Read record</string>
-    <string name="read_record_summary">Read record summary</string>
     <string name="local_tts">Local TTS</string>
     <string name="thread_count">Thread count</string>
     <string name="all_read_time">Total read time</string>
     <string name="un_select_all">Unselect all</string>
     <string name="import_str">Import</string>
     <string name="export_str">Export</string>
-    <string name="save_theme_config">Save Theme Config</string>
-    <string name="save_day_theme_summary">Save day theme config</string>
     <string name="save_night_theme_summary">Save night theme config</string>
-    <string name="theme_list">Theme List</string>
-    <string name="theme_list_summary">Save, Import, Share theme</string>
     <string name="select_theme">Switch default theme</string>
     <string name="sort_by_lastUpdateTime">Sort by update time</string>
     <string name="sort_by_respondTime">Sort by respond time</string>
@@ -1148,7 +1136,6 @@
     <string name="hide">Hide</string>
     <string name="hide_when_status_bar_show">Hide when status bar show</string>
     <string name="reverse_toc">Reverse toc</string>
-    <string name="show_discovery">Show Discovery</string>
     <string name="main_navigation_settings">Home and navigation</string>
     <string name="main_navigation_settings_summary">Configure Home, Discovery, Subscriptions, start page, and navigation icons</string>
     <string name="navigation_order">Navigation order</string>
@@ -1199,7 +1186,6 @@
     <string name="set_book_variable">Set book variable</string>
     <string name="summary">summary</string>
     <string name="cover_config">Cover Config</string>
-    <string name="cover_config_summary">Generic Cover Rules and Default Cover Style</string>
     <string name="cover_show_name">Show Name</string>
     <string name="cover_show_name_summary">Book title shown on cover</string>
     <string name="cover_show_author">Show Author</string>
@@ -1244,7 +1230,6 @@
     <string name="hide_all">Hide All</string>
 
     <string name="book_tree_uri_t">Book Save Location</string>
-    <string name="book_tree_uri_s">Save location for books opened from other apps</string>
     <string name="select_book_folder">Select the folder where the books are saved</string>
     <string name="user_agent">User Agent</string>
     <string name="bg_alpha">Background alpha</string>
@@ -1371,8 +1356,6 @@
     <string name="like_source">Like</string>
     <string name="not_like_source">Not like</string>
     <string name="async_load_image">Load pictures asynchronously</string>
-    <string name="ignore_audio_focus_title">Ignore Audio Focus</string>
-    <string name="ignore_audio_focus_summary">Allow audio to be played at the same time as other applications</string>
     <string name="refresh_sort">Refresh sort</string>
     <string name="cover_decode_js">Decode Cover Js(coverDecodeJs)</string>
     <string name="net_no_group">Network ungrouped</string>
@@ -1434,7 +1417,6 @@
     <string name="create">Create</string>
     <string name="url_rule">URL Rule (urlRule)</string>
     <string name="show_rule">Display Rule (showRule)</string>
-    <string name="config_txt_toc_rule">Configure txt catalog rules</string>
     <string name="keep_group">Keep group</string>
     <string name="server_config">Server Configuration</string>
     <string name="config_ignore">Config Ignore</string>
@@ -1455,7 +1437,6 @@
     <string name="agree">Agree</string>
     <string name="refuse">Refuse</string>
     <string name="file_manage">File Management</string>
-    <string name="file_manage_summary">Managing files in the application\'s private folder</string>
     <string name="create_folder">Create Folder</string>
     <string name="allow_drop_down_refresh">Allow drop-down refresh</string>
     <string name="private_group">Set as private group</string>
@@ -1559,8 +1540,6 @@
     <string name="pause_read_aloud_while_phone_calls_title">Pause Reading Aloud During Calls</string>
     <string name="pause_read_aloud_while_phone_calls_summary">Pause reading aloud during calls, requires phone state permission</string>
     <string name="read_aloud_read_phone_state_permission_rationale">Reading requires phone state access to pause reading aloud during calls</string>
-    <string name="read_aloud_by_media_button_title">Start Read Aloud via Headset Buttons</string>
-    <string name="read_aloud_by_media_button_summary">Use headset buttons to start reading aloud</string>
     <string name="group_sources_by_domain">Group Sources by Domain</string>
     <string name="theme_config">Theme Configuration</string>
     <string name="enable_auto_page_scroll">Enable Auto Page Flip</string>
@@ -1737,7 +1716,6 @@
     <string name="transparent_theme_alarm">Please set the transparent theme after setting a background image.</string>
     <string name="seed_color_summary">Create a theme from a seed color</string>
     <string name="seed_color">Seed Color</string>
-    <string name="custom_mode">Custom Mode</string>
     <string name="be_swiped">Pages can still be swiped</string>
     <string name="show_bottom_nav">Show Navigation Bar</string>
     <string name="floating_bottom_bar">Floating Bottom Bar</string>
@@ -1770,7 +1748,6 @@
     <string name="seed_photo_summary">Generate theme colors from an image</string>
     <string name="seed_photo_alart">To use a seed color, clear the selected seed image first</string>
     <string name="click_to_delete">Click to delete or change</string>
-    <string name="tip_custom_mode">The theme engine depends on Monet. Dynamic colors and custom themes do not take effect on devices below Android 12.</string>
     <string name="restart_required_message">Changing this option requires a restart</string>
     <string name="restart_later_message">Restart Later</string>
     <string name="search_select_group">Select Book Source Group</string>
@@ -1782,7 +1759,6 @@
     <string name="text_shadow_y">Y Offset</string>
     <string name="text_shadow_radius">Shadow Radius</string>
     <string name="text_shadow_color">Shadow</string>
-    <string name="global_read_setting">Reading Display • Manga</string>
     <string name="screen_settings">Display and Brightness</string>
     <string name="refresh_limit_unlimited">Unlimited</string>
     <string name="refresh_limit_books">%1$d Books</string>
@@ -1858,7 +1834,6 @@
     <string name="reverse_volume_key_page">Reverse Volume-Key Page Turn Direction</string>
     <string name="palette_style">Palette Style</string>
     <string name="material_version">Color Specification</string>
-    <string name="tip_compose_set">These options only affect screens rewritten in Compose. Disabled options are placeholders and will be enabled after implementation.</string>
     <string name="is_blur_enable">Enable Element Blur</string>
     <string name="use_underline">Always Use Underline for Emphasized Text</string>
     <string name="adapt_special_style">Adapt Special Styles</string>
