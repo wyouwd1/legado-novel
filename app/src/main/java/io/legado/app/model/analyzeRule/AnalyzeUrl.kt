@@ -3,7 +3,6 @@ package io.legado.app.model.analyzeRule
 import android.annotation.SuppressLint
 import android.util.Base64
 import androidx.annotation.Keep
-import androidx.media3.common.MediaItem
 import com.bumptech.glide.load.model.GlideUrl
 import com.script.buildScriptBindings
 import com.script.rhino.RhinoScriptEngine
@@ -19,7 +18,6 @@ import io.legado.app.help.CacheManager
 import io.legado.app.help.ConcurrentRateLimiter
 import io.legado.app.help.JsExtensions
 import io.legado.app.help.crypto.toHexString
-import io.legado.app.help.exoplayer.ExoPlayerHelper
 import io.legado.app.help.glide.GlideHeaders
 import io.legado.app.help.http.BackstageWebView
 import io.legado.app.help.http.CookieManager
@@ -801,10 +799,6 @@ class AnalyzeUrl(
         }
 
         val customIp by lazy { ConcurrentHashMap<String, String>() }
-        fun AnalyzeUrl.getMediaItem(): MediaItem {
-            setCookie()
-            return ExoPlayerHelper.createMediaItem(url, headerMap)
-        }
 
     }
 

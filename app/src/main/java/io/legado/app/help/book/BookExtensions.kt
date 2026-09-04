@@ -54,9 +54,6 @@ private val importBookGateway by lazy { GlobalContext.get().get<ImportBookSettin
 private val readGateway by lazy { GlobalContext.get().get<ReadSettingsGateway>() }
 private val exportGateway by lazy { GlobalContext.get().get<BookExportSettingsGateway>() }
 
-val Book.isAudio: Boolean
-    get() = isType(BookType.audio)
-
 val Book.isImage: Boolean
     get() = isType(BookType.image)
 
@@ -118,7 +115,6 @@ fun Book.getBookTypeName(): String {
         isUmd        -> "UMD"
         isPdf        -> "PDF"
         isMobi       -> "MOBI"
-        isAudio      -> "有声书"
         isImage      -> "漫画"
         isOnLineTxt  -> "小说"
         isWebFile    -> "网页文件"
@@ -323,7 +319,7 @@ fun Book.upType() {
     if (type < 8) {
         type = when (type) {
             BookSourceType.image -> BookType.image
-            BookSourceType.audio -> BookType.audio
+            BookSourceType.audio -> BookType.text
             BookSourceType.file -> BookType.webFile
             else -> BookType.text
         }

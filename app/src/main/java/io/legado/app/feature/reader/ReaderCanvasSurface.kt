@@ -956,7 +956,7 @@ fun ReaderCanvasSurface(
                     windowProvider = { currentPageWindow() },
                     offsetYState = scrollOffsetState,
                     selection = selectionColor,
-                    readAloud = textAccentColor,
+                    accentColor = textAccentColor,
                     selectionProvider = { textSelection },
                     cachedImage = cachedImage,
                     loadImage = loadImage,
@@ -1102,7 +1102,7 @@ private fun ScrollPageStack(
     windowProvider: () -> ReaderPageWindow,
     offsetYState: androidx.compose.runtime.MutableFloatState,
     selection: Color,
-    readAloud: Color,
+    accentColor: Color,
     selectionProvider: () -> ReaderSelection?,
     cachedImage: (ReaderElement.Image) -> Bitmap?,
     loadImage: suspend (ReaderElement.Image) -> Bitmap?,
@@ -1165,7 +1165,7 @@ private fun ScrollPageStack(
                     .mergeSelectionBounds()
             } else emptyList()
             withTransform({ translate(0f, stackOffsetY) }) {
-                drawScrollPageContent(page, data, selection, readAloud, activeSelection, selectedBounds)
+                drawScrollPageContent(page, data, selection, accentColor, activeSelection, selectedBounds)
             }
         }
         window.previous?.let { drawOne(it, -it.scrollExtentPx) }
@@ -1178,7 +1178,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScrollPageConte
     page: ReaderPage,
     data: ScrollPageDrawData,
     selection: Color,
-    readAloud: Color,
+    accentColor: Color,
     activeSelection: ReaderSelection?,
     selectedBounds: List<ReaderRect>,
 ) {
@@ -1203,7 +1203,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScrollPageConte
     page.elements.forEach { e -> when (e) {
         is ReaderElement.Text -> {
             val paint = data.paints.getValue(e.style)
-            paint.color = e.resolvedColorArgb(readAloud.toArgb())
+            paint.color = e.resolvedColorArgb(accentColor.toArgb())
             paint.isUnderlineText = e.style.nativeUnderline || e.drawsLinkUnderline
             native.drawText(e.value, e.bounds.left, e.baselinePx, paint)
         }
@@ -1260,7 +1260,7 @@ private fun SimulationPageStack(
     backgroundImage: Drawable?,
     backgroundImageAlpha: Float,
     selection: Color,
-    readAloud: Color,
+    accentColor: Color,
     activeSelection: ReaderSelection?,
     cachedImage: (ReaderElement.Image) -> Bitmap?,
     loadImage: suspend (ReaderElement.Image) -> Bitmap?,
@@ -1282,7 +1282,7 @@ private fun SimulationPageStack(
             )
         }
         if (frame == null) {
-            ReaderPageCanvas(basePage, background, backgroundImage, backgroundImageAlpha, selection, readAloud, Modifier.fillMaxSize(), activeSelection, cachedImage, loadImage)
+            ReaderPageCanvas(basePage, background, backgroundImage, backgroundImageAlpha, selection, accentColor, Modifier.fillMaxSize(), activeSelection, cachedImage, loadImage)
             return@BoxWithConstraints
         }
         val paths = remember(frame, width, height) { frame.renderPaths(width, height) }
@@ -1294,7 +1294,7 @@ private fun SimulationPageStack(
             baseLayer.record { this@drawWithContent.drawContent() }
             clipPath(path0, ClipOp.Difference) { drawLayer(baseLayer) }
         }) {
-            ReaderPageCanvas(basePage, background, backgroundImage, backgroundImageAlpha, selection, readAloud, Modifier.fillMaxSize(), activeSelection, cachedImage, loadImage)
+            ReaderPageCanvas(basePage, background, backgroundImage, backgroundImageAlpha, selection, accentColor, Modifier.fillMaxSize(), activeSelection, cachedImage, loadImage)
         }
         Box(Modifier.fillMaxSize().drawWithContent {
             clipPath(path0) { clipPath(pathNext) {
@@ -1302,7 +1302,7 @@ private fun SimulationPageStack(
                 drawCurlBackShadow(frame)
             } }
         }) {
-            ReaderPageCanvas(revealPage, background, backgroundImage, backgroundImageAlpha, selection, readAloud, Modifier.fillMaxSize(), activeSelection, cachedImage, loadImage)
+            ReaderPageCanvas(revealPage, background, backgroundImage, backgroundImageAlpha, selection, accentColor, Modifier.fillMaxSize(), activeSelection, cachedImage, loadImage)
         }
         Canvas(Modifier.fillMaxSize()) {
             clipPath(path0) { clipPath(pathBack) {
@@ -1422,7 +1422,7 @@ private fun ReaderPageCanvas(
     backgroundImage: Drawable?,
     backgroundImageAlpha: Float,
     selection: Color,
-    readAloud: Color,
+    accentColor: Color,
     modifier: Modifier,
     activeSelection: ReaderSelection?,
     cachedImage: (ReaderElement.Image) -> Bitmap?,
@@ -1524,7 +1524,7 @@ private fun ReaderPageCanvas(
         page.elements.forEach { e -> when (e) {
             is ReaderElement.Text -> {
                 val paint = paints.getValue(e.style)
-                paint.color = e.resolvedColorArgb(readAloud.toArgb())
+                paint.color = e.resolvedColorArgb(accentColor.toArgb())
                 paint.isUnderlineText = e.style.nativeUnderline || e.drawsLinkUnderline
                 native.drawText(e.value, e.bounds.left, e.baselinePx, paint)
             }

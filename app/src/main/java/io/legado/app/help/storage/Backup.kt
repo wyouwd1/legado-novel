@@ -78,7 +78,6 @@ object Backup {
             "searchHistory.json",
             "sourceSub.json",
             "txtTocRule.json",
-            "httpTTS.json",
             "keyboardAssists.json",
             "dictRule.json",
             "homepageModules.json",
@@ -180,9 +179,6 @@ object Backup {
         }
         if (BackupConfig.dbIsNotIgnored("txtTocRule", true)) {
             writeListToJson(appDb.txtTocRuleDao.all, "txtTocRule.json", backupPath)
-        }
-        if (BackupConfig.dbIsNotIgnored("httpTTS", true)) {
-            writeListToJson(appDb.httpTTSDao.all, "httpTTS.json", backupPath)
         }
         if (BackupConfig.dbIsNotIgnored("keyboardAssists", true)) {
             writeListToJson(appDb.keyboardAssistsDao.all, "keyboardAssists.json", backupPath)

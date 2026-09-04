@@ -40,7 +40,6 @@ data class ReadSettings(
     val autoChangeSource: Boolean = true,
     val autoSuggestDayNight: Boolean = false,
     val readingAnchorEnabled: Boolean = true,
-    val readAloudDetachReminderEnabled: Boolean = false,
     val selectText: Boolean = true,
     val noAnimScrollPage: Boolean = false,
     val clickImgWay: String = "2",

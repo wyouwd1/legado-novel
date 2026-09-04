@@ -31,7 +31,6 @@ data class BookGroup(
         const val IdRoot = -100L
         const val IdAll = -1L
         const val IdLocal = -2L
-        const val IdAudio = -3L
         const val IdNetNone = -4L
         const val IdLocalNone = -5L
         const val IdManga = -7L
@@ -52,7 +51,6 @@ data class BookGroup(
     fun getManageName(context: Context): GroupNameInfo {
         return when (groupId) {
             IdAll -> GroupNameInfo(groupName, context.getString(R.string.all))
-            IdAudio -> GroupNameInfo(groupName, context.getString(R.string.audio))
             IdLocal -> GroupNameInfo(groupName, context.getString(R.string.local))
             IdNetNone -> GroupNameInfo(groupName, context.getString(R.string.net_no_group))
             IdLocalNone -> GroupNameInfo(groupName, context.getString(R.string.local_no_group))

@@ -39,7 +39,6 @@ interface BookDao {
             BookGroup.IdRoot -> flowRoot()
             BookGroup.IdAll -> flowAll()
             BookGroup.IdLocal -> flowLocal()
-            BookGroup.IdAudio -> flowAudio()
             BookGroup.IdNetNone -> flowNetNoGroup()
             BookGroup.IdLocalNone -> flowLocalNoGroup()
             BookGroup.IdManga -> flowManga()
@@ -61,7 +60,6 @@ interface BookDao {
             BookGroup.IdRoot -> flowBookShelfRoot()
             BookGroup.IdAll -> flowBookShelf()
             BookGroup.IdLocal -> flowBookShelfLocal()
-            BookGroup.IdAudio -> flowBookShelfAudio()
             BookGroup.IdNetNone -> flowBookShelfNetNoGroup()
             BookGroup.IdLocalNone -> flowBookShelfLocalNoGroup()
             BookGroup.IdManga -> flowBookShelfManga()
@@ -164,42 +162,6 @@ interface BookDao {
     )
     fun flowBookShelf(): Flow<List<BookShelfItem>>
 
-    @Query("SELECT * FROM books WHERE type & ${BookType.audio} > 0")
-    fun flowAudio(): Flow<List<Book>>
-
-    @Query(
-        """
-        SELECT 
-            bookUrl,
-            name,
-            author,
-            origin,
-            originName,
-            coverUrl,
-            customCoverUrl,
-            durChapterTitle,
-            durChapterTime,
-            durChapterPos,
-            latestChapterTitle,
-            latestChapterTime,
-            lastCheckCount,
-            totalChapterNum,
-            durChapterIndex,
-            type,
-            `group`,
-            `order`,
-            canUpdate,
-            ifnull(customIntro, ifnull(listIntro, intro)) as intro,
-            kind,
-            customTag,
-            wordCount
-        FROM books
-        WHERE type & ${BookType.audio} > 0
-        AND $PUBLIC_BOOK_FILTER
-        """
-    )
-    fun flowBookShelfAudio(): Flow<List<BookShelfItem>>
-
     @Query("SELECT * FROM books WHERE type & ${BookType.local} > 0")
     fun flowLocal(): Flow<List<Book>>
 
@@ -238,7 +200,7 @@ interface BookDao {
 
     @Query(
         """
-        select * from books where type & ${BookType.audio} = 0 and type & ${BookType.local} = 0
+        select * from books where type & ${BookType.local} = 0
         and ((SELECT sum(groupId) FROM book_groups where groupId > 0) & `group`) = 0
         """
     )
@@ -271,7 +233,7 @@ interface BookDao {
             customTag,
             wordCount
         FROM books 
-        where type & ${BookType.audio} = 0 and type & ${BookType.local} = 0
+        where type & ${BookType.local} = 0
         and ($PUBLIC_GROUP_MASK & `group`) = 0
         and $PUBLIC_BOOK_FILTER
         """
@@ -705,7 +667,6 @@ interface BookDao {
         SELECT
             bookUrl,
             type & ${BookType.local} > 0 AS isLocal,
-            type & ${BookType.audio} > 0 AS isAudio,
             durChapterIndex,
             totalChapterNum - 1 AS lastChapterIndex
         FROM books
@@ -838,9 +799,8 @@ interface BookDao {
             AND $PUBLIC_BOOK_FILTER
             AND (SELECT show FROM book_groups WHERE groupId = ${BookGroup.IdNetNone}) != 1
         UNION ALL SELECT ${BookGroup.IdLocal}, COUNT(*) FROM books WHERE type & ${BookType.local} > 0 AND $PUBLIC_BOOK_FILTER
-        UNION ALL SELECT ${BookGroup.IdAudio}, COUNT(*) FROM books WHERE type & ${BookType.audio} > 0 AND $PUBLIC_BOOK_FILTER
         UNION ALL SELECT ${BookGroup.IdNetNone}, COUNT(*) FROM books
-            WHERE type & ${BookType.audio} = 0 AND type & ${BookType.local} = 0
+            WHERE type & ${BookType.local} = 0
             AND ($PUBLIC_GROUP_MASK & `group`) = 0
             AND $PUBLIC_BOOK_FILTER
         UNION ALL SELECT ${BookGroup.IdLocalNone}, COUNT(*) FROM books
@@ -873,7 +833,6 @@ interface BookDao {
             BookGroup.IdRoot -> flowBookShelfRootPreview()
             BookGroup.IdAll -> flowBookShelfPreview()
             BookGroup.IdLocal -> flowBookShelfLocalPreview()
-            BookGroup.IdAudio -> flowBookShelfAudioPreview()
             BookGroup.IdNetNone -> flowBookShelfNetNoGroupPreview()
             BookGroup.IdLocalNone -> flowBookShelfLocalNoGroupPreview()
             BookGroup.IdManga -> flowBookShelfMangaPreview()
@@ -951,24 +910,7 @@ interface BookDao {
             type, `group`, `order`, canUpdate,
             ifnull(customIntro, ifnull(listIntro, intro)) as intro, kind, customTag, wordCount
         FROM books
-        WHERE type & ${BookType.audio} > 0
-            AND $PUBLIC_BOOK_FILTER
-        ORDER BY durChapterTime DESC
-        LIMIT 10
-        """
-    )
-    fun flowBookShelfAudioPreview(): Flow<List<BookShelfItem>>
-
-    @Query(
-        """
-        SELECT bookUrl, name, author, origin, originName,
-            coverUrl, customCoverUrl, durChapterTitle, durChapterTime,
-            durChapterPos, latestChapterTitle, latestChapterTime,
-            lastCheckCount, totalChapterNum, durChapterIndex,
-            type, `group`, `order`, canUpdate,
-            ifnull(customIntro, ifnull(listIntro, intro)) as intro, kind, customTag, wordCount
-        FROM books
-        WHERE type & ${BookType.audio} = 0 AND type & ${BookType.local} = 0
+        WHERE type & ${BookType.local} = 0
             AND ($PUBLIC_GROUP_MASK & `group`) = 0
             AND $PUBLIC_BOOK_FILTER
         ORDER BY durChapterTime DESC

@@ -21,7 +21,6 @@ data class OtherSettings(
     val processText: Boolean = true,
     val recordLog: Boolean = false,
     val recordHeapDump: Boolean = false,
-    val audioPlayUseWakeLock: Boolean = false,
     val importKeepName: Boolean = false,
     val importKeepGroup: Boolean = false,
     val importKeepEnable: Boolean = false,

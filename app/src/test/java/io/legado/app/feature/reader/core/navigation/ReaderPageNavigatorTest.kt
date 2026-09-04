@@ -131,7 +131,7 @@ class ReaderPageNavigatorTest {
     }
 
     @Test
-    fun titleOffsetsDoNotBecomeBodyBookmarkOrReadAloudOffsets() {
+    fun titleOffsetsDoNotBecomeBodyOffsets() {
         val body = (page(0, 0).elements.single() as ReaderElement.Text).copy(paragraphIndex = 1)
         val title = body.copy(emphasized = true, chapterPosition = 50, paragraphIndex = 0)
         val page = page(0, 0).copy(elements = listOf(title, body))

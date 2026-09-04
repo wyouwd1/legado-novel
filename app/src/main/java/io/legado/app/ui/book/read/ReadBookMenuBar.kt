@@ -74,7 +74,6 @@ import io.legado.app.R
 import io.legado.app.constant.ReadMenuBlurMode
 import io.legado.app.data.repository.ReadPreferences
 import io.legado.app.ui.book.read.sheet.AutoReadContent
-import io.legado.app.ui.book.read.sheet.ReadAloudContent
 import io.legado.app.ui.book.read.sheet.ReadStyleContent
 import io.legado.app.ui.book.read.sheet.TypographyPage
 import io.legado.app.ui.book.read.sheet.TypographySection
@@ -703,36 +702,6 @@ private fun ReadBookMenuSurface(
                                 onOpenUnderlineConfig = {},
                                 onOpenHighlightRule = {},
                                 section = TypographySection.Padding,
-                            )
-                        }
-                    }
-
-                    ReadBookMenuRoute.ReadAloud -> {
-                        ReadBookMenuRoutePage(
-                            title = stringResource(R.string.aloud_config),
-                            maxHeight = maxHeight,
-                            scrollContent = true,
-                            bottomPadding = if (extendSurfaceToNavigationBar) navBarHeight else 0.dp,
-                            onBack = { onIntent(ReadBookIntent.ReadMenuBack) },
-                        ) {
-                            ReadAloudContent(
-                                state = state,
-                                onIntent = onIntent,
-                                onDismissRequest = { onIntent(ReadBookIntent.HideMenu) },
-                                onOpenChapterList = {
-                                    onIntent(ReadBookIntent.HideMenu)
-                                    onIntent(ReadBookIntent.OpenChapterList)
-                                },
-                                onGoToBackground = {
-                                    onIntent(ReadBookIntent.CloseReadBook(keepReadAloud = true))
-                                },
-                                onOpenMainMenu = {
-                                    onIntent(ReadBookIntent.ReadMenuBack)
-                                },
-                                onShowReadAloudConfig = {
-                                    onIntent(ReadBookIntent.ShowReadAloudConfig)
-                                },
-                                modifier = Modifier.padding(horizontal = 16.dp)
                             )
                         }
                     }

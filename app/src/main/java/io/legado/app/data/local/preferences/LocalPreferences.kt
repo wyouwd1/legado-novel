@@ -27,8 +27,6 @@ object LocalPreferencesKeys {
     val PRIVACY_POLICY_OK = booleanPreferencesKey("privacy_policy_ok")
     val PERMISSION_CHECKED = booleanPreferencesKey("permission_checked")
     val DAILY_READING_GOAL_MINUTES = intPreferencesKey("daily_reading_goal_minutes")
-    val READ_ALOUD_CAPSULE_OFFSET_X = floatPreferencesKey("read_aloud_capsule_offset_x")
-    val READ_ALOUD_CAPSULE_OFFSET_Y = floatPreferencesKey("read_aloud_capsule_offset_y")
 
     // ENABLE_READ_RECORD也许需要换个地方存，但先放这
     val ENABLE_READ_RECORD = booleanPreferencesKey("enableReadRecord")

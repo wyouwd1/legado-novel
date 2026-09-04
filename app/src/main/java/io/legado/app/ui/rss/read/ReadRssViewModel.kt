@@ -16,7 +16,6 @@ import io.legado.app.data.repository.RssRepository
 import io.legado.app.domain.gateway.AppShellSettingsGateway
 import io.legado.app.domain.gateway.DownloadCacheSettingsGateway
 import io.legado.app.exception.NoStackTraceException
-import io.legado.app.help.TTS
 import io.legado.app.help.http.newCallResponseBody
 import io.legado.app.help.http.okHttpClient
 import io.legado.app.help.webView.WebJsExtensions
@@ -71,7 +70,6 @@ class ReadRssViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ReadRssSettings())
     var rssSource: RssSource? = null
     var rssArticle: RssArticle? = null
-    var tts: TTS? = null
     var hasPreloadJs = false
     var headerMap: Map<String, String> = emptyMap()
     private var isStartPage = false
@@ -81,9 +79,6 @@ class ReadRssViewModel(
 
     private val _urlState = MutableStateFlow<AnalyzeUrl?>(null)
     val urlState: StateFlow<AnalyzeUrl?> = _urlState.asStateFlow()
-
-    private val _isSpeakingState = MutableStateFlow(false)
-    val isSpeakingState: StateFlow<Boolean> = _isSpeakingState.asStateFlow()
 
     private val _rssStarState = MutableStateFlow<RssStar?>(null)
     val rssStarState: StateFlow<RssStar?> = _rssStarState.asStateFlow()
@@ -353,29 +348,6 @@ class ReadRssViewModel(
         }
     }
 
-    @Synchronized
-    fun readAloud(text: String) {
-        if (tts == null) {
-            tts = TTS().apply {
-                setSpeakStateListener(object : TTS.SpeakStateListener {
-                    override fun onStart() {
-                        _isSpeakingState.value = true
-                    }
-
-                    override fun onDone() {
-                        _isSpeakingState.value = false
-                    }
-                })
-            }
-        }
-        tts?.speak(text)
-    }
-
-    fun stopReadAloud() {
-        tts?.stop()
-        _isSpeakingState.value = false
-    }
-
     fun updateRssSourceRedirectPolicy(sourceUrl: String, redirectPolicy: String) {
         execute {
             rssRepository.updateRedirectPolicy(sourceUrl, redirectPolicy)
@@ -383,10 +355,5 @@ class ReadRssViewModel(
         }.onError {
             appCtx.toastOnUi("保存失败: ${it.localizedMessage}")
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        tts?.clearTts()
     }
 }

@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import io.legado.app.R
 import io.legado.app.data.entities.Book
-import io.legado.app.help.book.isAudio
 import io.legado.app.help.book.isImage
 import io.legado.app.help.book.isLocal
 import io.legado.app.domain.gateway.MangaSettingsGateway
@@ -58,14 +57,13 @@ fun Fragment.startActivityForBook(
     configIntent: Intent.() -> Unit = {},
 ) {
     val intent = when {
-        book.isAudio -> MainActivity.createAudioPlayIntent(requireActivity(), book.bookUrl)
         !book.isLocal && book.isImage && mangaSettingsGateway.currentSettings.showMangaUi ->
             MainActivity.createReadMangaIntent(requireActivity(), book.bookUrl)
 
         else -> MainActivity.createReadBookIntent(requireActivity(), book.bookUrl)
     }
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (book.isAudio || (!book.isLocal && book.isImage && mangaSettingsGateway.currentSettings.showMangaUi)) {
+    if (!book.isLocal && book.isImage && mangaSettingsGateway.currentSettings.showMangaUi) {
         intent.putExtra("bookUrl", book.bookUrl)
     }
     intent.apply(configIntent)

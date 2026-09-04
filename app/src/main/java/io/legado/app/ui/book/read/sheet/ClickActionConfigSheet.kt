@@ -52,15 +52,12 @@ fun ClickActionConfigSheet(
         2 to stringResource(R.string.prev_page),
         3 to stringResource(R.string.next_chapter),
         4 to stringResource(R.string.previous_chapter),
-        5 to stringResource(R.string.read_aloud_prev_paragraph),
-        6 to stringResource(R.string.read_aloud_next_paragraph),
         7 to stringResource(R.string.bookmark_add),
         8 to stringResource(R.string.edit_content),
         9 to stringResource(R.string.replace_state_change),
         10 to stringResource(R.string.chapter_list),
         11 to stringResource(R.string.search_content),
         12 to stringResource(R.string.sync_book_progress_t),
-        13 to stringResource(R.string.read_aloud_pause_resume),
     )
 
     var selectingPrefKey by remember { mutableStateOf<String?>(null) }

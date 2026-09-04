@@ -21,14 +21,12 @@ import com.script.rhino.RhinoScriptEngine
 import com.script.rhino.RhinoWrapFactory
 import io.legado.app.constant.AppConst.channelIdBookSourceCheck
 import io.legado.app.constant.AppConst.channelIdDownload
-import io.legado.app.constant.AppConst.channelIdReadAloud
 import io.legado.app.constant.AppConst.channelIdWeb
 import io.legado.app.constant.PreferKey
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookSource
-import io.legado.app.data.entities.HttpTTS
 import io.legado.app.data.entities.RssSource
 import io.legado.app.data.entities.rule.BookInfoRule
 import io.legado.app.data.entities.rule.ContentRule
@@ -125,7 +123,6 @@ class App : Application(), SingletonImageLoader.Factory {
             cacheGateway = get(),
             coverGateway = get(),
             readGateway = get(),
-            aloudGateway = get(),
             importBookGateway = get(),
             exportGateway = get(),
         )
@@ -293,17 +290,6 @@ class App : Application(), SingletonImageLoader.Factory {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
 
-        val readAloudChannel = NotificationChannel(
-            channelIdReadAloud,
-            getString(R.string.read_aloud),
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-            enableLights(false)
-            enableVibration(false)
-            setSound(null, null)
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        }
-
         val bookSourceCheckChannel = NotificationChannel(
             channelIdBookSourceCheck,
             getString(R.string.check_book_source),
@@ -331,7 +317,6 @@ class App : Application(), SingletonImageLoader.Factory {
             listOf(
                 downloadChannel,
                 bookSourceCheckChannel,
-                readAloudChannel,
                 webChannel
             )
         )
@@ -342,7 +327,6 @@ class App : Application(), SingletonImageLoader.Factory {
         RhinoScriptEngine
         RhinoWrapFactory.register(BookSource::class.java, NativeBaseSource.factory)
         RhinoWrapFactory.register(RssSource::class.java, NativeBaseSource.factory)
-        RhinoWrapFactory.register(HttpTTS::class.java, NativeBaseSource.factory)
         RhinoWrapFactory.register(ExploreRule::class.java, ReadOnlyJavaObject.factory)
         RhinoWrapFactory.register(SearchRule::class.java, ReadOnlyJavaObject.factory)
         RhinoWrapFactory.register(BookInfoRule::class.java, ReadOnlyJavaObject.factory)

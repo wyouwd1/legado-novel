@@ -39,10 +39,6 @@ object PreferKey {
     const val clickActionBR = "clickActionBottomRight"
     const val hideNavigationBar = "hideNavigationBar"
     const val precisionSearch = "precisionSearch"
-    const val readAloudByPage = "readAloudByPage"
-    const val ttsEngine = "appTtsEngine"
-    const val ttsFollowSys = "ttsFollowSys"
-    const val ttsSpeechRate = "ttsSpeechRate"
     const val prevKeys = "prevKeyCodes"
     const val nextKeys = "nextKeyCodes"
     const val showHome = "showHome"
@@ -112,7 +108,6 @@ object PreferKey {
     const val autoChangeSource = "autoChangeSource"
     const val autoSuggestDayNight = "autoSuggestDayNight"
     const val readingAnchorEnabled = "readingAnchorEnabled"
-    const val readAloudDetachReminderEnabled = "readAloudDetachReminderEnabled"
     const val importKeepName = "importKeepName"
     const val importKeepGroup = "importKeepGroup"
     const val screenOrientation = "screenOrientation"
@@ -160,18 +155,9 @@ object PreferKey {
     const val parallelExportBook = "parallelExportBook"
     const val progressBarBehavior = "progressBarBehavior"
     const val sourceEditMaxLine = "sourceEditMaxLine"
-    const val ttsTimer = "ttsTimer"
     const val noAnimScrollPage = "noAnimScrollPage"
     const val webDavDeviceName = "webDavDeviceName"
     const val webServiceWakeLock = "webServiceWakeLock"
-    const val audioPlayWakeLock = "audioPlayWakeLock"
-    const val readAloudWakeLock = "readAloudWakeLock"
-    const val showReadAloudCapsule = "showReadAloudCapsule"
-    const val capsuleAutoCollapse = "capsuleAutoCollapse"
-    const val defaultReadAloudInterface = "defaultReadAloudInterface"
-    const val readAloudPlayerBgMode = "readAloudPlayerBgMode"
-    const val audioPlayBgMode = "audioPlayBgMode"
-    const val audioPlayCoverRatio = "audioPlayCoverRatio"
     const val showLastUpdateTime = "showLastUpdateTime"
     const val showWaitUpCount = "showWaitUpCount"
     const val clearWebViewData = "clearWebViewData"
@@ -197,9 +183,6 @@ object PreferKey {
     const val optimizeRender = "optimizeRender"
     const val updateToVariant = "updateToVariant"
     const val autoCheckUpdateOnStart = "autoCheckUpdateOnStart"
-    const val streamReadAloudAudio = "streamReadAloudAudio"
-    const val pauseReadAloudWhilePhoneCalls = "pauseReadAloudWhilePhoneCalls"
-    const val readAloudByMediaButton = "readAloudByMediaButton"
     const val showMangaUi = "showMangaUi"
     const val disableMangaScale = "disableMangaScale"
     const val firebaseEnable = "firebaseEnable"
@@ -273,9 +256,6 @@ object PreferKey {
     const val bgImageNBlurring = "backgroundImageNightBlurring"
     const val showReadTitleAddition = "showReadTitleAddition"
     const val readBarStyleFollowPage = "readBarStyleFollowPage"
-    const val contentSelectSpeakMod = "contentReadAloudMod"
-    const val speechAnalysisMode = "speechAnalysisMode"
-    const val useMultiSpeaker = "useMultiSpeaker"
     const val themePref = "themePref"
     const val bookshelfSortOrder = "bookshelfSortOrder"
     const val showBottomView = "showBottomView"
@@ -346,10 +326,6 @@ object PreferKey {
     const val menuAlpha = "menuAlpha"
     const val colorImage = "colorImage"
     const val bookshelfRefreshingLimit = "bookshelfRefreshingLimit"
-    const val mediaButtonPerNext = "mediaButtonPerNext"
-    const val systemMediaControlCompatibilityChange = "systemMediaControlCompatibilityChange"
-    const val readAloudAndroidMediaControl = "readAloudAndroidMediaControl"
-    const val finishCurrentChapterAfterTimer = "finishCurrentChapterAfterTimer"
     const val isPredictiveBackEnabled = "isPredictiveBackEnabled"
     const val readRecordDisplayMode = "readRecordDisplayMode"
     const val replaceSortMode = "desc"
@@ -420,10 +396,6 @@ object PreferKey {
     const val useNewTocSheet = "useNewTocSheet"
     const val maxLengthWithNoToc = "maxLengthWithNoToc"
     const val selectVibrator = "selectVibrator"
-    const val audioCacheCleanTime = "audioCacheCleanTime"
-    const val audioPreDownloadNum = "audioPreDownloadNum"
-    const val ttsPreSynthesisConcurrency = "ttsPreSynthesisConcurrency"
-    const val ttsParagraphInterval = "ttsParagraphInterval"
     const val customTagColors = "customTagColors"
     const val enableCustomTagColors = "enableCustomTagColors"
     const val navIconBookshelf = "navIconBookshelf"
@@ -475,13 +447,6 @@ object ReadMenuBlurMode {
 object ReadMenuBlurStyle {
     const val Solid = 0
     const val Progressive = 1
-}
-
-object ReadAloudBgMode {
-    const val Solid = 0
-    const val Blur = 1
-    const val FlowingLight = 2
-    const val Transparent = 3
 }
 
 object CoverRatio {

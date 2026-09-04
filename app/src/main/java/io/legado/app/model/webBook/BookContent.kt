@@ -12,7 +12,6 @@ import io.legado.app.domain.gateway.ReadSettingsGateway
 import io.legado.app.exception.ContentEmptyException
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.help.book.BookHelp
-import io.legado.app.help.book.isAudio
 import io.legado.app.help.book.isOnLineTxt
 import io.legado.app.help.book.isVideo
 import io.legado.app.model.Debug
@@ -156,8 +155,6 @@ object BookContent {
             if (subContent.isNotBlank()) {
                 if (book.isOnLineTxt) {
                     appendContent(subContent)
-                } else if (book.isAudio) {
-                    bookChapter.putVariable("lyric", subContent)
                 }
             }
         }
@@ -232,7 +229,7 @@ object BookContent {
         analyzeRule.setChapter(chapter)
         //获取正文
         var content = analyzeRule.getString(contentRule.content, unescape = false)
-        if (!book.isAudio && !book.isVideo) { //音频和视频获取的是链接，不需要html格式化 && !book.isVideo
+        if (!book.isVideo) { //视频获取的是链接，不需要html格式化
             val useHtmlMap = mutableMapOf<String, String>()
             if (readSettingsGateway.currentSettings.adaptSpecialStyle) {
                 content = AppPattern.useHtmlRegex.replace(content) {

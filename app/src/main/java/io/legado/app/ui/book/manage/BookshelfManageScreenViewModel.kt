@@ -589,7 +589,6 @@ class BookshelfManageScreenViewModel(
             batchCacheDownloadUseCase.execute(
                 bookUrls = bookUrls,
                 downloadAllChapters = downloadAllChapters,
-                skipAudioBooks = true
             )
         }.onFinally {
             syncDownloadRunning()
@@ -697,7 +696,6 @@ class BookshelfManageScreenViewModel(
             batchCacheDownloadUseCase.execute(
                 bookUrls = bookUrls,
                 downloadAllChapters = downloadAllChapters,
-                skipAudioBooks = true
             )
         }.onSuccess { count ->
             if (count > 0) {

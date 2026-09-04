@@ -198,7 +198,6 @@ class ReadButtonConfigDelegate(
             "search",
             "auto_page",
             "catalog",
-            "read_aloud",
             "setting",
         )
     }

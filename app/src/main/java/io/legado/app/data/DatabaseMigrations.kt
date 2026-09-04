@@ -22,7 +22,19 @@ object DatabaseMigrations {
             migration_39_40, migration_40_41, migration_41_42, migration_42_43,
             migration_82_83, migration_98_99, migration_99_100,
             migration_102_103,
+            migration_104_105,
         )
+    }
+
+    private val migration_104_105 = object : Migration(104, 105) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `httpTTS`")
+            db.execSQL("DROP TABLE IF EXISTS `read_aloud_voices`")
+            db.execSQL("DROP TABLE IF EXISTS `book_voice_bindings`")
+            db.execSQL("DROP TABLE IF EXISTS `chapter_speech_analysis`")
+            db.execSQL("DROP TABLE IF EXISTS `chapter_speech_segments`")
+            db.execSQL("DROP TABLE IF EXISTS `cloud_tts_engines`")
+        }
     }
 
     private val migration_10_11 = object : Migration(10, 11) {
@@ -458,7 +470,7 @@ object DatabaseMigrations {
         override fun onPostMigrate(db: SupportSQLiteDatabase) {
             db.execSQL(
                 """
-                update books set type = ${BookType.audio}
+                update books set type = 32
                 where type = ${BookSourceType.audio}
             """.trimIndent()
             )

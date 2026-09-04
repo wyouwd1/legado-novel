@@ -354,15 +354,6 @@ fun ReadConfigScreen(
                 )
 
                 SwitchSettingItem(
-                    title = stringResource(R.string.read_aloud_detach_reminder),
-                    description = stringResource(R.string.read_aloud_detach_reminder_summary),
-                    checked = settings.readAloudDetachReminderEnabled,
-                    onCheckedChange = {
-                        onIntent(ReadConfigIntent.ReadAloudDetachReminderChanged(it))
-                    }
-                )
-
-                SwitchSettingItem(
                     title = stringResource(R.string.selectText),
                     checked = settings.selectText,
                     onCheckedChange = {

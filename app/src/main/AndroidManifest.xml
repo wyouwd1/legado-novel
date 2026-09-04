@@ -20,7 +20,6 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -224,7 +223,6 @@
             android:enableOnBackInvokedCallback="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-        <!-- 音频播放界面（nav3 路由，见 MainRouteAudioPlay） -->
         <!-- 授权界面 -->
         <activity
             android:name="io.legado.app.lib.permission.PermissionActivity"
@@ -461,15 +459,6 @@
             </intent-filter>
         </service>
         <service
-            android:name=".service.TTSReadAloudService"
-            android:foregroundServiceType="mediaPlayback" />
-        <service
-            android:name=".service.HttpReadAloudService"
-            android:foregroundServiceType="mediaPlayback" />
-        <service
-            android:name=".service.AudioPlayService"
-            android:foregroundServiceType="mediaPlayback" />
-        <service
             android:name=".service.DownloadService"
             android:foregroundServiceType="dataSync" />
 
@@ -482,14 +471,6 @@
                 android:name="autoStoreLocales"
                 android:value="true" />
         </service>
-
-        <receiver
-            android:name=".receiver.MediaButtonReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
 
         <provider
             android:name=".api.ReaderProvider"
@@ -537,9 +518,6 @@
             <data
                 android:mimeType="*/*"
                 android:scheme="*" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.TTS_SERVICE" />
         </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />

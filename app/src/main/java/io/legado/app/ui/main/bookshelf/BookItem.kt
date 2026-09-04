@@ -654,7 +654,6 @@ fun BookItem(
     val showUpdateBadge = settings.showUnread && settings.showUnreadNew && book.isNew
     val bookTypeLabel = if (settings.showTip) {
         when {
-            book.isAudio -> stringResource(R.string.audio)
             book.isImage -> stringResource(R.string.manga)
             (book.type and BookType.webFile) > 0 -> stringResource(R.string.web_file)
             book.isLocal -> stringResource(R.string.local)

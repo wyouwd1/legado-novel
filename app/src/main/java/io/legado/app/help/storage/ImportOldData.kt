@@ -136,8 +136,9 @@ object ImportOldData {
             book.originName = jsonItem.readString("$.bookInfoBean.origin") ?: ""
             book.author = jsonItem.readString("$.bookInfoBean.author") ?: ""
             val local = if (book.origin == "loc_book") BookType.local else 0
+            // 旧版音频书类型位（32）保留原值导入，听书功能下线后不再有新书使用该位
             val isAudio = jsonItem.readString("$.bookInfoBean.bookSourceType") == "AUDIO"
-            book.type = local or if (isAudio) BookType.audio else BookType.text
+            book.type = local or if (isAudio) 32 else BookType.text
             book.tocUrl = jsonItem.readString("$.bookInfoBean.chapterUrl") ?: book.bookUrl
             book.coverUrl = jsonItem.readString("$.bookInfoBean.coverUrl")
             book.customCoverUrl = jsonItem.readString("$.customCoverPath")

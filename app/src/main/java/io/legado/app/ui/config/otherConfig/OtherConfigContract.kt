@@ -17,9 +17,6 @@ data class OtherConfigUiState(
     val defaultBookTreeUri: String? = null,
     val antiAlias: Boolean = false,
     val replaceEnableDefault: Boolean = true,
-    val mediaButtonOnExit: Boolean = true,
-    val readAloudByMediaButton: Boolean = false,
-    val ignoreAudioFocus: Boolean = false,
     val autoClearExpired: Boolean = true,
     val showAddToShelfAlert: Boolean = true,
     val showMangaUi: Boolean = true,
@@ -86,9 +83,6 @@ sealed interface OtherConfigIntent {
     data class DefaultBookTreeUriChanged(val value: String?) : OtherConfigIntent
     data class AntiAliasChanged(val value: Boolean) : OtherConfigIntent
     data class ReplaceEnableDefaultChanged(val value: Boolean) : OtherConfigIntent
-    data class MediaButtonOnExitChanged(val value: Boolean) : OtherConfigIntent
-    data class ReadAloudByMediaButtonChanged(val value: Boolean) : OtherConfigIntent
-    data class IgnoreAudioFocusChanged(val value: Boolean) : OtherConfigIntent
     data class AutoClearExpiredChanged(val value: Boolean) : OtherConfigIntent
     data class ShowAddToShelfAlertChanged(val value: Boolean) : OtherConfigIntent
     data class ShowMangaUiChanged(val value: Boolean) : OtherConfigIntent

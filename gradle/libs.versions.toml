@@ -54,8 +54,6 @@ material = "1.14.0"
 material3 = "1.5.0-alpha23"
 material3IconsExtended = "1.7.8"
 materialKolor = "4.1.1"
-media = "1.8.0"
-media3 = "1.8.0"
 navigationCompose = "2.9.8"
 okhttp = "5.4.0"
 palette = "1.0.0"
@@ -95,7 +93,6 @@ telephoto = "0.19.0"
 miuix = "0.9.3"
 backdrop = "2.0.0"
 capsule = "2.1.3"
-lyricViewx = "1.3.2"
 uiautomator = "2.4.0"
 benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
@@ -171,9 +168,6 @@ lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-common-java8",
 lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
 
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
-media-media = { module = "androidx.media:media", version.ref = "media" }
-media3-datasource-okhttp = { module = "androidx.media3:media3-datasource-okhttp", version.ref = "media3" }
-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 
 markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon" }
 markwon-image-glide = { module = "io.noties.markwon:image-glide", version.ref = "markwon" }
@@ -254,7 +248,6 @@ miuix-ui-android = { module = "top.yukonga.miuix.kmp:miuix-ui-android", version.
 
 capsule = { module = "io.github.kyant0:capsule", version.ref = "capsule" }
 backdrop = { module = "io.github.kyant0:backdrop", version.ref = "backdrop" }
-lyricViewx = { module = "com.github.Moriafly:LyricViewX", version.ref = "lyricViewx" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }

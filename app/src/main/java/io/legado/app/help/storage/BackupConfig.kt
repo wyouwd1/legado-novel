@@ -17,8 +17,6 @@ internal val alwaysIgnoredPreferenceKeys = setOf(
     PreferKey.launcherIcon,
     PreferKey.bitmapCacheSize,
     PreferKey.webServiceWakeLock,
-    PreferKey.readAloudWakeLock,
-    PreferKey.audioPlayWakeLock,
     LocalPreferencesKeys.PASSWORD.name,
     LocalPreferencesKeys.MIGRATED_TO_SETTINGS.name,
 )
@@ -74,7 +72,6 @@ object BackupConfig {
     private const val dbKeySearchHistory = "searchHistory"
     private const val dbKeySourceSub = "sourceSub"
     private const val dbKeyTxtTocRule = "txtTocRule"
-    private const val dbKeyHttpTts = "httpTTS"
     private const val dbKeyKeyboardAssists = "keyboardAssists"
     private const val dbKeyDictRule = "dictRule"
     private const val dbKeyHomepageModules = "homepageModules"
@@ -87,7 +84,7 @@ object BackupConfig {
     val dbIgnoreKeys = arrayOf(
         dbKeyBookmark, dbKeyBookGroup, dbKeyBookSource, dbKeyRssSource,
         dbKeyRssStar, dbKeyReplaceRule, dbKeyReadRecord, dbKeySearchHistory,
-        dbKeySourceSub, dbKeyTxtTocRule, dbKeyHttpTts, dbKeyKeyboardAssists,
+        dbKeySourceSub, dbKeyTxtTocRule, dbKeyKeyboardAssists,
         dbKeyDictRule, dbKeyHomepageModules, dbKeyHomepageCustomSets,
         dbKeyHighlightRule, dbKeyHighlightTagRule, dbKeyTagGroupRule, dbKeyServer
     )
@@ -103,7 +100,6 @@ object BackupConfig {
         appCtx.getString(R.string.search_history),
         appCtx.getString(R.string.source_sub),
         appCtx.getString(R.string.txt_toc_rule),
-        appCtx.getString(R.string.http_tts),
         appCtx.getString(R.string.keyboard_assists),
         appCtx.getString(R.string.dict_rule),
         appCtx.getString(R.string.homepage_modules),

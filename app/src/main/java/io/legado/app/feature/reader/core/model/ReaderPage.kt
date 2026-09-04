@@ -84,7 +84,6 @@ sealed interface ReaderElement {
         val style: ReaderTextStyle,
         val selected: Boolean,
         val emphasized: Boolean,
-        val readAloud: Boolean = false,
         val searchResult: Boolean = false,
         val emphasisUnderline: ReaderEmphasisUnderline? = null,
         val link: String? = null,
@@ -94,9 +93,9 @@ sealed interface ReaderElement {
         val backgroundFrameTopPx: Float = 0f,
         val backgroundFrameBottomPx: Float = 0f,
     ) : ReaderElement {
-        /** HTML links keep the legacy reader's accent priority, including during read-aloud. */
+        /** HTML links keep the legacy reader's accent priority, including search-result highlights. */
         fun resolvedColorArgb(accentColorArgb: Int): Int =
-            if (link != null || readAloud || searchResult) accentColorArgb else style.colorArgb
+            if (link != null || searchResult) accentColorArgb else style.colorArgb
 
         val drawsLinkUnderline: Boolean
             get() = link != null

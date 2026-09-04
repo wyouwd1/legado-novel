@@ -22,7 +22,6 @@ import com.script.rhino.runScriptWithContext
 import io.legado.app.R
 import io.legado.app.constant.AppLog
 import io.legado.app.data.entities.BookGroup
-import io.legado.app.help.book.isAudio
 import io.legado.app.help.book.isImage
 import io.legado.app.help.book.isLocal
 import io.legado.app.model.SourceCallBack
@@ -55,7 +54,6 @@ fun BookInfoRouteScreen(
     onOpenSourceLogin: (String) -> Unit,
     onOpenReader: (bookUrl: String, inBookshelf: Boolean, chapterChanged: Boolean) -> Unit = { _, _, _ -> },
     onOpenMangaReader: (bookUrl: String, inBookshelf: Boolean, chapterChanged: Boolean) -> Unit = { _, _, _ -> },
-    onOpenAudioPlay: (bookUrl: String, inBookshelf: Boolean) -> Unit = { _, _ -> },
     onNavigateToBookInfo: (name: String?, author: String?, bookUrl: String, origin: String?, coverPath: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToExploreShow: (title: String?, sourceUrl: String, exploreUrl: String?) -> Unit = { _, _, _ -> },
     onOpenCharacterDetail: (bookUrl: String, characterId: String?) -> Unit = { _, _ -> },
@@ -128,11 +126,6 @@ fun BookInfoRouteScreen(
 
                 is BookInfoEffect.OpenReader -> {
                     when {
-                        effect.book.isAudio -> onOpenAudioPlay(
-                            effect.book.bookUrl,
-                            effect.inBookshelf
-                        )
-
                         !effect.book.isLocal && effect.book.isImage && showMangaUi -> {
                             onOpenMangaReader(
                                 effect.book.bookUrl,

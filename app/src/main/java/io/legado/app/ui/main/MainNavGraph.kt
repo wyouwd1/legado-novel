@@ -37,20 +37,12 @@ import io.legado.app.constant.Status
 import io.legado.app.domain.model.BookSearchScope
 import io.legado.app.domain.model.settings.AppUiConfiguration
 import io.legado.app.help.coil.CoverExtras
-import io.legado.app.model.AudioPlay
 import io.legado.app.model.Download
-import io.legado.app.model.SourceCallBack
-import io.legado.app.service.AudioPlayService
 import io.legado.app.ui.about.AboutEffect
 import io.legado.app.ui.about.AboutScreen
 import io.legado.app.ui.about.AboutViewModel
 import io.legado.app.ui.ai.chat.AiChatRouteScreen
-import io.legado.app.ui.book.audio.AudioPlayEffect
-import io.legado.app.ui.book.audio.AudioPlayIntent
-import io.legado.app.ui.book.audio.AudioPlayScreenContent
-import io.legado.app.ui.book.audio.AudioPlayViewModel
 import io.legado.app.ui.book.cache.manage.BookCacheManageRouteScreen
-import io.legado.app.ui.book.changesource.ChangeBookSourceDialog
 import io.legado.app.ui.book.explore.ExploreShowIntent
 import io.legado.app.ui.book.explore.ExploreShowRouteScreen
 import io.legado.app.ui.book.explore.ExploreShowViewModel
@@ -87,13 +79,6 @@ import io.legado.app.ui.book.read.ReadBookViewModel
 import io.legado.app.ui.book.read.ReaderSessionViewModel
 import io.legado.app.ui.book.readRecord.ReadRecordOverviewRouteScreen
 import io.legado.app.ui.book.readRecord.ReadRecordRouteScreen
-import io.legado.app.ui.book.readaloud.cache.TtsCacheRouteScreen
-import io.legado.app.ui.book.readaloud.casting.BookVoiceCastingScreen
-import io.legado.app.ui.book.readaloud.casting.BookVoiceCastingViewModel
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsEffect
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsIntent
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsScreen
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsViewModel
 import io.legado.app.ui.book.search.SearchIntent
 import io.legado.app.ui.book.search.SearchRouteScreen
 import io.legado.app.ui.book.search.SearchViewModel
@@ -143,7 +128,6 @@ import io.legado.app.ui.theme.ProvideThemeOverride
 import io.legado.app.ui.theme.rememberImageSeedColor
 import io.legado.app.ui.theme.rememberThemeOverride
 import io.legado.app.utils.openUrl
-import io.legado.app.utils.sendToClip
 import io.legado.app.utils.showDialogFragment
 import io.legado.app.utils.startActivityForBook
 import io.legado.app.utils.toastOnUi
@@ -336,9 +320,7 @@ fun MainActivity.mainEntryProvider(
                 onNavigateToRoute(MainRouteBookCacheManage)
             },
             onOpenBookshelfBook = { book, sharedCoverKey ->
-                if (book.isAudio) {
-                    this@mainEntryProvider.startActivityForBook(book)
-                } else if (!book.isLocal && book.isImage && showMangaUi) {
+                if (!book.isLocal && book.isImage && showMangaUi) {
                     onNavigateToRoute(MainRouteReadManga(bookUrl = book.bookUrl))
                 } else {
                     onNavigateToRoute(
@@ -676,27 +658,14 @@ fun MainActivity.mainEntryProvider(
                     )
                 )
             },
-            onOpenVoiceCasting = { bookUrl ->
-                onNavigateToRoute(MainRouteBookVoiceCasting(bookUrl))
-            },
-            onOpenTtsEnginesAndVoices = {
-                onNavigateToRoute(MainRouteCloudTtsEngines(route.bookUrl))
-            },
-            onOpenTtsCache = {
-                onNavigateToRoute(MainRouteTtsCache)
-            },
         )
 
-        DisposableEffect(controller, lifecycleOwner, route.readAloud) {
+        DisposableEffect(controller, lifecycleOwner) {
             activeReadBookInputHandler = controller
             activeReadBookRoute = route
             MainActivity.hasActiveReadBookRoute = true
             controller.onClose = { onNavigateBack() }
-            controller.onStartContentLoadFinish = {
-                if (route.readAloud) {
-                    io.legado.app.model.ReadBook.readAloud()
-                }
-            }
+            controller.onStartContentLoadFinish = {}
 
             val lifecycleObserver = LifecycleEventObserver { _, event ->
                 when (event) {
@@ -719,7 +688,7 @@ fun MainActivity.mainEntryProvider(
                     activeReadBookRoute = null
                 }
                 MainActivity.hasActiveReadBookRoute = false
-                controller.clearTts()
+                controller.releaseReader()
                 this@mainEntryProvider.toggleSystemBar(configuration.appShell.showStatusBar)
             }
         }
@@ -764,128 +733,6 @@ fun MainActivity.mainEntryProvider(
                 )
             },
         )
-    }
-
-    entry<MainRouteAudioPlay> { route ->
-        val audioPlayViewModel = koinViewModel<AudioPlayViewModel>(
-            key = "AudioPlay:${route.bookUrl}",
-        )
-        val lifecycleOwner = LocalLifecycleOwner.current
-        val uiState by audioPlayViewModel.uiState.collectAsStateWithLifecycle()
-        val imageLoader: ImageLoader = koinInject()
-        val sourceEditResult = rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                audioPlayViewModel.onIntent(AudioPlayIntent.SourceEdited)
-            }
-        }
-
-        fun copyAudioPlayUrl() {
-            AudioPlay.book?.let {
-                SourceCallBack.callBackBtn(
-                    this@mainEntryProvider,
-                    SourceCallBack.CLICK_COPY_PLAY_URL,
-                    AudioPlay.bookSource,
-                    it,
-                    AudioPlay.durChapter,
-                    BookType.audio,
-                ) {
-                    sendToClip(AudioPlayService.url)
-                }
-            }
-        }
-
-        fun finishAudioPlay() {
-            if (AudioPlay.inBookshelf) {
-                SourceCallBack.callBackBook(
-                    SourceCallBack.END_READ,
-                    AudioPlay.bookSource,
-                    AudioPlay.book,
-                    AudioPlay.durChapter
-                )
-            }
-            onNavigateBack()
-        }
-
-        LaunchedEffect(route, audioPlayViewModel) {
-            audioPlayViewModel.onIntent(
-                AudioPlayIntent.Init(route.bookUrl.orEmpty(), route.inBookshelf)
-            )
-        }
-        DisposableEffect(audioPlayViewModel, lifecycleOwner) {
-            MainActivity.hasActiveAudioPlayRoute = true
-            this@mainEntryProvider.activeAudioPlayViewModel = audioPlayViewModel
-            AudioPlay.register(this@mainEntryProvider)
-            onDispose {
-                if (AudioPlay.status != Status.PLAY) {
-                    AudioPlay.stop()
-                }
-                AudioPlay.unregister(this@mainEntryProvider)
-                if (this@mainEntryProvider.activeAudioPlayViewModel === audioPlayViewModel) {
-                    this@mainEntryProvider.activeAudioPlayViewModel = null
-                }
-                MainActivity.hasActiveAudioPlayRoute = false
-            }
-        }
-        LaunchedEffect(audioPlayViewModel) {
-            audioPlayViewModel.effects.collectLatest { effect ->
-                when (effect) {
-                    is AudioPlayEffect.OpenChangeSource -> showDialogFragment(
-                        ChangeBookSourceDialog(effect.bookName, effect.author)
-                    )
-
-                    is AudioPlayEffect.OpenLogin -> startActivity(
-                        MainActivity.createSourceLoginIntent(
-                            this@mainEntryProvider,
-                            SourceLoginType.BookSource,
-                            effect.sourceUrl
-                        )
-                    )
-
-                    AudioPlayEffect.CopyPlayUrl -> copyAudioPlayUrl()
-                    is AudioPlayEffect.OpenEditSource -> sourceEditResult.launch(
-                        MainActivity.createBookSourceEditIntent(
-                            this@mainEntryProvider,
-                            effect.sourceUrl
-                        )
-                    )
-
-                    is AudioPlayEffect.ShowToast -> toastOnUi(effect.message)
-                    is AudioPlayEffect.OpenBookReader -> {
-                        startActivity(
-                            MainActivity.createReadBookIntent(
-                                this@mainEntryProvider,
-                                effect.bookUrl
-                            )
-                        )
-                        onNavigateBack()
-                    }
-
-                    AudioPlayEffect.Finish -> finishAudioPlay()
-                }
-            }
-        }
-        BackHandler {
-            audioPlayViewModel.onIntent(AudioPlayIntent.BackPressed)
-        }
-
-        // 封面动态取色：从封面提取主色作为本界面主题
-        val seedColor = rememberImageSeedColor(
-            imageLoader = imageLoader,
-            data = uiState.coverPath,
-            requestKey = listOf(uiState.coverPath, uiState.sourceOrigin),
-        ) {
-            extras[CoverExtras.SourceOrigin] = uiState.sourceOrigin
-        }
-        val themeOverride = rememberThemeOverride(seedColor)
-        ProvideThemeOverride(themeOverride) {
-            AudioPlayScreenContent(
-                state = uiState,
-                onIntent = audioPlayViewModel::onIntent,
-                onBack = { audioPlayViewModel.onIntent(AudioPlayIntent.BackPressed) },
-            )
-        }
     }
 
     entry<MainRouteSearchContent> { route ->
@@ -1136,14 +983,6 @@ fun MainActivity.mainEntryProvider(
                     )
                 )
             },
-            onOpenAudioPlay = { bookUrl, inBookshelf ->
-                onNavigateToRoute(
-                    MainRouteAudioPlay(
-                        bookUrl = bookUrl,
-                        inBookshelf = inBookshelf,
-                    )
-                )
-            },
             onNavigateToBookInfo = { name, author, bookUrl, origin, coverPath ->
                 onNavigateToRoute(MainRouteBookInfo(name, author, bookUrl, origin, coverPath))
             },
@@ -1248,65 +1087,6 @@ fun MainActivity.mainEntryProvider(
                 onNavigateToRoute(MainRouteBookCharacterDetail(route.bookUrl, characterId))
             },
             onRefresh = viewModel::refresh,
-        )
-    }
-
-    entry<MainRouteBookVoiceCasting> { route ->
-        val viewModel = koinViewModel<BookVoiceCastingViewModel>(
-            key = "BookVoiceCasting:${route.bookUrl}",
-            parameters = { parametersOf(route.bookUrl) },
-        )
-        BookVoiceCastingScreen(
-            state = viewModel.uiState.collectAsStateWithLifecycle().value,
-            onIntent = viewModel::onIntent,
-            effects = viewModel.effects,
-            onBack = { onNavigateBack() },
-            onManageCloudTts = { onNavigateToRoute(MainRouteCloudTtsEngines(route.bookUrl)) },
-        )
-    }
-
-    entry<MainRouteCloudTtsEngines> { route ->
-        val viewModel = koinViewModel<CloudTtsViewModel>()
-        LaunchedEffect(route.bookUrl) {
-            viewModel.onIntent(CloudTtsIntent.SetBookContext(route.bookUrl))
-        }
-        val context = LocalContext.current
-        val importLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.OpenDocument()
-        ) { uri -> uri?.let { viewModel.onIntent(CloudTtsIntent.ImportHttpTtsFileSelected(it)) } }
-        val exportLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.CreateDocument("application/json")
-        ) { uri -> uri?.let { viewModel.onIntent(CloudTtsIntent.ExportHttpTtsFileSelected(it)) } }
-        LaunchedEffect(viewModel) {
-            viewModel.effects.collectLatest { effect ->
-                when (effect) {
-                    CloudTtsEffect.OpenHttpTtsImportPicker -> importLauncher.launch(
-                        arrayOf("application/json", "text/plain")
-                    )
-
-                    CloudTtsEffect.OpenHttpTtsExportPicker -> exportLauncher.launch("httpTTS.json")
-                    is CloudTtsEffect.OpenHttpTtsLogin -> onNavigateToRoute(
-                        MainRouteSourceLogin(
-                            type = SourceLoginType.HttpTts,
-                            sourceKey = effect.engineId.toString(),
-                        )
-                    )
-
-                    else -> Unit
-                }
-            }
-        }
-        CloudTtsScreen(
-            state = viewModel.uiState.collectAsStateWithLifecycle().value,
-            onIntent = viewModel::onIntent,
-            effects = viewModel.effects,
-            onBack = { onNavigateBack() },
-        )
-    }
-
-    entry<MainRouteTtsCache> {
-        TtsCacheRouteScreen(
-            onBackClick = { onNavigateBack() },
         )
     }
 

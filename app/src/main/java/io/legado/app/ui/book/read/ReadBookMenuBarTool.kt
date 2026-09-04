@@ -451,19 +451,6 @@ internal fun loadToolButtons(
         infoMap.getValue("catalog").toButton {
             onIntent(ReadBookIntent.OpenChapterList)
         },
-        infoMap.getValue("read_aloud").toButton(
-            isActive = state.isReadAloudRunning,
-            onLongClick = {
-                onIntent(ReadBookIntent.OpenReadMenuRoute(ReadBookMenuRoute.ReadAloud))
-            },
-        ) {
-            if (state.isReadAloudRunning) {
-                onIntent(ReadBookIntent.ReadAloudAction)
-            } else {
-                onIntent(ReadBookIntent.ToggleReadAloud)
-                onIntent(ReadBookIntent.HideMenu)
-            }
-        },
         infoMap.getValue("setting").toButton {
             onIntent(ReadBookIntent.OpenReadMenuRoute(ReadBookMenuRoute.ReadStyle))
         },

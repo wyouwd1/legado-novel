@@ -38,8 +38,6 @@ data class BookShelfItem(
 
     val isLocal: Boolean get() = (type and BookType.local) > 0
 
-    val isAudio: Boolean get() = (type and BookType.audio) > 0
-
     val isImage: Boolean get() = (type and BookType.image) > 0
 
     val isNotShelf: Boolean get() = (type and BookType.notShelf) > 0

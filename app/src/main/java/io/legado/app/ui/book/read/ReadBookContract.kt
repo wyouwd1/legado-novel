@@ -13,10 +13,8 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.Bookmark
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.ReplaceRule
-import io.legado.app.data.repository.ReadAloudSettingsRepository
 import io.legado.app.domain.model.AiReasoningLevel
 import io.legado.app.domain.model.TextProcessStyle
-import io.legado.app.domain.model.readaloud.SpeechRoleType
 import io.legado.app.domain.model.settings.ReadStyleItem
 import io.legado.app.domain.usecase.BookmarkTargetVerdict
 import io.legado.app.model.translation.TranslationChapterStatus
@@ -57,7 +55,6 @@ data class ReadBookMenuState(
 sealed interface ReadBookMenuRoute {
     data object Main : ReadBookMenuRoute
     data object ReadStyle : ReadBookMenuRoute
-    data object ReadAloud : ReadBookMenuRoute
     data object AutoRead : ReadBookMenuRoute
     data object TypographyConfig : ReadBookMenuRoute
     data object InformationConfig : ReadBookMenuRoute
@@ -223,18 +220,7 @@ data class ReadBookUiState(
     val searchContentQuery: String = "",
     val searchResultList: ImmutableList<SearchResult> = persistentListOf(),
     val searchResultIndex: Int = 0,
-    // Read aloud / auto page
-    val isReadAloudRunning: Boolean = false,
-    val isReadAloudPaused: Boolean = false,
-    /** 朗读位置是否跟随当前显示页；手动翻页/跳章后为 false（显示"回到朗读位置"悬浮条）。 */
-    val readAloudFollow: Boolean = true,
-    /** 朗读位置脱离当前页时的悬浮提示开关；关闭时手动翻页朗读跟随新页面。 */
-    val readAloudDetachReminderEnabled: Boolean = false,
-    val readAloudEngineName: String = "",
-    val readAloudCharacterName: String = "",
-    val readAloudRoleType: SpeechRoleType = SpeechRoleType.Narrator,
-    val readAloudChapterPosition: Int = 0,
-    val readAloudChapterLength: Int = 0,
+    // Auto page
     val isAutoPage: Boolean = false,
     // Seek bar
     val seekProgress: Int = 0,
@@ -270,30 +256,6 @@ data class ReadBookUiState(
     val isReadingProgressSyncConfigured: Boolean = false,
     // Content edit
     // 正文编辑域状态见 ContentEditUiState —— 由 ReadContentEditDelegate 独立持有
-    val preDownloadNum: Int = 10,
-    val preSynthesisConcurrency: Int = 3,
-    val audioCacheCleanTime: Int = 10,
-    // Read aloud config
-    val readAloudIgnoreAudioFocus: Boolean = false,
-    val readAloudPauseOnPhoneCall: Boolean = false,
-    val readAloudWakeLock: Boolean = false,
-    val showReadAloudCapsule: Boolean = true,
-    val capsuleAutoCollapse: Boolean = true,
-    val readAloudCapsuleOffsetX: Float = 0f,
-    val readAloudCapsuleOffsetY: Float = 0f,
-    val readAloudMediaButtonPerNext: Boolean = false,
-    val readAloudByPage: Boolean = false,
-    val readAloudSystemMediaCompat: Boolean = true,
-    val readAloudAndroidMediaControl: Boolean = false,
-    val readAloudStreamAudio: Boolean = false,
-    val readAloudTtsFollowSys: Boolean = false,
-    val readAloudTtsSpeechRate: Int = 10,
-    val readAloudTtsTimer: Int = 0,
-    val readAloudFinishCurrentChapterAfterTimer: Boolean = false,
-    val speechAnalysisMode: String = "rule",
-    val useMultiSpeaker: Boolean = true,
-    val defaultReadAloudInterface: String = ReadAloudSettingsRepository.DEFAULT_INTERFACE_CLASSIC,
-    val readAloudParagraphInterval: Int = 0,
     // Style config (reactive state for ReadBookConfig)
     val styleConfig: ReadBookStyleConfig = ReadBookStyleConfig(),
     val sheetConfig: ReadSheetConfigUiState = ReadSheetConfigUiState(),
@@ -408,7 +370,6 @@ internal val ReadBookButtonIds = listOf(
     "search",
     "auto_page",
     "catalog",
-    "read_aloud",
     "eye_protection",
     "setting",
     "addBookmark",
@@ -475,9 +436,6 @@ sealed interface ReadBookIntent {
     data class NavigateToSearchResult(val result: SearchResult, val index: Int) : ReadBookIntent
     data object RestoreLastBookProgress : ReadBookIntent
     data object KeepCurrentBookProgress : ReadBookIntent
-
-    // Read aloud
-    data object ToggleReadAloud : ReadBookIntent
 
     // Auto page
     data object ToggleAutoPage : ReadBookIntent
@@ -685,10 +643,6 @@ sealed interface ReadBookIntent {
 
     // Default font picker (needs Activity for AlertDialog)
     // Text action menu (moved from Activity)
-    data class TextActionAloud(
-        val text: String,
-        val chapterPosition: Int? = null,
-    ) : ReadBookIntent
     data class TextActionBookmark(val bookmark: Bookmark) : ReadBookIntent
     data class OpenMarking(val selection: Bookmark) : ReadBookIntent
 
@@ -745,61 +699,10 @@ sealed interface ReadBookIntent {
     data class SetOrientation(val value: String) : ReadBookIntent
     data class TextSelectAbleChanged(val enabled: Boolean) : ReadBookIntent
 
-    // Media / TTS
-    data class MediaButtonPressed(val play: Boolean) : ReadBookIntent
-    data class TtsProgress(val chapterStart: Int) : ReadBookIntent
-
     // Dialog callback bridge
-    data object ReadAloudAction : ReadBookIntent
     data object ConfirmAddCurrentBookToBookshelf : ReadBookIntent
     data object ExitWithoutAddingCurrentBookToBookshelf : ReadBookIntent
 
-    // Read aloud config (needs Activity for DialogFragment)
-    data object ShowReadAloudConfig : ReadBookIntent
-    data object OpenPreDownloadNumPicker : ReadBookIntent
-    data object OpenPreSynthesisConcurrencyPicker : ReadBookIntent
-    data object OpenParagraphIntervalPicker : ReadBookIntent
-    data object OpenCacheCleanTimePicker : ReadBookIntent
-    data class ApplyPreDownloadNum(val value: Int) : ReadBookIntent
-    data class ApplyPreSynthesisConcurrency(val value: Int) : ReadBookIntent
-    data class ApplyAudioCacheCleanTime(val value: Int) : ReadBookIntent
-    data class ApplyParagraphInterval(val value: Int) : ReadBookIntent
-    data class SetReadAloudIgnoreAudioFocus(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudPauseOnPhoneCall(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudWakeLock(val value: Boolean) : ReadBookIntent
-    data class SetShowReadAloudCapsule(val value: Boolean) : ReadBookIntent
-    data class SetCapsuleAutoCollapse(val value: Boolean) : ReadBookIntent
-    data object ResetReadAloudCapsulePosition : ReadBookIntent
-    data class SetReadAloudCapsulePosition(val x: Float, val y: Float) : ReadBookIntent
-    data class SetReadAloudMediaButtonPerNext(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudByPage(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudSystemMediaCompat(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudAndroidMediaControl(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudStreamAudio(val value: Boolean) : ReadBookIntent
-    data object ReadAloudPrevParagraph : ReadBookIntent
-    data object ReadAloudTogglePause : ReadBookIntent
-    data object ReadAloudStop : ReadBookIntent
-    data object ReadAloudNextParagraph : ReadBookIntent
-    data object ReadAloudPrevChapter : ReadBookIntent
-    data object ReadAloudNextChapter : ReadBookIntent
-    /** 页面脱离朗读位置后，跳回朗读所在位置并恢复跟随。 */
-    data object BackToSpeakingPosition : ReadBookIntent
-    /** 页面脱离朗读位置后，从当前显示页重新开始朗读。 */
-    data object ReadAloudFromHere : ReadBookIntent
-    data class SetReadAloudTtsTimer(val value: Int) : ReadBookIntent
-    data class SetFinishCurrentChapterAfterTimer(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudTtsFollowSys(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudTtsSpeechRate(val value: Int) : ReadBookIntent
-    data class SetSpeechAnalysisMode(val value: String) : ReadBookIntent
-    data class SetUseMultiSpeaker(val value: Boolean) : ReadBookIntent
-    data class SetDefaultReadAloudInterface(val value: String) : ReadBookIntent
-    data object OpenSystemTtsSettings : ReadBookIntent
-    data object ClearTtsCache : ReadBookIntent
-    data object OpenTtsEnginesAndVoices : ReadBookIntent
-    data object OpenTtsCache : ReadBookIntent
-    data object OpenBookVoiceCasting : ReadBookIntent
-    data object OpenReadAloudPlayer : ReadBookIntent
-    data object OpenClassicReadAloudControls : ReadBookIntent
     data class SelectFont(val path: String) : ReadBookIntent
     data class SelectTitleFont(val path: String) : ReadBookIntent
     data class SelectTitleSystemTypeface(val index: Int) : ReadBookIntent
@@ -822,7 +725,7 @@ sealed interface ReadBookIntent {
     data object OnResume : ReadBookIntent
     data object OnPause : ReadBookIntent
     data object OnDispose : ReadBookIntent
-    data class CloseReadBook(val keepReadAloud: Boolean = false) : ReadBookIntent
+    data object CloseReadBook : ReadBookIntent
     data object OpenBooksDirPicker : ReadBookIntent
     data class BooksDirSelected(val uri: Uri) : ReadBookIntent
 }
@@ -831,7 +734,6 @@ sealed interface ReadBookEffect {
     // Toast
     data class ShowToast(val message: String) : ReadBookEffect
     data class LongToast(val message: String) : ReadBookEffect
-    data class TtsCacheCleared(val message: String) : ReadBookEffect
 
     // Navigation / lifecycle
     data object Finish : ReadBookEffect
@@ -846,7 +748,6 @@ sealed interface ReadBookEffect {
     data class UpPageAnim(val upRecorder: Boolean) : ReadBookEffect
     data object UpTime : ReadBookEffect
     data class UpBattery(val level: Int) : ReadBookEffect
-    data object UpAloudState : ReadBookEffect
     data object UpSeekBar : ReadBookEffect
     data object UpMenuView : ReadBookEffect
     // R2.3：PageChanged / ContentLoadFinish / LayoutPageCompleted 已内联进
@@ -863,8 +764,7 @@ sealed interface ReadBookEffect {
     data class SetBrightness(val value: Int) : ReadBookEffect
     data class ToggleBrightnessAuto(val auto: Boolean, val value: Int) : ReadBookEffect
 
-    // Read aloud / auto page
-    data object ToggleReadAloud : ReadBookEffect
+    // Auto page
     data object ToggleAutoPage : ReadBookEffect
     data object StopAutoPage : ReadBookEffect
 
@@ -908,15 +808,11 @@ sealed interface ReadBookEffect {
     data class SyncBookProgress(val book: Book) : ReadBookEffect
 
     // Text action menu (needs Activity for View operations)
-    data class TextActionAloudPosition(val chapterPosition: Int) : ReadBookEffect
-    data class TextActionSpeak(val text: String) : ReadBookEffect
     data class TextActionReplace(val text: String, val bookName: String?, val bookSourceUrl: String?) : ReadBookEffect
 
     // Screen / selection
     data object UpScreenTimeOut : ReadBookEffect
     data class UpTextSelectAble(val enabled: Boolean) : ReadBookEffect
-
-    // TTS
 
     // Dialogs (Activity-driven)
     data object ShowConfirmSkipToChapter : ReadBookEffect
@@ -933,10 +829,6 @@ sealed interface ReadBookEffect {
     data class OpenReadStyleExport(val fileName: String) : ReadBookEffect
     data class OpenMenuCustomIconPicker(val id: String) : ReadBookEffect
     data class OpenTitleBarCustomIconPicker(val id: String) : ReadBookEffect
-    data object OpenSystemTtsSettings : ReadBookEffect
-    data object OpenTtsEnginesAndVoices : ReadBookEffect
-    data object OpenTtsCache : ReadBookEffect
-    data class OpenBookVoiceCasting(val bookUrl: String) : ReadBookEffect
     data object OpenHighlightRuleImportPicker : ReadBookEffect
     data object OpenHighlightRuleExportPicker : ReadBookEffect
 
@@ -993,12 +885,6 @@ sealed interface ReadBookSheet {
     data object Marking : ReadBookSheet
     data object MoreConfig : ReadBookSheet
     data object BgTextConfig : ReadBookSheet
-    data object ReadAloudConfig : ReadBookSheet
-    data object ReadAloudPlayer : ReadBookSheet
-    data object PreDownloadConfig : ReadBookSheet
-    data object PreSynthesisConcurrencyConfig : ReadBookSheet
-    data object AudioCacheCleanConfig : ReadBookSheet
-    data object ParagraphIntervalConfig : ReadBookSheet
     data object ClickActionConfig : ReadBookSheet
     data object PageKeyConfig : ReadBookSheet
     data object InfoConfig : ReadBookSheet
@@ -1597,9 +1483,6 @@ sealed interface ConfigUpdate {
         override val actions = emptySet<ConfigUpdateAction>()
     }
     data class ReadingAnchorEnabled(val value: Boolean) : ConfigUpdate {
-        override val actions = emptySet<ConfigUpdateAction>()
-    }
-    data class ReadAloudDetachReminderEnabled(val value: Boolean) : ConfigUpdate {
         override val actions = emptySet<ConfigUpdateAction>()
     }
     data class SelectText(val value: Boolean) : ConfigUpdate {

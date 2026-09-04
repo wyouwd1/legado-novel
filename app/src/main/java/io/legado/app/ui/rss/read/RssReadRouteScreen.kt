@@ -76,8 +76,6 @@ import io.legado.app.utils.openUrl
 import io.legado.app.utils.share
 import io.legado.app.utils.toastOnUi
 import io.legado.app.utils.toggleSystemBar
-import org.apache.commons.text.StringEscapeUtils
-import org.jsoup.Jsoup
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -122,7 +120,6 @@ fun RssReadRouteScreen(
 
     val content by viewModel.contentState.collectAsStateWithLifecycle()
     val analyzeUrl by viewModel.urlState.collectAsStateWithLifecycle()
-    val isSpeaking by viewModel.isSpeakingState.collectAsStateWithLifecycle()
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val fallbackUserAgent = settings.userAgent
 
@@ -343,28 +340,6 @@ fun RssReadRouteScreen(
                                         } ?: context.toastOnUi(R.string.null_url)
                                     }
                             )
-                                RoundDropdownMenuItem(
-                                    text = if (isSpeaking) stringResource(R.string.aloud_stop) else stringResource(
-                                        R.string.read_aloud
-                                    ),
-                                    leadingIcon = {
-                                        MenuItemIcon(if (isSpeaking) Icons.Default.Stop else Icons.AutoMirrored.Filled.VolumeUp)
-                                    },
-                                    onClick = {
-                                        dismiss()
-                                        if (isSpeaking) {
-                                            viewModel.stopReadAloud()
-                                        } else {
-                                            webView?.evaluateJavascript("document.documentElement.outerHTML") {
-                                                val html = StringEscapeUtils.unescapeJson(it)
-                                                    .replace("^\"|\"$".toRegex(), "")
-                                                viewModel.readAloud(
-                                                    Jsoup.parse(html).text()
-                                                )
-                                            }
-                                    }
-                                    }
-                                )
                                 if (!viewModel.rssSource?.loginUrl.isNullOrBlank()) {
                                 RoundDropdownMenuItem(
                                     text = stringResource(R.string.login),

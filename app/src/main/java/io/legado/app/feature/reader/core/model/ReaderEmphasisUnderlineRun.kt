@@ -13,7 +13,7 @@ data class ReaderEmphasisUnderlineRun(
     val style: ReaderEmphasisUnderline,
 )
 
-/** Restores the legacy whole-line underline used for search hits and read-aloud paragraphs. */
+/** Restores the legacy whole-line underline used for search hits. */
 fun ReaderPage.emphasisUnderlineRuns(): List<ReaderEmphasisUnderlineRun> {
     val lines = elements.filterIsInstance<ReaderElement.Text>()
         .groupBy { it.bounds.top to it.bounds.bottom }

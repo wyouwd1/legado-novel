@@ -7,15 +7,12 @@ enum class ReaderTapAction(val legacyValue: Int) {
     PREVIOUS_PAGE(2),
     NEXT_CHAPTER(3),
     PREVIOUS_CHAPTER(4),
-    READ_ALOUD_PREVIOUS_PARAGRAPH(5),
-    READ_ALOUD_NEXT_PARAGRAPH(6),
     ADD_BOOKMARK(7),
     OPEN_CONTENT_EDIT(8),
     TOGGLE_REPLACE(9),
     OPEN_CHAPTER_LIST(10),
     OPEN_SEARCH(11),
-    SYNC_PROGRESS(12),
-    TOGGLE_READ_ALOUD_PAUSE(13);
+    SYNC_PROGRESS(12);
 
     companion object {
         fun fromLegacyValue(value: Int): ReaderTapAction =

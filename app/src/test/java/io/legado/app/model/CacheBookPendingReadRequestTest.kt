@@ -8,17 +8,15 @@ import org.junit.Test
 class CacheBookPendingReadRequestTest {
 
     @Test
-    fun firstRelayoutRequestPreservesReadAloudPosition() {
+    fun firstRelayoutRequestKeepsResetPageOffset() {
         val request = mergePendingReadRequest(
             previous = null,
             resetPageOffset = false,
-            preserveReadAloudPosition = true,
         )
 
         assertEquals(
             PendingReadRequest(
                 resetPageOffset = false,
-                preserveReadAloudPosition = true,
             ),
             request,
         )
@@ -29,41 +27,44 @@ class CacheBookPendingReadRequestTest {
         val request = mergePendingReadRequest(
             previous = PendingReadRequest(
                 resetPageOffset = true,
-                preserveReadAloudPosition = true,
             ),
             resetPageOffset = false,
-            preserveReadAloudPosition = true,
         )
 
         assertTrue(request.resetPageOffset)
-        assertTrue(request.preserveReadAloudPosition)
     }
 
     @Test
-    fun anyNavigationRequestDisablesPositionPreservation() {
+    fun anyRelayoutRequestSetsResetPageOffset() {
         val request = mergePendingReadRequest(
             previous = PendingReadRequest(
                 resetPageOffset = false,
-                preserveReadAloudPosition = true,
             ),
-            resetPageOffset = false,
-            preserveReadAloudPosition = false,
+            resetPageOffset = true,
         )
 
-        assertFalse(request.preserveReadAloudPosition)
+        assertTrue(request.resetPageOffset)
     }
 
     @Test
-    fun laterRelayoutCannotOverrideNavigationRequest() {
+    fun laterRelayoutCannotOverrideResetRequest() {
         val request = mergePendingReadRequest(
             previous = PendingReadRequest(
-                resetPageOffset = false,
-                preserveReadAloudPosition = false,
+                resetPageOffset = true,
             ),
             resetPageOffset = false,
-            preserveReadAloudPosition = true,
         )
 
-        assertFalse(request.preserveReadAloudPosition)
+        assertTrue(request.resetPageOffset)
+    }
+
+    @Test
+    fun noPreviousAndNoResetKeepsDefaults() {
+        val request = mergePendingReadRequest(
+            previous = null,
+            resetPageOffset = false,
+        )
+
+        assertFalse(request.resetPageOffset)
     }
 }

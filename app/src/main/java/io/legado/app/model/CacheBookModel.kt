@@ -765,7 +765,6 @@ class CacheBookModel(
         chapter: BookChapter,
         semaphore: Semaphore?,
         resetPageOffset: Boolean = false,
-        preserveReadAloudPosition: Boolean = false,
     ): Boolean {
         if (!markChapterDownloadStarted(chapter.index)) {
             // Chapter is already in onDownloadSet. Check if the task is actually alive.
@@ -783,7 +782,6 @@ class CacheBookModel(
                     markPendingReadRequest(
                         chapter.index,
                         resetPageOffset,
-                        preserveReadAloudPosition,
                     )
                     return false
                 }
@@ -791,7 +789,6 @@ class CacheBookModel(
                 markPendingReadRequest(
                     chapter.index,
                     resetPageOffset,
-                    preserveReadAloudPosition,
                 )
                 return true
             }
@@ -812,7 +809,6 @@ class CacheBookModel(
                 chapter,
                 content,
                 resetPageOffset,
-                preserveReadAloudPosition = preserveReadAloudPosition,
             )
             emitPendingReadContent(chapter, content)
             try {
@@ -836,7 +832,6 @@ class CacheBookModel(
                 chapter,
                 "获取正文失败\n${it.localizedMessage}",
                 resetPageOffset,
-                preserveReadAloudPosition = preserveReadAloudPosition,
             )
             emitPendingReadError(chapter, it)
         }.onCancel {
@@ -846,7 +841,6 @@ class CacheBookModel(
                 "download canceled",
                 resetPageOffset,
                 canceled = true,
-                preserveReadAloudPosition = preserveReadAloudPosition,
             )
         }.onFinally {
             if (chapterTasks[chapter.index] === task) {
@@ -874,12 +868,10 @@ class CacheBookModel(
     private fun markPendingReadRequest(
         index: Int,
         resetPageOffset: Boolean,
-        preserveReadAloudPosition: Boolean,
     ) {
         pendingReadRequestMap[index] = mergePendingReadRequest(
             previous = pendingReadRequestMap[index],
             resetPageOffset = resetPageOffset,
-            preserveReadAloudPosition = preserveReadAloudPosition,
         )
     }
 
@@ -894,7 +886,6 @@ class CacheBookModel(
             chapter,
             content,
             request.resetPageOffset,
-            preserveReadAloudPosition = request.preserveReadAloudPosition,
         )
     }
 
@@ -904,7 +895,6 @@ class CacheBookModel(
             chapter,
             "获取正文失败\n${error.localizedMessage}",
             request.resetPageOffset,
-            preserveReadAloudPosition = request.preserveReadAloudPosition,
         )
     }
 
@@ -914,7 +904,6 @@ class CacheBookModel(
             chapter,
             "download canceled",
             request.resetPageOffset,
-            preserveReadAloudPosition = request.preserveReadAloudPosition,
         )
     }
 
@@ -923,7 +912,6 @@ class CacheBookModel(
         content: String,
         resetPageOffset: Boolean = false,
         canceled: Boolean = false,
-        preserveReadAloudPosition: Boolean = false,
     ) {
         if (ReadBook.book?.bookUrl == book.bookUrl) {
             ReadBook.contentLoadFinish(
@@ -932,7 +920,6 @@ class CacheBookModel(
                 content = content,
                 resetPageOffset = resetPageOffset,
                 canceled = canceled,
-                preserveReadAloudPosition = preserveReadAloudPosition,
             )
         }
     }
@@ -940,15 +927,11 @@ class CacheBookModel(
 
 internal data class PendingReadRequest(
     val resetPageOffset: Boolean,
-    val preserveReadAloudPosition: Boolean,
 )
 
 internal fun mergePendingReadRequest(
     previous: PendingReadRequest?,
     resetPageOffset: Boolean,
-    preserveReadAloudPosition: Boolean,
 ): PendingReadRequest = PendingReadRequest(
     resetPageOffset = previous?.resetPageOffset == true || resetPageOffset,
-    preserveReadAloudPosition =
-        (previous?.preserveReadAloudPosition ?: true) && preserveReadAloudPosition,
 )

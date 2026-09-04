@@ -192,42 +192,6 @@ data class Book(
             return readConfig!!
         }
 
-    // 音频片头（秒）的 setter 和 getter
-    fun setOpenCredits(openCredits: Int) {
-        config.openCredits = openCredits
-    }
-
-    fun getOpenCredits(): Int {
-        return config.openCredits
-    }
-
-    // 音频片尾（秒）的 setter 和 getter
-    fun setCloseCredits(closeCredits: Int) {
-        config.closeCredits = closeCredits
-    }
-
-    fun getCloseCredits(): Int {
-        return config.closeCredits
-    }
-
-    // 音频播放模式 的 setter 和 getter
-    fun setPlayMode(playMode: Int) {
-        config.playMode = playMode
-    }
-
-    fun getPlayMode(): Int {
-        return config.playMode
-    }
-
-    // 音频增益（mB） 的 setter 和 getter
-    fun setAudioGain(audioGain: Int) {
-        config.audioGain = audioGain
-    }
-
-    fun getAudioGain(): Int {
-        return config.audioGain
-    }
-
     fun setReverseToc(reverseToc: Boolean) {
         config.reverseToc = reverseToc
     }
@@ -279,14 +243,6 @@ data class Book(
 
     fun getImageStyle(): String? {
         return config.imageStyle
-    }
-
-    fun setTtsEngine(ttsEngine: String?) {
-        config.ttsEngine = ttsEngine
-    }
-
-    fun getTtsEngine(): String? {
-        return config.ttsEngine
     }
 
     fun setSplitLongChapter(limitLongContent: Boolean) {
@@ -469,7 +425,6 @@ data class Book(
         var imageStyle: String? = null,
         var useReplaceRule: Boolean? = null,// 正文使用净化替换规则
         var delTag: Long = 0L,//去除标签
-        var ttsEngine: String? = null,
         var splitLongChapter: Boolean = true,
         var readSimulating: Boolean = false,
         var startDate: String? = null,
@@ -484,11 +439,6 @@ data class Book(
         var fixedType: Boolean = false, // 固定书籍类型,不随书源更新
 
         var translationMode: Boolean = false, // 是否启用翻译阅读模式
-
-        var openCredits: Int = 0,    // 音频片头（秒）
-        var closeCredits: Int = 0,   // 音频片尾（秒）
-        var playMode: Int = 0,       // 音频播放模式
-        var audioGain: Int = 0       // 音频增益（mB，-6000..6000）
 
     ) : Parcelable
 

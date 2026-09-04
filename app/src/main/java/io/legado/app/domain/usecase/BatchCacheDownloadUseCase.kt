@@ -14,12 +14,11 @@ class BatchCacheDownloadUseCase(
 
     suspend fun execute(
         bookUrls: Set<String>,
-        downloadAllChapters: Boolean,
-        skipAudioBooks: Boolean = false
+        downloadAllChapters: Boolean
     ): Int {
         if (bookUrls.isEmpty()) return 0
         val requests = bookRepository.getCacheableBooks(bookUrls).mapNotNull { book ->
-            createRequestIfNeeded(book, downloadAllChapters, skipAudioBooks)
+            createRequestIfNeeded(book, downloadAllChapters)
         }
         bookCacheDownloadGateway.start(requests)
         return requests.size
@@ -27,11 +26,9 @@ class BatchCacheDownloadUseCase(
 
     private fun createRequestIfNeeded(
         book: CacheableBook,
-        downloadAllChapters: Boolean,
-        skipAudioBooks: Boolean
+        downloadAllChapters: Boolean
     ): CacheDownloadRequest? {
         if (book.isLocal) return null
-        if (skipAudioBooks && book.isAudio) return null
         val startIndex = if (downloadAllChapters) 0 else book.durChapterIndex
         val endIndex = book.lastChapterIndex
         if (endIndex < startIndex) return null

@@ -50,12 +50,9 @@ import io.legado.app.help.coroutine.Coroutine
 import io.legado.app.help.storage.Backup
 import io.legado.app.help.update.AppUpdateGitHub
 import io.legado.app.lib.dialogs.alert
-import io.legado.app.model.AudioPlay
 import io.legado.app.service.WebService
 import io.legado.app.ui.about.CrashLogsDialog
 import io.legado.app.ui.about.UpdateDialog
-import io.legado.app.ui.book.audio.AudioPlayViewModel
-import io.legado.app.ui.book.changesource.ChangeBookSourceDialog
 import io.legado.app.ui.book.read.ReadBookInputHandler
 import io.legado.app.ui.book.read.ReadBookRouteHost
 import io.legado.app.ui.book.read.page.entities.PageDirection
@@ -80,30 +77,22 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * 主界面
  */
-open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack,
-    ChangeBookSourceDialog.CallBack {
+open class MainActivity : BaseComposeActivity() {
 
     private data class RouteEvent(
         val route: NavKey,
         val resetToHome: Boolean,
     )
 
-    /** 当前激活的有声书播放器 ViewModel（由有声书路由在生命周期内设置/清理） */
-    internal var activeAudioPlayViewModel: AudioPlayViewModel? = null
-
     companion object {
         private const val KEY_RESTORE_READ_ROUTE = "restoreReadRoute"
         private const val KEY_RESTORE_READ_BOOK_URL = "restoreReadBookUrl"
-        private const val KEY_RESTORE_READ_ALOUD = "restoreReadAloud"
         private const val KEY_RESTORE_READ_IN_BOOKSHELF = "restoreReadInBookshelf"
         private const val KEY_RESTORE_READ_CHAPTER_CHANGED = "restoreReadChapterChanged"
         private val startupUpdateCheckGate = ProcessStartupUpdateCheckGate()
 
         @Volatile
         var hasActiveReadBookRoute: Boolean = false
-
-        @Volatile
-        var hasActiveAudioPlayRoute: Boolean = false
 
         @Volatile
         var hasActiveSourceLoginRoute: Boolean = false
@@ -181,19 +170,14 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack,
         fun createReadBookIntent(
             context: Context,
             bookUrl: String? = null,
-            readAloud: Boolean = false,
             inBookshelf: Boolean = true,
             chapterChanged: Boolean = false,
         ): Intent = MainIntent.createReadBookIntent(
             context = context,
             bookUrl = bookUrl,
-            readAloud = readAloud,
             inBookshelf = inBookshelf,
             chapterChanged = chapterChanged,
         )
-
-        fun createReadBookMediaControlIntent(context: Context): Intent =
-            MainIntent.createReadBookMediaControlIntent(context)
 
         fun createReadMangaIntent(
             context: Context,
@@ -205,16 +189,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack,
             bookUrl = bookUrl,
             inBookshelf = inBookshelf,
             chapterChanged = chapterChanged,
-        )
-
-        fun createAudioPlayIntent(
-            context: Context,
-            bookUrl: String? = null,
-            inBookshelf: Boolean = true,
-        ): Intent = MainIntent.createAudioPlayIntent(
-            context = context,
-            bookUrl = bookUrl,
-            inBookshelf = inBookshelf,
         )
 
         fun createSearchIntent(
@@ -608,7 +582,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack,
         if (readRoute != null) {
             outState.putBoolean(KEY_RESTORE_READ_ROUTE, true)
             outState.putString(KEY_RESTORE_READ_BOOK_URL, readRoute.bookUrl)
-            outState.putBoolean(KEY_RESTORE_READ_ALOUD, readRoute.readAloud)
             outState.putBoolean(KEY_RESTORE_READ_IN_BOOKSHELF, readRoute.inBookshelf)
             outState.putBoolean(KEY_RESTORE_READ_CHAPTER_CHANGED, readRoute.chapterChanged)
         }
@@ -618,7 +591,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack,
         if (!getBoolean(KEY_RESTORE_READ_ROUTE, false)) return null
         return MainRouteReadBook(
             bookUrl = getString(KEY_RESTORE_READ_BOOK_URL),
-            readAloud = getBoolean(KEY_RESTORE_READ_ALOUD, false),
             inBookshelf = getBoolean(KEY_RESTORE_READ_IN_BOOKSHELF, true),
             chapterChanged = getBoolean(KEY_RESTORE_READ_CHAPTER_CHANGED, false),
         )
@@ -692,33 +664,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack,
         if (!BuildConfig.DEBUG) {
             Backup.autoBack(this)
         }
-    }
-
-    // ===== AudioPlay.CallBack（有声书播放器路由注册，转发加载状态给当前播放器）=====
-
-    override fun upLoading(loading: Boolean) {
-        activeAudioPlayViewModel?.onLoadingChanged(loading)
-    }
-
-    override fun upLyric(lyric: String?) {
-        activeAudioPlayViewModel?.onLyricChanged()
-    }
-
-    override fun upLyricP(position: Int) {
-        // 歌词暂不在界面展示
-    }
-
-    // ===== ChangeBookSourceDialog.CallBack（有声书换源对话框，转发给当前播放器）=====
-
-    override val oldBook: Book?
-        get() = AudioPlay.book
-
-    override fun changeTo(source: BookSource, book: Book, toc: List<BookChapter>) {
-        activeAudioPlayViewModel?.changeTo(source, book, toc)
-    }
-
-    override fun addToBookshelf(book: Book, toc: List<BookChapter>) {
-        activeAudioPlayViewModel?.addToBookshelf(book, toc)
     }
 
 }

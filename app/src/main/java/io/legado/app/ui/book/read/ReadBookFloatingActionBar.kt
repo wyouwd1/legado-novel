@@ -14,8 +14,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -28,7 +26,7 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * 阅读界面底部悬浮胶囊组：独立悬浮窗纵向堆叠（朗读脱离提示、阅读锚点、主题切换提醒）。
+ * 阅读界面底部悬浮胶囊组：独立悬浮窗纵向堆叠（阅读锚点、主题切换提醒）。
  *
  * 每个胶囊为「按钮组」形态；多个胶囊同时出现时上下排列，
  * 各自条件独立、可并存；都为空时不显示。
@@ -41,12 +39,9 @@ fun ReadBookFloatingActionBar(
     val anchorVisible = state.readingAnchorAvailable &&
         !state.menuVisible && !state.isShowingSearchResult
     val reminder = state.activeReminder?.takeIf { !state.menuVisible }
-    val readAloudDetached = state.isReadAloudRunning && !state.readAloudFollow &&
-        state.readAloudDetachReminderEnabled &&
-        !state.menuVisible && !state.isShowingSearchResult
     Box(Modifier.fillMaxSize()) {
         AnimatedVisibility(
-            visible = anchorVisible || reminder != null || readAloudDetached,
+            visible = anchorVisible || reminder != null,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier
@@ -57,9 +52,6 @@ fun ReadBookFloatingActionBar(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                if (readAloudDetached) {
-                    ReadAloudDetachedCapsule(onIntent = onIntent)
-                }
                 if (anchorVisible) {
                     ReadingAnchorCapsule(onIntent = onIntent)
                 }
@@ -68,27 +60,6 @@ fun ReadBookFloatingActionBar(
                 }
             }
         }
-    }
-}
-
-/** 朗读位置脱离当前显示页时：跳回朗读位置，或从当前页重新朗读。 */
-@Composable
-private fun ReadAloudDetachedCapsule(onIntent: (ReadBookIntent) -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        MediumTonalButton(
-            onClick = { onIntent(ReadBookIntent.BackToSpeakingPosition) },
-            icon = Icons.AutoMirrored.Filled.VolumeUp,
-            text = stringResource(R.string.back_to_speaking_position),
-            contentDescription = stringResource(R.string.back_to_speaking_position),
-        )
-        MediumTonalButton(
-            onClick = { onIntent(ReadBookIntent.ReadAloudFromHere) },
-            icon = Icons.Default.PlayArrow,
-            text = stringResource(R.string.read_aloud_from_here),
-            contentDescription = stringResource(R.string.read_aloud_from_here),
-        )
     }
 }
 

@@ -13,7 +13,6 @@ import io.legado.app.data.entities.RssSource
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.help.CacheManager
 import io.legado.app.help.coroutine.Coroutine
-import io.legado.app.model.AudioPlay
 import io.legado.app.model.Debug
 import io.legado.app.model.ReadBook
 import io.legado.app.model.analyzeRule.AnalyzeRule
@@ -70,11 +69,6 @@ class WebJsExtensions(
                         ReadBook.durChapterIndex
                     )
                 }
-            }
-
-            BookType.audio -> {
-                book = AudioPlay.book
-                chapter = AudioPlay.durChapter
             }
         }
         Pair(book, chapter)

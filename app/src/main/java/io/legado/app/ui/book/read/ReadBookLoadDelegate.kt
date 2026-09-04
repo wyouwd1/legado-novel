@@ -27,7 +27,6 @@ import io.legado.app.model.ReadBook
 import io.legado.app.model.SourceCallBack
 import io.legado.app.model.localBook.LocalBook
 import io.legado.app.model.webBook.WebBook
-import io.legado.app.service.BaseReadAloudService
 import io.legado.app.utils.mapParallelSafe
 import io.legado.app.utils.postEvent
 import kotlinx.coroutines.CoroutineScope
@@ -188,7 +187,7 @@ class ReadBookLoadDelegate(
         }
         if (ReadBook.chapterChanged) {
             ReadBook.chapterChanged = false
-        } else if (!(isSameBook && BaseReadAloudService.isRun) && ReadBook.inBookshelf) {
+        } else if (!isSameBook && ReadBook.inBookshelf) {
             if (backupSettingsGateway.currentSettings.syncBookProgressPlus) {
                 ReadBook.syncProgress({ progress -> host.sureNewProgress(progress) })
             } else {

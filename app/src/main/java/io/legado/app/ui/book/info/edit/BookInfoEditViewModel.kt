@@ -12,7 +12,6 @@ import io.legado.app.data.repository.BookRepository
 import io.legado.app.help.book.BookHelp
 import io.legado.app.help.book.addType
 import io.legado.app.help.book.applyTagGroupRulesForBook
-import io.legado.app.help.book.isAudio
 import io.legado.app.help.book.isImage
 import io.legado.app.help.book.isLocal
 import io.legado.app.help.book.removeType
@@ -30,7 +29,6 @@ import java.io.FileOutputStream
 
 enum class BookInfoEditType {
     TEXT,
-    AUDIO,
     IMAGE
 }
 
@@ -62,7 +60,6 @@ class BookInfoEditViewModel(
             book?.let {
                 val selectedType = when {
                     it.isImage -> BookInfoEditType.IMAGE
-                    it.isAudio -> BookInfoEditType.AUDIO
                     else -> BookInfoEditType.TEXT
                 }
                 val sourceKinds = it.kind?.splitNotBlank(",", "\n").orEmpty().distinct()
@@ -135,10 +132,9 @@ class BookInfoEditViewModel(
                 val local = if (book.isLocal) BookType.local else 0
                 val bookType = when (currentState.selectedType) {
                     BookInfoEditType.IMAGE -> BookType.image or local
-                    BookInfoEditType.AUDIO -> BookType.audio or local
                     else -> BookType.text or local
                 }
-                book.removeType(BookType.local, BookType.image, BookType.audio, BookType.text)
+                book.removeType(BookType.local, BookType.image, BookType.text)
                 book.addType(bookType)
                 book.config.fixedType = currentState.fixedType
                 book.customCoverUrl = if (currentState.coverUrl == book.coverUrl) null else currentState.coverUrl

@@ -8,7 +8,6 @@ import io.legado.app.domain.gateway.CoverSettingsGateway
 import io.legado.app.domain.gateway.DownloadCacheSettingsGateway
 import io.legado.app.domain.gateway.ImportBookSettingsGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
-import io.legado.app.domain.gateway.ReadAloudSettingsGateway
 import io.legado.app.domain.gateway.ReadSettingsGateway
 import io.legado.app.domain.gateway.ThemeSettingsGateway
 import io.legado.app.utils.isNightMode
@@ -29,7 +28,6 @@ object AppConfig {
     private lateinit var cacheGateway: DownloadCacheSettingsGateway
     private lateinit var coverGateway: CoverSettingsGateway
     private lateinit var readGateway: ReadSettingsGateway
-    private lateinit var aloudGateway: ReadAloudSettingsGateway
     private lateinit var importBookGateway: ImportBookSettingsGateway
     private lateinit var exportGateway: BookExportSettingsGateway
 
@@ -42,7 +40,6 @@ object AppConfig {
         cacheGateway: DownloadCacheSettingsGateway,
         coverGateway: CoverSettingsGateway,
         readGateway: ReadSettingsGateway,
-        aloudGateway: ReadAloudSettingsGateway,
         importBookGateway: ImportBookSettingsGateway,
         exportGateway: BookExportSettingsGateway,
     ) {
@@ -54,7 +51,6 @@ object AppConfig {
         this.cacheGateway = cacheGateway
         this.coverGateway = coverGateway
         this.readGateway = readGateway
-        this.aloudGateway = aloudGateway
         this.importBookGateway = importBookGateway
         this.exportGateway = exportGateway
     }
@@ -67,7 +63,6 @@ object AppConfig {
     private val cache get() = cacheGateway.currentSettings
     private val cover get() = coverGateway.currentSettings
     private val read get() = readGateway.currentSettings
-    private val aloud get() = aloudGateway.currentSettings
     private val importBook get() = importBookGateway.currentSettings
     private val export get() = exportGateway.currentSettings
 
@@ -106,8 +101,6 @@ object AppConfig {
     val importKeepEnable get() = other.importKeepEnable
     val preDownloadNum get() = cache.preDownloadNum
     val syncBookProgress get() = backup.syncBookProgress
-    val mediaButtonOnExit get() = aloud.mediaButtonOnExit
-    val readAloudByMediaButton get() = aloud.readAloudByMediaButton
     val replaceEnableDefault get() = other.replaceEnableDefault
     val webDavDir get() = backup.webDavDir
     val webDavDeviceName get() = backup.webDavDeviceName
@@ -117,9 +110,7 @@ object AppConfig {
     val bookshelfSort get() = bookshelf.bookshelfSort
     val bitmapCacheSize get() = cache.bitmapCacheSize
     val sourceEditMaxLine get() = other.sourceEditMaxLine
-    val audioPlayUseWakeLock get() = other.audioPlayUseWakeLock
     val firebaseEnable get() = other.firebaseEnable
     val pureBlack get() = theme.isPureBlack
-    val systemMediaControlCompatibilityChange get() = aloud.systemMediaControlCompatibilityChange
     val isPredictiveBackEnabled get() = shell.predictiveBackEnabled
 }

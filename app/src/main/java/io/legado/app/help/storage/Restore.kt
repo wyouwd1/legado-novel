@@ -21,7 +21,6 @@ import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.HighlightTagRule
 import io.legado.app.data.entities.HomepageCustomSet
 import io.legado.app.data.entities.HomepageModule
-import io.legado.app.data.entities.HttpTTS
 import io.legado.app.data.entities.KeyboardAssist
 import io.legado.app.data.entities.ReplaceRule
 import io.legado.app.data.entities.RssSource
@@ -219,14 +218,6 @@ object Restore : KoinComponent {
             fileToListT<TxtTocRule>(path, "txtTocRule.json")?.let {
                 try {
                     appDb.txtTocRuleDao.insert(*it.toTypedArray())
-                } catch (_: SQLiteConstraintException) {
-                }
-            }
-        }
-        if (BackupConfig.dbIsNotIgnored("httpTTS")) {
-            fileToListT<HttpTTS>(path, "httpTTS.json")?.let {
-                try {
-                    appDb.httpTTSDao.insert(*it.toTypedArray())
                 } catch (_: SQLiteConstraintException) {
                 }
             }

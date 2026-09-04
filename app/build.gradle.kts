@@ -213,9 +213,6 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.lifecycle.common.java8)
     implementation(libs.lifecycle.service)
-    implementation(libs.media.media)
-    implementation(libs.media3.exoplayer)
-    implementation(libs.media3.datasource.okhttp)
     implementation(libs.splitties.appctx)
     implementation(libs.splitties.systemservices)
     implementation(libs.splitties.views)
@@ -313,6 +310,5 @@ dependencies {
     implementation(libs.miuix.core)
     implementation(libs.capsule)
     implementation(libs.backdrop)
-    implementation(libs.lyricViewx)
     implementation(libs.timber)
 }

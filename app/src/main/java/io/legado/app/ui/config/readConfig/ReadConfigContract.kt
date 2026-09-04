@@ -38,7 +38,6 @@ data class ReadConfigUiState(
     val autoChangeSource: Boolean = true,
     val autoSuggestDayNight: Boolean = false,
     val readingAnchorEnabled: Boolean = true,
-    val readAloudDetachReminderEnabled: Boolean = false,
     val selectText: Boolean = true,
     val noAnimScrollPage: Boolean = false,
     val clickImgWay: String = "2",
@@ -109,7 +108,6 @@ sealed interface ReadConfigIntent {
     data class ShowMenuIconChanged(val value: Boolean) : ReadConfigIntent
     data class AutoSuggestDayNightChanged(val value: Boolean) : ReadConfigIntent
     data class ReadingAnchorChanged(val value: Boolean) : ReadConfigIntent
-    data class ReadAloudDetachReminderChanged(val value: Boolean) : ReadConfigIntent
     data class PageKeysChanged(val prevKeys: String, val nextKeys: String) : ReadConfigIntent
 }
 

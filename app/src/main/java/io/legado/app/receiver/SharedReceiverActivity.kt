@@ -5,8 +5,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import io.legado.app.ui.main.MainActivity
-import splitties.init.appCtx
 
 class SharedReceiverActivity : AppCompatActivity() {
 
@@ -32,9 +30,6 @@ class SharedReceiverActivity : AppCompatActivity() {
                 intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)?.let {
                     dispose(it)
                 }
-            }
-            intent.getStringExtra("action") == "readAloud" -> {
-                MediaButtonReceiver.readAloud(appCtx, false)
             }
         }
     }

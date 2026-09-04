@@ -72,7 +72,6 @@ internal fun FloatingIconRow(
     val context = LocalContext.current
     val floatingIcons = remember(
         state.menuConfig.titleBarButtons,
-        state.isReadAloudRunning,
         state.isAutoPage,
         state.translationMode,
         state.useReplaceRule,
@@ -376,14 +375,6 @@ private fun loadFloatingIcons(
     val actionMap: Map<String, () -> Unit> = mapOf(
         "search" to { onIntent(ReadBookIntent.OpenSearch(null)) },
         "catalog" to { onIntent(ReadBookIntent.OpenChapterList) },
-        "read_aloud" to {
-            if (state.isReadAloudRunning) {
-                onIntent(ReadBookIntent.ReadAloudAction)
-            } else {
-                onIntent(ReadBookIntent.ToggleReadAloud)
-                onIntent(ReadBookIntent.HideMenu)
-            }
-        },
         "setting" to { onIntent(ReadBookIntent.OpenReadMenuRoute(ReadBookMenuRoute.ReadStyle)) },
         "addBookmark" to { onIntent(ReadBookIntent.AddBookmark) },
         "theme" to { onIntent(ReadBookIntent.ToggleDayNight) },
@@ -408,7 +399,6 @@ private fun loadFloatingIcons(
     )
 
     val activeIds = buildSet {
-        if (state.isReadAloudRunning) add("read_aloud")
         if (state.isAutoPage) add("auto_page")
         if (state.translationMode) add("translate")
         if (eyeProtectionActive) add("eye_protection")
@@ -426,13 +416,7 @@ private fun loadFloatingIcons(
                 label = info.label,
                 isActive = id in activeIds,
                 onClick = actionMap[id] ?: {},
-                onLongClick = when (id) {
-                    "read_aloud" -> {
-                        { onIntent(ReadBookIntent.OpenReadMenuRoute(ReadBookMenuRoute.ReadAloud)) }
-                    }
-
-                    else -> null
-                },
+                onLongClick = null,
             )
         }
         .toList()

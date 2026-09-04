@@ -25,11 +25,6 @@ object BookType {
     const val updateError = 0b10000
 
     /**
-     * 32 音频
-     */
-    const val audio = 0b100000
-
-    /**
      * 64 图片
      */
     const val image = 0b1000000
@@ -56,15 +51,15 @@ object BookType {
 
     @Target(AnnotationTarget.VALUE_PARAMETER)
     @Retention(AnnotationRetention.SOURCE)
-    @IntDef(text, updateError, audio, image, webFile, local, archive, notShelf)
+    @IntDef(text, updateError, image, webFile, local, archive, notShelf)
     annotation class Type
 
     /**
      * 所有可以从书源转换的书籍类型
      */
-    const val allBookType = text or image or audio or webFile
+    const val allBookType = text or image or webFile
 
-    const val allBookTypeLocal = text or image or audio or webFile or local
+    const val allBookTypeLocal = text or image or webFile or local
 
     /**
      * 本地书籍书源标志

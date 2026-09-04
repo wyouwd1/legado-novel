@@ -15,7 +15,6 @@ import io.legado.app.domain.gateway.BackupSettingsGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.help.config.LocalConfig
-import io.legado.app.model.ReadAloud
 import io.legado.app.utils.FileDoc
 import io.legado.app.utils.FileUtils
 import io.legado.app.utils.createFileIfNotExist
@@ -57,7 +56,6 @@ class CrashHandler(val context: Context) : Thread.UncaughtExceptionHandler {
             AppLog.put("发生未捕获的异常\n${ex.localizedMessage}", ex)
             Looper.loop()
         } else {
-            ReadAloud.stop(context)
             if (handleException(ex)) {
                 Process.killProcess(Process.myPid())
                 exitProcess(10)

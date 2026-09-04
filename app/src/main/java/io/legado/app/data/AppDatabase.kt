@@ -21,8 +21,6 @@ import io.legado.app.data.dao.BookMarkingDao
 import io.legado.app.data.dao.BookSourceDao
 import io.legado.app.data.dao.BookmarkDao
 import io.legado.app.data.dao.CacheDao
-import io.legado.app.data.dao.ChapterSpeechDao
-import io.legado.app.data.dao.CloudTtsEngineDao
 import io.legado.app.data.dao.CookieDao
 import io.legado.app.data.dao.DictRuleDao
 import io.legado.app.data.dao.ExactChapterPageCountDao
@@ -30,9 +28,7 @@ import io.legado.app.data.dao.HighlightRuleDao
 import io.legado.app.data.dao.HighlightTagRuleDao
 import io.legado.app.data.dao.HomepageCustomSetDao
 import io.legado.app.data.dao.HomepageModuleDao
-import io.legado.app.data.dao.HttpTTSDao
 import io.legado.app.data.dao.KeyboardAssistsDao
-import io.legado.app.data.dao.ReadAloudVoiceDao
 import io.legado.app.data.dao.ReadRecordDao
 import io.legado.app.data.dao.ReplaceRuleDao
 import io.legado.app.data.dao.RssArticleDao
@@ -66,12 +62,8 @@ import io.legado.app.data.entities.BookMarking
 import io.legado.app.data.entities.BookOutlineNode
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.BookSourcePart
-import io.legado.app.data.entities.BookVoiceBindingEntity
 import io.legado.app.data.entities.Bookmark
 import io.legado.app.data.entities.Cache
-import io.legado.app.data.entities.ChapterSpeechAnalysisEntity
-import io.legado.app.data.entities.ChapterSpeechSegmentEntity
-import io.legado.app.data.entities.CloudTtsEngineEntity
 import io.legado.app.data.entities.Cookie
 import io.legado.app.data.entities.DictRule
 import io.legado.app.data.entities.ExactChapterPageCountEntity
@@ -79,9 +71,7 @@ import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.HighlightTagRule
 import io.legado.app.data.entities.HomepageCustomSet
 import io.legado.app.data.entities.HomepageModule
-import io.legado.app.data.entities.HttpTTS
 import io.legado.app.data.entities.KeyboardAssist
-import io.legado.app.data.entities.ReadAloudVoiceEntity
 import io.legado.app.data.entities.ReplaceRule
 import io.legado.app.data.entities.RssArticle
 import io.legado.app.data.entities.RssReadRecord
@@ -112,13 +102,13 @@ val appDb by lazy {
 }
 
 @Database(
-    version = 104,
+    version = 105,
     exportSchema = true,
     entities = [Book::class, BookGroup::class, BookSource::class, BookChapter::class,
         ReplaceRule::class, SearchBook::class, SearchKeyword::class, Cookie::class,
         RssSource::class, Bookmark::class, RssArticle::class,
         RssReadRecord::class, ReadRecordDetail::class, ReadRecordSession::class,
-        RssStar::class, TxtTocRule::class, ReadRecord::class, HttpTTS::class, Cache::class,
+        RssStar::class, TxtTocRule::class, ReadRecord::class, Cache::class,
         RuleSub::class, DictRule::class, KeyboardAssist::class, Server::class,
         SearchContentHistory::class, HomepageModule::class, HomepageCustomSet::class,
         HighlightRule::class, AiProviderProfile::class, AiModelProfile::class,
@@ -126,9 +116,8 @@ val appDb by lazy {
         AiChatMessage::class, AiMemory::class, HighlightTagRule::class, TagGroupRule::class,
         BookContentProcess::class, AiPromptPreset::class, BookCharacterProfile::class,
         BookCharacterEvent::class, BookCharacterRelation::class, BookKnowledgeEntry::class,
-        BookOutlineNode::class, ReadAloudVoiceEntity::class, BookVoiceBindingEntity::class,
-        ChapterSpeechAnalysisEntity::class, ChapterSpeechSegmentEntity::class,
-        CloudTtsEngineEntity::class, ExactChapterPageCountEntity::class,
+        BookOutlineNode::class,
+        ExactChapterPageCountEntity::class,
         BookMarking::class],
     views = [BookSourcePart::class],
     autoMigrations = [
@@ -190,7 +179,6 @@ val appDb by lazy {
         AutoMigration(from = 100, to = 101, spec = DatabaseMigrations.Migration_100_101::class),
         // book_marks 新表：Room AutoMigration 支持新增表，自动 CREATE TABLE
         AutoMigration(from = 101, to = 102),
-        // httpTTS 新增可空列 speed（源级语速）
         AutoMigration(from = 103, to = 104)
     ]
 )
@@ -202,9 +190,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val bookChapterDao: BookChapterDao
     abstract val bookContentProcessDao: BookContentProcessDao
     abstract val bookKnowledgeDao: BookKnowledgeDao
-    abstract val readAloudVoiceDao: ReadAloudVoiceDao
-    abstract val chapterSpeechDao: ChapterSpeechDao
-    abstract val cloudTtsEngineDao: CloudTtsEngineDao
     abstract val replaceRuleDao: ReplaceRuleDao
     abstract val searchBookDao: SearchBookDao
     abstract val searchKeywordDao: SearchKeywordDao
@@ -217,7 +202,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val cookieDao: CookieDao
     abstract val txtTocRuleDao: TxtTocRuleDao
     abstract val readRecordDao: ReadRecordDao
-    abstract val httpTTSDao: HttpTTSDao
     abstract val cacheDao: CacheDao
     abstract val ruleSubDao: RuleSubDao
     abstract val dictRuleDao: DictRuleDao
@@ -280,13 +264,6 @@ abstract class AppDatabase : RoomDatabase() {
                 """.trimIndent()
                 db.execSQL(insertBookGroupMangaSql)
                 @Language("sql")
-                val insertBookGroupMusicSql = """
-                    insert into book_groups(groupId, groupName, 'order', show) 
-                    select ${BookGroup.IdAudio}, '音频', -8, 1
-                    where not exists (select * from book_groups where groupId = ${BookGroup.IdAudio})
-                """.trimIndent()
-                db.execSQL(insertBookGroupMusicSql)
-                Language("sql")
                 val insertGroupReading = """
                     insert into book_groups(groupId, groupName, 'order', show) 
                     select ${BookGroup.IdReading}, '在读', -30, 1
@@ -350,14 +327,6 @@ abstract class AppDatabase : RoomDatabase() {
                 val upRssSourceLoginUiSql =
                     "update rssSources set loginUi = null where loginUi = 'null'"
                 db.execSQL(upRssSourceLoginUiSql)
-                @Language("sql")
-                val upHttpTtsLoginUiSql =
-                    "update httpTTS set loginUi = null where loginUi = 'null'"
-                db.execSQL(upHttpTtsLoginUiSql)
-                @Language("sql")
-                val upHttpTtsConcurrentRateSql =
-                    "update httpTTS set concurrentRate = '0' where concurrentRate is null"
-                db.execSQL(upHttpTtsConcurrentRateSql)
                 db.query("select * from keyboardAssists order by serialNo").use {
                     if (it.count == 0) {
                         DefaultData.keyboardAssists.forEach { keyboardAssist ->

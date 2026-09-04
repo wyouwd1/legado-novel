@@ -209,7 +209,6 @@ internal fun MenuBottomBar(
             context,
             state.menuConfig.bottomBarButtons,
             state.menuConfig.readMenuCustomIcons,
-            state.isReadAloudRunning,
             state.isAutoPage,
             state.translationMode,
             state.useReplaceRule,

@@ -14,12 +14,9 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.ImageLoader
 import io.legado.app.R
 import io.legado.app.data.repository.ReadPreferences
-import io.legado.app.domain.gateway.CoverSettingsGateway
 import io.legado.app.domain.usecase.BookmarkTargetVerdict
-import io.legado.app.help.coil.CoverExtras
 import io.legado.app.ui.book.read.sheet.AiRewritePresetConfigSheet
 import io.legado.app.ui.book.read.sheet.AiTextCleanSheet
 import io.legado.app.ui.book.read.sheet.AiTextRewriteSheet
@@ -38,34 +35,22 @@ import io.legado.app.ui.book.read.sheet.MoreConfigSheet
 import io.legado.app.ui.book.read.sheet.PageAnimConfigSheet
 import io.legado.app.ui.book.read.sheet.PageKeyConfigSheet
 import io.legado.app.ui.book.read.sheet.PhotoSheet
-import io.legado.app.ui.book.read.sheet.ReadAloudNumberConfigSheet
-import io.legado.app.ui.book.read.sheet.ReadAloudPage
-import io.legado.app.ui.book.read.sheet.ReadAloudScreen
 import io.legado.app.ui.book.read.sheet.ReaderMoreActionsSheet
 import io.legado.app.ui.book.read.sheet.ShadowSetSheet
 import io.legado.app.ui.book.read.sheet.SimulatedReadingSheet
 import io.legado.app.ui.book.read.sheet.TextProcessingSheet
 import io.legado.app.ui.book.read.sheet.ToolButtonConfigSheet
 import io.legado.app.ui.book.read.sheet.UnderlineConfigSheet
-import io.legado.app.ui.book.readaloud.player.ReadAloudPlayerEffect
-import io.legado.app.ui.book.readaloud.player.ReadAloudPlayerViewModel
 import io.legado.app.ui.dict.DictSheet
-import io.legado.app.ui.theme.LegadoTheme
-import io.legado.app.ui.theme.rememberImageSeedColor
-import io.legado.app.ui.theme.rememberThemeOverride
 import io.legado.app.ui.widget.components.FontFolderState
 import io.legado.app.ui.widget.components.FontSelectSheet
 import io.legado.app.ui.widget.components.alert.AppAlertDialog
 import io.legado.app.ui.widget.components.bookmark.BookmarkEditSheet
 import io.legado.app.ui.widget.components.changeSource.ChangeSourceSheet
-import io.legado.app.ui.widget.components.image.cover.usesDefaultBookCover
 import io.legado.app.ui.widget.components.log.AppLogSheet
 import io.legado.app.ui.widget.components.text.AppText
 import io.legado.app.utils.toastOnUi
 import kotlinx.coroutines.flow.collectLatest
-import org.koin.compose.koinInject
-import io.legado.app.model.BookCover as BookCoverModel
-
 /**
  * Stateless reader overlays: back handling, dialogs and sheets.
  * [ReadBookRouteScreen] owns the Compose Canvas reading surface.
@@ -433,62 +418,6 @@ fun ReadBookScreen(
         onPickBookmarkBadgeImage = onPickBookmarkBadgeImage,
         onResetBookmarkBadge = onResetBookmarkBadge,
     )
-    ReadAloudNumberConfigSheet(
-        show = state.activeSheet is ReadBookSheet.PreDownloadConfig,
-        title = stringResource(R.string.read_aloud_preload),
-        description = stringResource(R.string.read_aloud_preload_summary, state.preDownloadNum),
-        value = state.preDownloadNum,
-        defaultValue = 10,
-        valueRange = 0f..100f,
-        onValueChange = { onIntent(ReadBookIntent.ApplyPreDownloadNum(it)) },
-        onDismissRequest = {
-            onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.ReadAloudConfig))
-        },
-    )
-    ReadAloudNumberConfigSheet(
-        show = state.activeSheet is ReadBookSheet.PreSynthesisConcurrencyConfig,
-        title = stringResource(R.string.tts_pre_synthesis_concurrency),
-        description = stringResource(
-            R.string.tts_pre_synthesis_concurrency_summary, state.preSynthesisConcurrency,
-        ),
-        value = state.preSynthesisConcurrency,
-        defaultValue = 3,
-        valueRange = 1f..8f,
-        onValueChange = { onIntent(ReadBookIntent.ApplyPreSynthesisConcurrency(it)) },
-        onDismissRequest = {
-            onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.ReadAloudConfig))
-        },
-    )
-    ReadAloudNumberConfigSheet(
-        show = state.activeSheet is ReadBookSheet.AudioCacheCleanConfig,
-        title = stringResource(R.string.audio_cache_clean_time),
-        description = stringResource(
-            R.string.audio_cache_clean_time_summary,
-            state.audioCacheCleanTime
-        ),
-        value = state.audioCacheCleanTime,
-        defaultValue = 10,
-        valueRange = 0f..10080f,
-        onValueChange = { onIntent(ReadBookIntent.ApplyAudioCacheCleanTime(it)) },
-        onDismissRequest = {
-            onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.ReadAloudConfig))
-        },
-    )
-    ReadAloudNumberConfigSheet(
-        show = state.activeSheet is ReadBookSheet.ParagraphIntervalConfig,
-        title = stringResource(R.string.tts_paragraph_interval),
-        description = stringResource(
-            R.string.tts_paragraph_interval_summary,
-            state.readAloudParagraphInterval
-        ),
-        value = state.readAloudParagraphInterval,
-        defaultValue = 0,
-        valueRange = 0f..5000f,
-        onValueChange = { onIntent(ReadBookIntent.ApplyParagraphInterval(it)) },
-        onDismissRequest = {
-            onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.ReadAloudConfig))
-        },
-    )
     AppLogSheet(
         show = state.activeSheet is ReadBookSheet.AppLog,
         onDismissRequest = dismissSheet,
@@ -505,77 +434,6 @@ fun ReadBookScreen(
         onExportConfig = { onIntent(ReadBookIntent.OpenReadStyleExport) },
         styleConfig = state.styleConfig,
     )
-
-    val aloudPlayerViewModel: ReadAloudPlayerViewModel =
-        org.koin.androidx.compose.koinViewModel()
-    val aloudPlayerState by aloudPlayerViewModel.uiState.collectAsStateWithLifecycle()
-    val playerTheme = run {
-        val imageLoader: ImageLoader = koinInject()
-        val coverSettings = koinInject<CoverSettingsGateway>().currentSettings
-        val isNight = LegadoTheme.isDark
-        val useDefaultCover = usesDefaultBookCover(aloudPlayerState.coverPath)
-        val defaultCoverPaths = if (isNight) coverSettings.defaultCoverDark else coverSettings.defaultCover
-        val coverPath = remember(
-            aloudPlayerState.bookName,
-            aloudPlayerState.author,
-            aloudPlayerState.coverPath,
-            useDefaultCover,
-            isNight,
-            defaultCoverPaths,
-        ) {
-            if (useDefaultCover) {
-                BookCoverModel.getRandomDefaultPath(
-                    seed = aloudPlayerState.bookName,
-                    isNight = isNight,
-                )
-            } else {
-                aloudPlayerState.coverPath
-            }
-        }
-        val sourceOrigin = if (useDefaultCover) null else aloudPlayerState.sourceOrigin
-        val loadOnlyWifi = !useDefaultCover && coverSettings.loadOnlyOnWifi
-        val requestKey = remember(coverPath, sourceOrigin, loadOnlyWifi) {
-            listOf(coverPath, sourceOrigin, loadOnlyWifi)
-        }
-        val seedColor = rememberImageSeedColor(
-            imageLoader = imageLoader,
-            data = coverPath,
-            requestKey = requestKey,
-        ) {
-            extras[CoverExtras.SourceOrigin] = sourceOrigin
-            extras[CoverExtras.LoadOnlyWifi] = loadOnlyWifi
-        }
-        rememberThemeOverride(seedColor)
-    }
-    val readAloudPage = when (state.activeSheet) {
-        ReadBookSheet.ReadAloudConfig -> ReadAloudPage.Config
-        ReadBookSheet.ReadAloudPlayer -> ReadAloudPage.Player
-        else -> null
-    }
-    ReadAloudScreen(
-        page = readAloudPage,
-        state = state,
-        playerState = aloudPlayerState,
-        playerTheme = playerTheme,
-        onIntent = onIntent,
-        onPlayerIntent = aloudPlayerViewModel::onIntent,
-        onDismissRequest = dismissSheet,
-    )
-    LaunchedEffect(state.activeSheet) {
-        if (state.activeSheet is ReadBookSheet.ReadAloudPlayer) {
-            aloudPlayerViewModel.onIntent(
-                io.legado.app.ui.book.readaloud.player.ReadAloudPlayerIntent.Refresh
-            )
-            aloudPlayerViewModel.effects.collectLatest { effect ->
-                when (effect) {
-                    ReadAloudPlayerEffect.ReturnToReaderSettings ->
-                        onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.ReadAloudConfig))
-                    ReadAloudPlayerEffect.ReturnToClassic ->
-                        onIntent(ReadBookIntent.OpenClassicReadAloudControls)
-                }
-            }
-        }
-    }
 
     val dictSheet = state.activeSheet as? ReadBookSheet.Dict
     DictSheet(

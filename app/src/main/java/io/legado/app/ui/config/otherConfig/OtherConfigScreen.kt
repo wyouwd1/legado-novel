@@ -151,27 +151,6 @@ fun OtherConfigScreen(
                 )
 
                 SwitchSettingItem(
-                    title = stringResource(R.string.media_button_on_exit_title),
-                    description = stringResource(R.string.media_button_on_exit_summary),
-                    checked = state.mediaButtonOnExit,
-                    onCheckedChange = { onIntent(OtherConfigIntent.MediaButtonOnExitChanged(it)) }
-                )
-
-                SwitchSettingItem(
-                    title = stringResource(R.string.read_aloud_by_media_button_title),
-                    description = stringResource(R.string.read_aloud_by_media_button_summary),
-                    checked = state.readAloudByMediaButton,
-                    onCheckedChange = { onIntent(OtherConfigIntent.ReadAloudByMediaButtonChanged(it)) }
-                )
-
-                SwitchSettingItem(
-                    title = stringResource(R.string.ignore_audio_focus_title),
-                    description = stringResource(R.string.ignore_audio_focus_summary),
-                    checked = state.ignoreAudioFocus,
-                    onCheckedChange = { onIntent(OtherConfigIntent.IgnoreAudioFocusChanged(it)) }
-                )
-
-                SwitchSettingItem(
                     title = stringResource(R.string.auto_clear_expired),
                     description = stringResource(R.string.auto_clear_expired_summary),
                     checked = state.autoClearExpired,

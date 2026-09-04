@@ -11,7 +11,6 @@ import io.legado.app.data.repository.BookCacheManageRepository
 import io.legado.app.domain.usecase.CacheBookChaptersUseCase
 import io.legado.app.domain.usecase.ClearBookCacheUseCase
 import io.legado.app.help.book.BookHelp
-import io.legado.app.help.book.isAudio
 import io.legado.app.help.book.isLocal
 import io.legado.app.help.book.isNotShelf
 import io.legado.app.model.CacheBook
@@ -241,7 +240,7 @@ class BookCacheManageViewModel(
                 }
                 val items = sortItems(
                     sourceBooks
-                        .filterNot { it.isLocal || it.isAudio }
+                        .filterNot { it.isLocal }
                         .mapNotNull { book -> buildBookItem(book) }
                         .filter(::shouldShowItem)
                 )
@@ -395,7 +394,7 @@ class BookCacheManageViewModel(
         val result = withContext(Dispatchers.IO) {
             val book = repository.getBook(bookUrl)
             val item = book
-                ?.takeUnless { it.isLocal || it.isAudio }
+                ?.takeUnless { it.isLocal }
                 ?.let { buildBookItem(it) }
                 ?.takeIf(::shouldShowItem)
             val chapters = if (expanded && item != null) {

@@ -129,7 +129,6 @@ data object MainRouteBookCacheManage : MainRoute
 @Serializable
 data class MainRouteReadBook(
     val bookUrl: String? = null,
-    val readAloud: Boolean = false,
     val inBookshelf: Boolean = true,
     val chapterChanged: Boolean = false,
     val sharedCoverKey: String? = null,
@@ -140,12 +139,6 @@ data class MainRouteReadManga(
     val bookUrl: String? = null,
     val inBookshelf: Boolean = true,
     val chapterChanged: Boolean = false,
-) : MainRoute
-
-@Serializable
-data class MainRouteAudioPlay(
-    val bookUrl: String? = null,
-    val inBookshelf: Boolean = true,
 ) : MainRoute
 
 @Serializable
@@ -179,17 +172,6 @@ data class MainRouteBookCharacterNetwork(
 data class MainRouteBookCharacterList(
     val bookUrl: String,
 ) : MainRoute
-
-@Serializable
-data class MainRouteBookVoiceCasting(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteCloudTtsEngines(val bookUrl: String? = null) : MainRoute
-
-@Serializable
-data object MainRouteTtsCache : MainRoute
 
 @Serializable
 data class MainRouteBookKnowledgeList(
@@ -271,7 +253,6 @@ object MainRouteConst {
     const val ROUTE_BOOK_CACHE_MANAGE = "book/cache/manage"
     const val ROUTE_READ_BOOK = "book/read"
     const val ROUTE_READ_MANGA = "book/read/manga"
-    const val ROUTE_AUDIO_PLAY = "book/read/audio"
     const val ROUTE_SEARCH = "search"
     const val ROUTE_SEARCH_CONTENT = "book/searchContent"
     const val ROUTE_BOOK_INFO = "book/info"
@@ -290,5 +271,4 @@ object MainRouteConst {
     const val ROUTE_READ_RECORD = "read_record"
     const val ROUTE_READ_RECORD_OVERVIEW = "read_record_overview"
     const val ROUTE_ABOUT = "about"
-    const val ROUTE_TTS_CACHE = "tts_cache"
 }
