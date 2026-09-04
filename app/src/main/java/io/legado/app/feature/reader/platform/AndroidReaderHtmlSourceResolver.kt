@@ -77,7 +77,7 @@ class AndroidReaderHtmlSourceResolver(
                         ))
                         is BulletSpan -> add(ReaderParagraphDecoration(
                             ReaderParagraphDecorationKind.BULLET,
-                            span.color.takeUnless { it == 0 },
+                            if (Build.VERSION.SDK_INT >= 28) span.color.takeUnless { it == 0 } else null,
                             if (Build.VERSION.SDK_INT >= 28) span.bulletRadius.toFloat() else 4f,
                             leadingOffset,
                         ))
