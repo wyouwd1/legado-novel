@@ -23,9 +23,6 @@ features:
   - icon: 🔧
     title: 自定义内容源
     details: 支持自定义内容抓取规则，可从任意网站聚合文字内容
-  - icon: 🎙️
-    title: 多种朗读引擎
-    details: 支持本地 TTS 和在线朗读，提供沉浸式听书体验
   - icon: ☁️
     title: WebDAV 同步
     details: 支持 WebDAV 云备份和书籍同步，多设备无缝切换

@@ -88,7 +88,6 @@ export default defineConfig({
           items: [
             { text: '源调试', link: '/dev/debug' },
             { text: '字典规则', link: '/dev/dict-rule' },
-            { text: '在线朗读规则', link: '/dev/tts-rule' },
             { text: 'TXT 目录正则', link: '/dev/txt-toc' },
             { text: 'MIME 类型参考', link: '/spec/mime-types' },
           ],
@@ -128,7 +127,6 @@ export default defineConfig({
           items: [
             { text: '源调试', link: '/dev/debug' },
             { text: '字典规则', link: '/dev/dict-rule' },
-            { text: '在线朗读规则', link: '/dev/tts-rule' },
             { text: 'TXT 目录正则', link: '/dev/txt-toc' },
             { text: 'MIME 类型参考', link: '/spec/mime-types' },
           ],

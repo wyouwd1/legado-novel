@@ -18,8 +18,6 @@
 | `ui/book/changecover`                    | `feature/change-cover`      | Feature                       | 图片选择与裁剪由 host/platform effect 处理                                             |
 | `ui/book/changesource`、`ui/book/source`  | `feature/book-source`       | Feature                       | source edit/manage/debug 可作为同域子包，避免交叉 impl 依赖                                |
 | `ui/book/readRecord`                     | `feature/reading-history`   | Feature                       | 新包统一全小写；不要延续 camelCase package                                               |
-| `ui/book/readaloud`                      | `feature/read-aloud`        | Feature + platform adapter    | 控制 UI 可 Feature 化，TTS/service/media 生命周期留 platform                           |
-| `ui/book/audio`                          | `feature/audio-playback`    | Feature + platform adapter    | 播放服务、媒体会话和通知留 Android platform                                               |
 | `ui/book/read`                           | `platform/android/reader`   | platform island               | 当前不作为普通 Feature 搬迁；共享状态/模型另行立项                                               |
 | `ui/book/manga`                          | `feature/manga`             | Feature + renderer capability | 图片渲染、缓存和手势需专项边界审计                                                            |
 | `ui/config/*`                            | `feature/settings`          | Feature domain                | 先保留 settings 下的 `appearance`、`reading`、`backup`、`advanced` 等 section，不为每页建模块 |

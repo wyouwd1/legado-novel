@@ -42,7 +42,7 @@ Compared to the official version, this project provides the following exclusive 
 * **Reading Records:**
   Detailed reading statistics with **timeline** and **chapter-based** views.
 * **Enhanced Experience:**
-  Improved experiences for **comic reading**, **audiobooks**, and **discovery** pages.
+  Improved experiences for **comic reading** and **discovery** pages.
 * **Bookshelf Layouts:**
   More bookshelf layout options, with dedicated UI optimizations for **tablet devices**.
 * **Practical Features:**
