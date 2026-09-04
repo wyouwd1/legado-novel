@@ -54,7 +54,7 @@ import org.jsoup.nodes.TextNode
 
 /**
  * 通用 HTML 渲染组件：把不可信 HTML 解析为段落 + 行内样式/链接/图片/按钮，供 Compose 展示。
- * 最初为词典内容(ui/dict)提取，书籍详情简介等纯文本 UI 复用同一实现。
+ * 书籍详情简介等纯文本 UI 复用同一实现。
  *
  * @param interactive 为 true 时启用 legado 交互约定（<button>名称@onclick:脚本</button>、
  *                   图片 src 后缀 {...,"click":"脚本"} 的点击、图片长按），并把回调暴露给调用方。

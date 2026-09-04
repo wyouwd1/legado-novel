@@ -25,7 +25,6 @@
     <item name="menu_copy" type="id" />
     <item name="menu_bookmark" type="id" />
     <item name="menu_aloud" type="id" />
-    <item name="menu_dict" type="id" />
     <item name="menu_edit" type="id" />
     <item name="menu_search_content" type="id" />
     <item name="menu_mark" type="id" />

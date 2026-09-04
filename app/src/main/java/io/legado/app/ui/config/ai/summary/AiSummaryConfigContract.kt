@@ -2,7 +2,7 @@ package io.legado.app.ui.config.ai.summary
 
 import androidx.compose.runtime.Stable
 import io.legado.app.domain.model.AiPromptTemplate
-import io.legado.app.domain.model.TranslationConstants
+import io.legado.app.domain.model.AiGenerationDefaults
 
 @Stable
 sealed interface AiSummaryConfigDialog {
@@ -14,7 +14,7 @@ sealed interface AiSummaryConfigDialog {
 data class AiSummaryConfigUiState(
     val loading: Boolean = true,
     val promptTemplate: String = AiPromptTemplate.DEFAULT_CHAPTER_SUMMARY,
-    val temperature: Float = TranslationConstants.DEFAULT_TEMPERATURE,
+    val temperature: Float = AiGenerationDefaults.DEFAULT_TEMPERATURE,
     val maxOutputTokens: Int = 0,
     val defaultPrompt: String = AiPromptTemplate.DEFAULT_CHAPTER_SUMMARY,
     val initialized: Boolean = false,

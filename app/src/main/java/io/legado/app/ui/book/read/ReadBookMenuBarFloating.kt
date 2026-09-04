@@ -73,7 +73,6 @@ internal fun FloatingIconRow(
     val floatingIcons = remember(
         state.menuConfig.titleBarButtons,
         state.isAutoPage,
-        state.translationMode,
         state.useReplaceRule,
         eyeProtectionActive,
     ) {
@@ -391,7 +390,6 @@ private fun loadFloatingIcons(
                 onIntent(ReadBookIntent.HideMenu)
             }
         },
-        "translate" to { onIntent(ReadBookIntent.ToggleTranslation) },
         "refresh_current" to { onIntent(ReadBookIntent.RefreshCurrentChapter) },
         "ai_summary" to { onIntent(ReadBookIntent.OpenChapterSummary) },
         "ai_rewrite" to { onIntent(ReadBookIntent.OpenAiCurrentChapterRewrite) },
@@ -400,7 +398,6 @@ private fun loadFloatingIcons(
 
     val activeIds = buildSet {
         if (state.isAutoPage) add("auto_page")
-        if (state.translationMode) add("translate")
         if (eyeProtectionActive) add("eye_protection")
     }
 

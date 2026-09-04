@@ -274,7 +274,6 @@ class AiTextFactoryUseCase(
             ?: aiProfileGateway.getTaskPreset(AiTaskType.TEXT_FACTORY)
             ?: aiProfileGateway.getTaskPreset(AiTaskType.CHAT)
             ?: aiProfileGateway.getTaskPreset(AiTaskType.SUMMARIZE_CHAPTER)
-            ?: aiProfileGateway.getTaskPreset(AiTaskType.TRANSLATE_CHAPTER)
     }
 
     private fun buildSystemPrompt(

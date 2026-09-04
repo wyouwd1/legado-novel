@@ -2,7 +2,6 @@ package io.legado.app.help
 
 import io.legado.app.constant.AppConst
 import io.legado.app.data.appDb
-import io.legado.app.data.entities.DictRule
 import io.legado.app.data.entities.KeyboardAssist
 import io.legado.app.data.entities.RssSource
 import io.legado.app.data.entities.TxtTocRule
@@ -28,9 +27,6 @@ object DefaultData {
                 }
                 if (LocalConfig.needUpRssSources) {
                     importDefaultRssSources()
-                }
-                if (LocalConfig.needUpDictRule) {
-                    importDefaultDictRules()
                 }
             }.onError {
                 it.printOnDebug()
@@ -79,14 +75,6 @@ object DefaultData {
         GSON.fromJsonObject<BookCover.CoverRule>(json).getOrThrow()
     }
 
-    val dictRules: List<DictRule> by lazy {
-        val json = String(
-            appCtx.assets.open("defaultData${File.separator}dictRules.json")
-                .readBytes()
-        )
-        GSON.fromJsonArray<DictRule>(json).getOrThrow()
-    }
-
     val keyboardAssists: List<KeyboardAssist> by lazy {
         val json = String(
             appCtx.assets.open("defaultData${File.separator}keyboardAssists.json")
@@ -103,10 +91,6 @@ object DefaultData {
     fun importDefaultRssSources() {
         appDb.rssSourceDao.deleteDefault()
         appDb.rssSourceDao.insert(*rssSources.toTypedArray())
-    }
-
-    fun importDefaultDictRules() {
-        appDb.dictRuleDao.insert(*dictRules.toTypedArray())
     }
 
 }

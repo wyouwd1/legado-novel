@@ -1236,10 +1236,6 @@ class ReadBookController(
                 return true
             }
 
-            R.id.menu_dict -> {
-                viewModel.onIntent(ReadBookIntent.TextActionDict(selectedText))
-                return true
-            }
         }
         return false
     }
@@ -1261,7 +1257,6 @@ class ReadBookController(
             items.add(ActionMenuItem(R.id.menu_browser, activity.getString(R.string.browser)))
             items.add(ActionMenuItem(R.id.menu_bookmark, activity.getString(R.string.bookmark)))
             items.add(ActionMenuItem(R.id.menu_mark, activity.getString(R.string.menu_mark)))
-            items.add(ActionMenuItem(R.id.menu_dict, activity.getString(R.string.dict)))
             items.add(ActionMenuItem(R.id.menu_replace, activity.getString(R.string.replace)))
             items.add(ActionMenuItem(R.id.menu_edit, activity.getString(R.string.edit)))
             items.add(ActionMenuItem(R.id.menu_ai_clean, activity.getString(R.string.ai_text_clean)))
@@ -2129,7 +2124,6 @@ data class ActionMenuItem(
                 R.id.menu_browser -> "menu_browser"
                 R.id.menu_bookmark -> "menu_bookmark"
                 R.id.menu_mark -> "menu_mark"
-                R.id.menu_dict -> "menu_dict"
                 R.id.menu_replace -> "menu_replace"
                 R.id.menu_edit -> "menu_edit"
                 R.id.menu_ai_clean -> "menu_ai_clean"

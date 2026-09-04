@@ -188,7 +188,7 @@ fun TxtRuleScreen(
         title = stringResource(R.string.export),
         onSelectSysDir = {
             showExportSheet = false
-            exportDoc.launch("exportDictRule.json")
+            exportDoc.launch("exportTxtTocRule.json")
         },
         onUpload = {
             showExportSheet = false

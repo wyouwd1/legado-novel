@@ -17,7 +17,6 @@ import io.legado.app.data.dao.BookSourceDao
 import io.legado.app.data.dao.BookmarkDao
 import io.legado.app.data.dao.CacheDao
 import io.legado.app.data.dao.CookieDao
-import io.legado.app.data.dao.DictRuleDao
 import io.legado.app.data.dao.ExactChapterPageCountDao
 import io.legado.app.data.dao.HighlightRuleDao
 import io.legado.app.data.dao.HighlightTagRuleDao
@@ -73,7 +72,6 @@ val appDatabaseModule = module {
     factory<ReadRecordDao> { get<AppDatabase>().readRecordDao }
     factory<CacheDao> { get<AppDatabase>().cacheDao }
     factory<RuleSubDao> { get<AppDatabase>().ruleSubDao }
-    factory<DictRuleDao> { get<AppDatabase>().dictRuleDao }
     factory<ExactChapterPageCountDao> { get<AppDatabase>().exactChapterPageCountDao }
     factory<KeyboardAssistsDao> { get<AppDatabase>().keyboardAssistsDao }
     factory<ServerDao> { get<AppDatabase>().serverDao }

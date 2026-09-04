@@ -41,7 +41,6 @@ import io.legado.app.ui.book.read.sheet.SimulatedReadingSheet
 import io.legado.app.ui.book.read.sheet.TextProcessingSheet
 import io.legado.app.ui.book.read.sheet.ToolButtonConfigSheet
 import io.legado.app.ui.book.read.sheet.UnderlineConfigSheet
-import io.legado.app.ui.dict.DictSheet
 import io.legado.app.ui.widget.components.FontFolderState
 import io.legado.app.ui.widget.components.FontSelectSheet
 import io.legado.app.ui.widget.components.alert.AppAlertDialog
@@ -435,12 +434,6 @@ fun ReadBookScreen(
         styleConfig = state.styleConfig,
     )
 
-    val dictSheet = state.activeSheet as? ReadBookSheet.Dict
-    DictSheet(
-        show = dictSheet != null,
-        word = dictSheet?.word ?: "",
-        onDismissRequest = dismissSheet,
-    )
     val photoSheet = state.activeSheet as? ReadBookSheet.Photo
     PhotoSheet(
         show = photoSheet != null,

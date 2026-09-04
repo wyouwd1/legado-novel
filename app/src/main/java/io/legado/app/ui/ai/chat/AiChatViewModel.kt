@@ -161,7 +161,6 @@ class AiChatViewModel(
         viewModelScope.launch {
             val conversation = aiChatGateway.getConversation(id)
             val preset = aiProfileGateway.getTaskPreset(AiTaskType.CHAT)
-                ?: aiProfileGateway.getTaskPreset(AiTaskType.TRANSLATE_CHAPTER)
             val providerName = preset?.model?.provider?.name.orEmpty()
             val modelName = preset?.model?.displayName.orEmpty()
 

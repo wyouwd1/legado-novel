@@ -22,7 +22,6 @@ import io.legado.app.data.dao.BookSourceDao
 import io.legado.app.data.dao.BookmarkDao
 import io.legado.app.data.dao.CacheDao
 import io.legado.app.data.dao.CookieDao
-import io.legado.app.data.dao.DictRuleDao
 import io.legado.app.data.dao.ExactChapterPageCountDao
 import io.legado.app.data.dao.HighlightRuleDao
 import io.legado.app.data.dao.HighlightTagRuleDao
@@ -65,7 +64,6 @@ import io.legado.app.data.entities.BookSourcePart
 import io.legado.app.data.entities.Bookmark
 import io.legado.app.data.entities.Cache
 import io.legado.app.data.entities.Cookie
-import io.legado.app.data.entities.DictRule
 import io.legado.app.data.entities.ExactChapterPageCountEntity
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.HighlightTagRule
@@ -102,14 +100,14 @@ val appDb by lazy {
 }
 
 @Database(
-    version = 105,
+    version = 106,
     exportSchema = true,
     entities = [Book::class, BookGroup::class, BookSource::class, BookChapter::class,
         ReplaceRule::class, SearchBook::class, SearchKeyword::class, Cookie::class,
         RssSource::class, Bookmark::class, RssArticle::class,
         RssReadRecord::class, ReadRecordDetail::class, ReadRecordSession::class,
         RssStar::class, TxtTocRule::class, ReadRecord::class, Cache::class,
-        RuleSub::class, DictRule::class, KeyboardAssist::class, Server::class,
+        RuleSub::class, KeyboardAssist::class, Server::class,
         SearchContentHistory::class, HomepageModule::class, HomepageCustomSet::class,
         HighlightRule::class, AiProviderProfile::class, AiModelProfile::class,
         AiTaskPreset::class, AiArtifact::class, AiChatConversation::class,
@@ -204,7 +202,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val readRecordDao: ReadRecordDao
     abstract val cacheDao: CacheDao
     abstract val ruleSubDao: RuleSubDao
-    abstract val dictRuleDao: DictRuleDao
     abstract val exactChapterPageCountDao: ExactChapterPageCountDao
     abstract val keyboardAssistsDao: KeyboardAssistsDao
     abstract val serverDao: ServerDao

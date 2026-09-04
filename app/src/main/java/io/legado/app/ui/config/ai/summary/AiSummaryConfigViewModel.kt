@@ -6,7 +6,7 @@ import io.legado.app.R
 import io.legado.app.domain.gateway.AiProfileGateway
 import io.legado.app.domain.model.AiPromptTemplate
 import io.legado.app.domain.model.AiTaskType
-import io.legado.app.domain.model.TranslationConstants
+import io.legado.app.domain.model.AiGenerationDefaults
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -33,7 +33,7 @@ class AiSummaryConfigViewModel(
                     current.copy(
                         loading = false,
                         promptTemplate = config?.promptTemplate ?: AiPromptTemplate.DEFAULT_CHAPTER_SUMMARY,
-                        temperature = config?.params?.temperature ?: TranslationConstants.DEFAULT_TEMPERATURE,
+                        temperature = config?.params?.temperature ?: AiGenerationDefaults.DEFAULT_TEMPERATURE,
                         maxOutputTokens = config?.params?.maxOutputTokens ?: 0,
                         defaultPrompt = AiPromptTemplate.DEFAULT_CHAPTER_SUMMARY,
                         initialized = true
@@ -44,7 +44,7 @@ class AiSummaryConfigViewModel(
                     current.copy(
                         loading = false,
                         promptTemplate = AiPromptTemplate.DEFAULT_CHAPTER_SUMMARY,
-                        temperature = TranslationConstants.DEFAULT_TEMPERATURE,
+                        temperature = AiGenerationDefaults.DEFAULT_TEMPERATURE,
                         maxOutputTokens = 0,
                         defaultPrompt = AiPromptTemplate.DEFAULT_CHAPTER_SUMMARY,
                         initialized = true
@@ -103,7 +103,7 @@ class AiSummaryConfigViewModel(
                 _uiState.update { current ->
                     current.copy(
                         promptTemplate = savedConfig.promptTemplate,
-                        temperature = savedConfig.params.temperature ?: TranslationConstants.DEFAULT_TEMPERATURE,
+                        temperature = savedConfig.params.temperature ?: AiGenerationDefaults.DEFAULT_TEMPERATURE,
                         maxOutputTokens = savedConfig.params.maxOutputTokens ?: 0
                     )
                 }

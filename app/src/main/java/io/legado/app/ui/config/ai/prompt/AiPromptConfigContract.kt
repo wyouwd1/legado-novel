@@ -3,7 +3,6 @@ package io.legado.app.ui.config.ai.prompt
 import androidx.compose.runtime.Stable
 import io.legado.app.domain.model.AiPromptTemplate
 import io.legado.app.domain.model.AiTaskType
-import io.legado.app.domain.model.TranslationConstants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

@@ -13,12 +13,10 @@ object AiProtocol {
     const val OPENAI_CHAT_COMPLETIONS = "openai_chat_completions"
     const val OPENAI_RESPONSES = "openai_responses"
     const val ANTHROPIC_MESSAGES = "anthropic_messages"
-    const val GOOGLE_TRANSLATE = "google_translate"
 }
 
 object AiTaskType {
     const val CHAT = "chat"
-    const val TRANSLATE_CHAPTER = "translate_chapter"
     const val SUMMARIZE_CHAPTER = "summarize_chapter"
     const val SUMMARIZE_BOOK = "summarize_book"
     const val EXPLAIN_SELECTION = "explain_selection"
@@ -165,6 +163,12 @@ data class AiTaskPresetConfig(
     val runtimeOptions: AiTaskRuntimeOptions = AiTaskRuntimeOptions()
 )
 
+object AiGenerationDefaults {
+    const val MIN_TEMPERATURE = 0f
+    const val MAX_TEMPERATURE = 2f
+    const val DEFAULT_TEMPERATURE = 0.7f
+}
+
 @Keep
 data class AiProfileDraft(
     val providerId: String? = null,
@@ -177,8 +181,7 @@ data class AiProfileDraft(
     val modelId: String,
     val contextWindow: Int = 0,
     val maxOutputTokens: Int = 0,
-    val temperature: Float = TranslationConstants.DEFAULT_TEMPERATURE,
-    val translationTargetLanguage: String = AiTaskRuntimeOptions.DEFAULT_TARGET_LANGUAGE,
+    val temperature: Float = AiGenerationDefaults.DEFAULT_TEMPERATURE,
     val maxInputChars: Int = AiTaskRuntimeOptions.DEFAULT_MAX_INPUT_CHARS,
     val concurrentRequests: Int = AiTaskRuntimeOptions.DEFAULT_CONCURRENT_REQUESTS,
     val retryCount: Int = AiTaskRuntimeOptions.DEFAULT_RETRY_COUNT
@@ -202,7 +205,7 @@ data class AiModelDraft(
     val modelId: String,
     val contextWindow: Int = 0,
     val maxOutputTokens: Int = 0,
-    val temperature: Float = TranslationConstants.DEFAULT_TEMPERATURE,
+    val temperature: Float = AiGenerationDefaults.DEFAULT_TEMPERATURE,
     val reasoningLevel: AiReasoningLevel = AiReasoningLevel.MEDIUM
 )
 
@@ -276,7 +279,7 @@ data class AiGenerationParams(
     ): AiGenerationParams {
         val mergedTemperature = this.temperature
             ?: modelParams.temperature
-            ?: TranslationConstants.DEFAULT_TEMPERATURE
+            ?: AiGenerationDefaults.DEFAULT_TEMPERATURE
 
         val effectiveModelMaxTokens = when {
             modelMaxOutputTokens > 0 -> modelMaxOutputTokens

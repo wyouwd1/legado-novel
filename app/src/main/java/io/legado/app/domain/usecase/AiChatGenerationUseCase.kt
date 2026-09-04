@@ -39,7 +39,6 @@ class AiChatGenerationUseCase(
         conversationId: String? = null
     ): AiGenerateRequest {
         val preset = aiProfileGateway.getTaskPreset(AiTaskType.CHAT)
-            ?: aiProfileGateway.getTaskPreset(AiTaskType.TRANSLATE_CHAPTER)
             ?: error("Please configure a default AI model first")
         return AiGenerateRequest(
             model = preset.model,

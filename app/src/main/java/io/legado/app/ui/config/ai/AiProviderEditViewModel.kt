@@ -12,7 +12,7 @@ import io.legado.app.domain.model.AiProviderConfig
 import io.legado.app.domain.model.AiProviderDraft
 import io.legado.app.domain.model.AiProviderPresets
 import io.legado.app.domain.model.AiReasoningLevel
-import io.legado.app.domain.model.TranslationConstants
+import io.legado.app.domain.model.AiGenerationDefaults
 import io.legado.app.utils.GSON
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CancellationException
@@ -74,7 +74,7 @@ class AiProviderEditViewModel(
                                 modelId = model.modelId,
                                 contextWindow = model.contextWindow,
                                 maxOutputTokens = model.maxOutputTokens,
-                                temperature = params.temperature ?: TranslationConstants.DEFAULT_TEMPERATURE,
+                                temperature = params.temperature ?: AiGenerationDefaults.DEFAULT_TEMPERATURE,
                                 reasoningLevel = params.reasoningLevel.toModelConfigLevel()
                             )
                         }
@@ -109,7 +109,7 @@ class AiProviderEditViewModel(
             is AiProviderEditIntent.UpdateModelsUrl -> _uiState.update { it.copy(modelsUrl = intent.value, selectedProviderPresetId = "") }
             is AiProviderEditIntent.UpdateApiKey -> _uiState.update { it.copy(apiKey = intent.value) }
             AiProviderEditIntent.AddModel -> _uiState.update {
-                it.copy(editingModel = AiProviderModelEditorUi(temperature = TranslationConstants.DEFAULT_TEMPERATURE.toString()))
+                it.copy(editingModel = AiProviderModelEditorUi(temperature = AiGenerationDefaults.DEFAULT_TEMPERATURE.toString()))
             }
             is AiProviderEditIntent.EditModel -> editModel(intent.modelProfileId)
             AiProviderEditIntent.DismissModelEditor -> _uiState.update { it.copy(editingModel = null) }
@@ -185,7 +185,7 @@ class AiProviderEditViewModel(
                         contextWindow = editor.contextWindow.toIntOrNull() ?: 0,
                         maxOutputTokens = editor.maxOutputTokens.toIntOrNull() ?: 0,
                         temperature = editor.temperature.toFloatOrNull()
-                            ?: TranslationConstants.DEFAULT_TEMPERATURE,
+                            ?: AiGenerationDefaults.DEFAULT_TEMPERATURE,
                         reasoningLevel = editor.reasoningLevel
                     )
                 )

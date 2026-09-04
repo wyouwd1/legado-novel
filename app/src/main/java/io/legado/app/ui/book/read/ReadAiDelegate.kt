@@ -19,7 +19,6 @@ import io.legado.app.help.book.BookHelp
 import io.legado.app.help.book.ContentProcessor
 import io.legado.app.help.config.ReadBookConfig
 import io.legado.app.model.ReadBook
-import io.legado.app.model.translation.TranslationManager
 import io.legado.app.utils.MD5Utils
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CancellationException
@@ -245,12 +244,7 @@ class ReadAiDelegate(
     }
 
     private fun getEffectiveChapterContent(book: Book, chapter: BookChapter): String {
-        val sourceContent = if (book.getTranslationMode()) {
-            TranslationManager.getCachedTranslation(book, chapter)
-                ?: BookHelp.getContent(book, chapter)
-        } else {
-            BookHelp.getContent(book, chapter)
-        } ?: return ""
+        val sourceContent = BookHelp.getContent(book, chapter) ?: return ""
         return ContentProcessor.get(book)
             .getContent(book, chapter, sourceContent, includeTitle = false)
             .toString()

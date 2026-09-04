@@ -291,7 +291,6 @@ class CleanSelectedTextUseCase(
         return aiProfileGateway.getTaskPreset(AiTaskType.CLEAN_SELECTION)
             ?: aiProfileGateway.getTaskPreset(AiTaskType.SUMMARIZE_CHAPTER)
             ?: aiProfileGateway.getTaskPreset(AiTaskType.CHAT)
-            ?: aiProfileGateway.getTaskPreset(AiTaskType.TRANSLATE_CHAPTER)
     }
 
     private fun buildUserContent(

@@ -73,7 +73,6 @@ object BackupConfig {
     private const val dbKeySourceSub = "sourceSub"
     private const val dbKeyTxtTocRule = "txtTocRule"
     private const val dbKeyKeyboardAssists = "keyboardAssists"
-    private const val dbKeyDictRule = "dictRule"
     private const val dbKeyHomepageModules = "homepageModules"
     private const val dbKeyHomepageCustomSets = "homepageCustomSets"
     private const val dbKeyHighlightRule = "highlightRule"
@@ -85,7 +84,7 @@ object BackupConfig {
         dbKeyBookmark, dbKeyBookGroup, dbKeyBookSource, dbKeyRssSource,
         dbKeyRssStar, dbKeyReplaceRule, dbKeyReadRecord, dbKeySearchHistory,
         dbKeySourceSub, dbKeyTxtTocRule, dbKeyKeyboardAssists,
-        dbKeyDictRule, dbKeyHomepageModules, dbKeyHomepageCustomSets,
+dbKeyHomepageModules, dbKeyHomepageCustomSets,
         dbKeyHighlightRule, dbKeyHighlightTagRule, dbKeyTagGroupRule, dbKeyServer
     )
 
@@ -101,7 +100,6 @@ object BackupConfig {
         appCtx.getString(R.string.source_sub),
         appCtx.getString(R.string.txt_toc_rule),
         appCtx.getString(R.string.keyboard_assists),
-        appCtx.getString(R.string.dict_rule),
         appCtx.getString(R.string.homepage_modules),
         appCtx.getString(R.string.homepage_custom_sets),
         appCtx.getString(R.string.highlight_rule_config),

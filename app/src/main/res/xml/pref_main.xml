@@ -79,12 +79,6 @@
         android:title="@string/replace_purify"
         app:iconSpaceReserved="false" />
 
-    <io.legado.app.lib.prefs.Preference
-        android:icon="@drawable/ic_translate"
-        android:key="dictRuleManage"
-        android:summary="@string/config_dict_rule"
-        android:title="@string/dict_rule"
-        app:iconSpaceReserved="false" />
 
     </io.legado.app.lib.prefs.PreferenceCategory>
 

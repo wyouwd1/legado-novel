@@ -487,9 +487,6 @@ internal fun loadToolButtons(
                 onIntent(ReadBookIntent.HideMenu)
             }
         },
-        infoMap.getValue("translate").toButton(isActive = state.translationMode) {
-            onIntent(ReadBookIntent.ToggleTranslation)
-        },
         infoMap.getValue("refresh_current").toButton {
             onIntent(ReadBookIntent.RefreshCurrentChapter)
         },

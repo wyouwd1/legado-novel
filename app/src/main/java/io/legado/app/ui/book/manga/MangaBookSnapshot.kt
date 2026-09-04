@@ -132,7 +132,6 @@ data class MangaReadConfigSnapshot(
     val webtoonSidePaddingDp: Int?,
     val mangaBackground: String?,
     val fixedType: Boolean,
-    val translationMode: Boolean,
 ) {
     fun toReadConfig() = Book.ReadConfig(
         reverseToc = reverseToc,
@@ -151,7 +150,6 @@ data class MangaReadConfigSnapshot(
         webtoonSidePaddingDp = webtoonSidePaddingDp,
         mangaBackground = mangaBackground,
         fixedType = fixedType,
-        translationMode = translationMode,
     )
 
     companion object {
@@ -172,7 +170,6 @@ data class MangaReadConfigSnapshot(
             webtoonSidePaddingDp = config.webtoonSidePaddingDp,
             mangaBackground = config.mangaBackground,
             fixedType = config.fixedType,
-            translationMode = config.translationMode,
         )
     }
 }

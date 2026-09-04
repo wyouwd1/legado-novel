@@ -16,7 +16,6 @@ import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookGroup
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.Bookmark
-import io.legado.app.data.entities.DictRule
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.HighlightTagRule
 import io.legado.app.data.entities.HomepageCustomSet
@@ -218,14 +217,6 @@ object Restore : KoinComponent {
             fileToListT<TxtTocRule>(path, "txtTocRule.json")?.let {
                 try {
                     appDb.txtTocRuleDao.insert(*it.toTypedArray())
-                } catch (_: SQLiteConstraintException) {
-                }
-            }
-        }
-        if (BackupConfig.dbIsNotIgnored("dictRule")) {
-            fileToListT<DictRule>(path, "dictRule.json")?.let {
-                try {
-                    appDb.dictRuleDao.insert(*it.toTypedArray())
                 } catch (_: SQLiteConstraintException) {
                 }
             }

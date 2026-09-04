@@ -23,6 +23,7 @@ object DatabaseMigrations {
             migration_82_83, migration_98_99, migration_99_100,
             migration_102_103,
             migration_104_105,
+            migration_105_106,
         )
     }
 
@@ -34,6 +35,12 @@ object DatabaseMigrations {
             db.execSQL("DROP TABLE IF EXISTS `chapter_speech_analysis`")
             db.execSQL("DROP TABLE IF EXISTS `chapter_speech_segments`")
             db.execSQL("DROP TABLE IF EXISTS `cloud_tts_engines`")
+        }
+    }
+
+    private val migration_105_106 = object : Migration(105, 106) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `dictRules`")
         }
     }
 

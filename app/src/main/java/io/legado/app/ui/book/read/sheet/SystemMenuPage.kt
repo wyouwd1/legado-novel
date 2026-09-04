@@ -32,7 +32,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -915,7 +914,6 @@ internal fun readMenuButtonInfos(context: Context): List<ReadMenuButtonInfo> = l
         Icons.Default.FindReplace,
         context.getString(R.string.text_processing)
     ),
-    ReadMenuButtonInfo("translate", Icons.Default.Translate, context.getString(R.string.translate)),
     ReadMenuButtonInfo(
         "refresh_current",
         Icons.Default.Refresh,

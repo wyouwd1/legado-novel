@@ -40,17 +40,6 @@
         errorLine1="        super.onCleared()"
         errorLine2="              ~~~~~~~~~">
         <location
-            file="src/main/java/io/legado/app/ui/dict/DictViewModel.kt"
-            line="145"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="EmptySuperCall"
-        message="No need to call `super.onCleared`; the super method is defined to be empty"
-        errorLine1="        super.onCleared()"
-        errorLine2="              ~~~~~~~~~">
-        <location
             file="src/main/java/io/legado/app/ui/main/homepage/HomepageViewModel.kt"
             line="383"
             column="15"/>

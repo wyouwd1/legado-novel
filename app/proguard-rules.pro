@@ -62,19 +62,10 @@
 # 数据类
 -keep class **.data.entities.**{*;}
 # Gson反序列化用的数据传输类
--keep class io.legado.app.model.translation.**{*;}
--keep class io.legado.app.domain.model.DictPair{*;}
--keep class io.legado.app.domain.model.BookDictionary{*;}
 -keep class io.legado.app.domain.model.TextChunk{*;}
 -keep class io.legado.app.domain.model.ModuleDef{*;}
 -keep class io.legado.app.domain.model.ModuleItem{*;}
 -keep class io.legado.app.domain.model.CustomSetItem{*;}
--keep class io.legado.app.data.repository.GoogleTranslateResponse{*;}
--keep class io.legado.app.data.repository.GoogleSentence{*;}
--keep class io.legado.app.data.repository.GoogleSpell{*;}
--keep class io.legado.app.data.repository.OpenAIResponse{*;}
--keep class io.legado.app.data.repository.OpenAIChoice{*;}
--keep class io.legado.app.data.repository.OpenAIMessage{*;}
 # 缓存 Cookie
 -keep class **.help.http.CookieStore{*;}
 -keep class **.help.CacheManager{*;}
