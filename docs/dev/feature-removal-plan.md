@@ -448,3 +448,23 @@ BookKnowledgeGateway，删除顺序：听书片先行）。
 ## 7. 审批
 
 - [x] 用户已拍板全部决策点并批准执行；执行中：本地改码 + 远程 test-env-wifi 验证。
+
+## 8. 执行进度（实时更新）
+
+| 切片 | 状态 | 提交 | 验证 | delta |
+|---|---|---|---|---|
+| ②听书 TTS+AudioPlay | **✅ 完成** | bcc486dfc（-23,470 行）+ c46f6a965（文档）+ 28a14650a/ac74b2057/71e78d995（修复 r1-r2）+ 352786b71（lint）+ ec0a749a9（测试） | 远程 gate5 **BUILD SUCCESSFUL**：compile/test(855通过+3 ignored)/lint(0 error)/verifyConfigArchitecture/assemble 全绿；残留 grep 仅剩迁移史 SQL | APK 三 ABI 各 **−1,716,153 B**（arm64 66,285,458→64,569,305）；DB 104→105 DROP 6 表；schema 105.json 已生成 |
+| ⑤词典/翻译 | 🔄 进行中 | — | — | — |
+| ⑦+④知识+AI | ⏳ | — | — | — |
+| ①漫画 | ⏳ | — | — | — |
+| ⑥关联书籍 | ⏳ | — | — | — |
+| ③首页/发现 | ⏳ | — | — | — |
+| ⑧欢迎页 | ⏳ | — | — | — |
+| 收尾 | ⏳ | — | — | — |
+
+**执行基础设施**：本地仓库（源码真相，实施 agent 只编辑不构建）；远程 test-env-wifi（192.168.31.217，
+rsync 同步，排除 local.properties/app/build/.gradle；门禁命令 `./gradlew :app:compileAppDebugKotlin
+testAppDebugUnitTest lintAppDebug verifyConfigArchitecture assembleAppDebug --continue --no-configuration-cache`）。
+
+**已知遗留（非本任务范围）**：AnalyzeRuleFastPathReproTest 3 个用例 @Ignore（复现 main 既有 AnalyzeRule
+NativeObject 快捷路径 bug，与功能删除无关；main 修复后删 @Ignore 转正）。
