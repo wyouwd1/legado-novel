@@ -75,27 +75,6 @@ class BookInfoActivity : BaseComposeActivity() {
                     MainActivity.createExploreShowIntent(this, title, sourceUrl, exploreUrl)
                 )
             },
-            onOpenCharacterDetail = { bookUrl, characterId ->
-                startActivity(
-                    MainActivity.createBookCharacterDetailIntent(
-                        this,
-                        bookUrl,
-                        characterId
-                    )
-                )
-            },
-            onOpenCharacterNetwork = { bookUrl ->
-                startActivity(MainActivity.createBookCharacterNetworkIntent(this, bookUrl))
-            },
-            onOpenCharacterList = { bookUrl ->
-                startActivity(MainActivity.createBookCharacterListIntent(this, bookUrl))
-            },
-            onOpenKnowledgeList = { bookUrl ->
-                startActivity(MainActivity.createBookKnowledgeListIntent(this, bookUrl))
-            },
-            onOpenEventList = { bookUrl ->
-                startActivity(MainActivity.createBookEventListIntent(this, bookUrl))
-            },
         )
     }
 

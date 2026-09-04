@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.legado.app.R
-import io.legado.app.data.entities.BookContentProcess
 import io.legado.app.domain.model.TextProcessAction
 import io.legado.app.ui.book.read.ContentProcessConfigUiState
 import io.legado.app.ui.book.read.ContentProcessItemUi
@@ -255,11 +254,7 @@ private fun ContentProcessItem(
 
 @Composable
 private fun contentProcessTitle(item: ContentProcessItemUi): String {
-    val kind = when (item.kind) {
-        BookContentProcess.KIND_AI_CLEAN -> stringResource(R.string.content_process_ai_clean)
-        BookContentProcess.KIND_AI_REWRITE -> stringResource(R.string.content_process_ai_rewrite)
-        else -> item.kind
-    }
+    val kind = item.kind
     val action = when (item.actionType) {
         TextProcessAction.TYPE_DELETE -> stringResource(R.string.content_process_delete_action)
         TextProcessAction.TYPE_INSERT_BEFORE,

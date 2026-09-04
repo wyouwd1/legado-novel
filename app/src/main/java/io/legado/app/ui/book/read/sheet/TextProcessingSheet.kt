@@ -583,8 +583,6 @@ private val ReplaceFilter.labelRes: Int
 @Composable
 private fun contentProcessTitle(item: ContentProcessItemUi): String {
     val kind = when (item.kind) {
-        BookContentProcess.KIND_AI_CLEAN -> stringResource(R.string.content_process_ai_clean)
-        BookContentProcess.KIND_AI_REWRITE -> stringResource(R.string.content_process_ai_rewrite)
         BookContentProcess.KIND_USER_UNDERLINE -> stringResource(R.string.content_process_user_underline)
         BookContentProcess.KIND_USER_HIGHLIGHT -> stringResource(R.string.content_process_user_highlight)
         else -> item.kind

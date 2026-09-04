@@ -1,7 +1,6 @@
 package io.legado.app.ui.book.read
 
 import io.legado.app.ui.book.read.ReadBookDomainSplitBoundaryTest.Companion.DOMAINS
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -72,16 +71,6 @@ class ReadBookDomainSplitBoundaryTest {
                 leaked.isEmpty(),
             )
         }
-    }
-
-    @Test
-    fun `ReadAiUiState 完整覆盖 AI 的四个子状态`() {
-        // AI 域是唯一有包装类型的域；这条保证下面 stateFields 的名单不会因改名而失真。
-        assertEquals(
-            "ReadAiUiState 的字段变了，请同步 DOMAINS 里 AI 域的 stateFields",
-            setOf("chapterSummary", "aiTextClean", "aiTextRewrite", "aiRewritePresetConfig"),
-            constructorParameterNames(ReadAiUiState::class),
-        )
     }
 
     @Test
@@ -248,24 +237,6 @@ class ReadBookDomainSplitBoundaryTest {
 
     private companion object {
         val DOMAINS = listOf(
-            DomainSplit(
-                name = "AI",
-                delegateFile = "io/legado/app/ui/book/read/ReadAiDelegate.kt",
-                stateFields = setOf(
-                    "chapterSummary",
-                    "aiTextClean",
-                    "aiTextRewrite",
-                    "aiRewritePresetConfig",
-                ),
-                stateTypes = listOf(
-                    "ChapterSummaryUiState",
-                    "AiTextCleanUiState",
-                    "AiTextRewriteUiState",
-                    "AiRewritePresetConfigUiState",
-                    "AiRewritePresetUi",
-                    "AiRewriteHistoryUi",
-                ),
-            ),
             DomainSplit(
                 name = "高亮规则",
                 delegateFile = "io/legado/app/ui/book/read/ReadHighlightRuleDelegate.kt",

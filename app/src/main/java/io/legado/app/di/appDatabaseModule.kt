@@ -2,16 +2,10 @@ package io.legado.app.di
 
 import io.legado.app.data.AppDatabase
 import io.legado.app.data.appDb
-import io.legado.app.data.dao.AiArtifactDao
-import io.legado.app.data.dao.AiChatDao
-import io.legado.app.data.dao.AiMemoryDao
-import io.legado.app.data.dao.AiProfileDao
-import io.legado.app.data.dao.AiPromptPresetDao
 import io.legado.app.data.dao.BookChapterDao
 import io.legado.app.data.dao.BookContentProcessDao
 import io.legado.app.data.dao.BookDao
 import io.legado.app.data.dao.BookGroupDao
-import io.legado.app.data.dao.BookKnowledgeDao
 import io.legado.app.data.dao.BookMarkingDao
 import io.legado.app.data.dao.BookSourceDao
 import io.legado.app.data.dao.BookmarkDao
@@ -48,17 +42,11 @@ val appDatabaseModule = module {
 
     // 注册所有的 DAO 接口，通过 AppDatabase 实例获取
     factory<BookDao> { get<AppDatabase>().bookDao }
-    factory<AiProfileDao> { get<AppDatabase>().aiProfileDao }
-    factory<AiArtifactDao> { get<AppDatabase>().aiArtifactDao }
-    factory<AiChatDao> { get<AppDatabase>().aiChatDao }
-    factory<AiMemoryDao> { get<AppDatabase>().aiMemoryDao }
-    factory<AiPromptPresetDao> { get<AppDatabase>().aiPromptPresetDao }
     factory<BookGroupDao> { get<AppDatabase>().bookGroupDao }
     factory<BookSourceDao> { get<AppDatabase>().bookSourceDao }
     factory<BookChapterDao> { get<AppDatabase>().bookChapterDao }
     factory<BookContentProcessDao> { get<AppDatabase>().bookContentProcessDao }
     factory<BookMarkingDao> { get<AppDatabase>().bookMarkingDao }
-    factory<BookKnowledgeDao> { get<AppDatabase>().bookKnowledgeDao }
     factory<ReplaceRuleDao> { get<AppDatabase>().replaceRuleDao }
     factory<SearchBookDao> { get<AppDatabase>().searchBookDao }
     factory<SearchKeywordDao> { get<AppDatabase>().searchKeywordDao }

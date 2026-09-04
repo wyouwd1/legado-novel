@@ -144,7 +144,7 @@ class BookContentProcessEngineTest {
             id = "test",
             bookUrl = "book",
             chapterIndex = 0,
-            kind = BookContentProcess.KIND_AI_CLEAN,
+            kind = "test_kind",
             anchorJson = GSON.toJson(
                 TextProcessAnchor(
                     chapterIndex = 0,

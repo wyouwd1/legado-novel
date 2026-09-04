@@ -56,11 +56,6 @@ fun BookInfoRouteScreen(
     onOpenMangaReader: (bookUrl: String, inBookshelf: Boolean, chapterChanged: Boolean) -> Unit = { _, _, _ -> },
     onNavigateToBookInfo: (name: String?, author: String?, bookUrl: String, origin: String?, coverPath: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToExploreShow: (title: String?, sourceUrl: String, exploreUrl: String?) -> Unit = { _, _, _ -> },
-    onOpenCharacterDetail: (bookUrl: String, characterId: String?) -> Unit = { _, _ -> },
-    onOpenCharacterNetwork: (bookUrl: String) -> Unit = {},
-    onOpenCharacterList: (bookUrl: String) -> Unit = {},
-    onOpenKnowledgeList: (bookUrl: String) -> Unit = {},
-    onOpenEventList: (bookUrl: String) -> Unit = {},
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     sharedCoverKey: String? = null,
@@ -172,26 +167,6 @@ fun BookInfoRouteScreen(
 
                 is BookInfoEffect.NavigateToExploreShow -> {
                     onNavigateToExploreShow(effect.title, effect.sourceUrl, effect.exploreUrl)
-                }
-
-                is BookInfoEffect.OpenCharacterDetail -> {
-                    onOpenCharacterDetail(effect.bookUrl, effect.characterId)
-                }
-
-                is BookInfoEffect.OpenCharacterNetwork -> {
-                    onOpenCharacterNetwork(effect.bookUrl)
-                }
-
-                is BookInfoEffect.OpenKnowledgeList -> {
-                    onOpenKnowledgeList(effect.bookUrl)
-                }
-
-                is BookInfoEffect.OpenCharacterList -> {
-                    onOpenCharacterList(effect.bookUrl)
-                }
-
-                is BookInfoEffect.OpenEventList -> {
-                    onOpenEventList(effect.bookUrl)
                 }
             }
         }

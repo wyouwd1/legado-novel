@@ -24,6 +24,7 @@ object DatabaseMigrations {
             migration_102_103,
             migration_104_105,
             migration_105_106,
+            migration_106_107,
         )
     }
 
@@ -41,6 +42,29 @@ object DatabaseMigrations {
     private val migration_105_106 = object : Migration(105, 106) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("DROP TABLE IF EXISTS `dictRules`")
+        }
+    }
+
+    // ⑦知识 + ④AI 平台同批删除：DROP 5 张知识表 + 8 张 ai_* 表，
+    // 并清理 book_content_processes 中遗留的 AI 净化/改写旧行（内容处理底座保留）。
+    private val migration_106_107 = object : Migration(106, 107) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `book_character_profiles`")
+            db.execSQL("DROP TABLE IF EXISTS `book_character_events`")
+            db.execSQL("DROP TABLE IF EXISTS `book_character_relations`")
+            db.execSQL("DROP TABLE IF EXISTS `book_knowledge_entries`")
+            db.execSQL("DROP TABLE IF EXISTS `book_outline_nodes`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_provider_profiles`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_model_profiles`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_task_presets`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_artifacts`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_chat_conversations`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_chat_messages`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_memory`")
+            db.execSQL("DROP TABLE IF EXISTS `ai_prompt_presets`")
+            db.execSQL(
+                "DELETE FROM `book_content_processes` WHERE kind IN ('ai_clean','ai_rewrite')"
+            )
         }
     }
 

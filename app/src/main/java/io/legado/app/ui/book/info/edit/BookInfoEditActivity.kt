@@ -5,7 +5,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.compose.runtime.Composable
 import io.legado.app.base.BaseComposeActivity
 import io.legado.app.ui.book.changecover.ChangeCoverDialog
-import io.legado.app.ui.main.MainActivity
 
 class BookInfoEditActivity : BaseComposeActivity(), ChangeCoverDialog.CallBack {
 
@@ -21,18 +20,6 @@ class BookInfoEditActivity : BaseComposeActivity(), ChangeCoverDialog.CallBack {
                     setResult(RESULT_OK)
                     finish()
                 }
-            },
-            onOpenCharacterList = { bookUrl ->
-                startActivity(MainActivity.createBookCharacterListIntent(this, bookUrl))
-            },
-            onOpenCharacterNetwork = { bookUrl ->
-                startActivity(MainActivity.createBookCharacterNetworkIntent(this, bookUrl))
-            },
-            onOpenKnowledgeList = { bookUrl ->
-                startActivity(MainActivity.createBookKnowledgeListIntent(this, bookUrl))
-            },
-            onOpenEventList = { bookUrl ->
-                startActivity(MainActivity.createBookEventListIntent(this, bookUrl))
             },
         )
     }

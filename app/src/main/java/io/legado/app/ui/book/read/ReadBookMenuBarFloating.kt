@@ -391,8 +391,6 @@ private fun loadFloatingIcons(
             }
         },
         "refresh_current" to { onIntent(ReadBookIntent.RefreshCurrentChapter) },
-        "ai_summary" to { onIntent(ReadBookIntent.OpenChapterSummary) },
-        "ai_rewrite" to { onIntent(ReadBookIntent.OpenAiCurrentChapterRewrite) },
         "more_actions" to { onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.MoreActions)) },
     )
 

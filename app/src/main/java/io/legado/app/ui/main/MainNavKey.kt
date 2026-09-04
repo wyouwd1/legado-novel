@@ -71,29 +71,6 @@ data object MainRouteSettingsTheme : MainRoute
 data object MainRouteSettingsBackup : MainRoute
 
 @Serializable
-data object MainRouteSettingsAi : MainRoute
-
-@Serializable
-data object MainRouteAiChat : MainRoute
-
-@Serializable
-data class MainRouteSettingsAiProviderEdit(
-    val providerId: String? = null
-) : MainRoute
-
-@Serializable
-data class MainRouteSettingsAiModelEdit(
-    val providerId: String? = null,
-    val modelProfileId: String? = null
-) : MainRoute
-
-@Serializable
-data object MainRouteSettingsAiSummary : MainRoute
-
-@Serializable
-data object MainRouteSettingsAiPrompt : MainRoute
-
-@Serializable
 data object MainRouteSettingsCustomTheme : MainRoute
 
 @Serializable
@@ -155,44 +132,6 @@ data class MainRouteBookInfo(
 ) : MainRoute
 
 @Serializable
-data class MainRouteBookCharacterDetail(
-    val bookUrl: String,
-    val characterId: String? = null,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookCharacterNetwork(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookCharacterList(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookKnowledgeList(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookKnowledgeDetail(
-    val bookUrl: String,
-    val entryId: String? = null,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookEventList(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookEventDetail(
-    val bookUrl: String,
-    val eventId: String? = null,
-) : MainRoute
-
-@Serializable
 data object MainRouteRssFavorites : MainRoute
 
 @Serializable
@@ -236,10 +175,6 @@ object MainRouteConst {
     const val ROUTE_SETTINGS_COVER_ALBUMS = "settings/cover/albums"
     const val ROUTE_SETTINGS_THEME = "settings/theme"
     const val ROUTE_SETTINGS_BACKUP = "settings/backup"
-    const val ROUTE_SETTINGS_AI = "settings/ai"
-    const val ROUTE_SETTINGS_AI_SUMMARY = "settings/ai/summary"
-    const val ROUTE_SETTINGS_AI_PROMPT = "settings/ai/prompt"
-    const val ROUTE_AI_CHAT = "ai/chat"
     const val ROUTE_SETTINGS_CUSTOM_THEME = "settings/custom_theme"
     const val ROUTE_SETTINGS_LAB_CONFIG = "settings/lab_config"
     const val ROUTE_SETTINGS_DOWNLOAD_CACHE = "settings/download_cache"
@@ -252,13 +187,6 @@ object MainRouteConst {
     const val ROUTE_SEARCH = "search"
     const val ROUTE_SEARCH_CONTENT = "book/searchContent"
     const val ROUTE_BOOK_INFO = "book/info"
-    const val ROUTE_BOOK_CHARACTER_DETAIL = "book/character/detail"
-    const val ROUTE_BOOK_CHARACTER_NETWORK = "book/character/network"
-    const val ROUTE_BOOK_CHARACTER_LIST = "book/character/list"
-    const val ROUTE_BOOK_KNOWLEDGE_LIST = "book/knowledge/list"
-    const val ROUTE_BOOK_KNOWLEDGE_DETAIL = "book/knowledge/detail"
-    const val ROUTE_BOOK_EVENT_LIST = "book/event/list"
-    const val ROUTE_BOOK_EVENT_DETAIL = "book/event/detail"
     const val ROUTE_EXPLORE_SHOW = "explore/show"
     const val ROUTE_RSS_SORT = "rss/sort"
     const val ROUTE_RSS_READ = "rss/read"

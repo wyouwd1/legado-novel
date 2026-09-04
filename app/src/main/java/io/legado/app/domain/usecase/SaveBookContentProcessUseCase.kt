@@ -23,7 +23,7 @@ class SaveBookContentProcessUseCase(
         contextBefore: String,
         contextAfter: String,
         replacementText: String,
-        kind: String = BookContentProcess.KIND_AI_CLEAN,
+        kind: String,
         source: String = BookContentProcess.SOURCE_AI,
         aiArtifactId: String? = null,
         sourceContentHash: String? = null,

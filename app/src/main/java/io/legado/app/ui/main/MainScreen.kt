@@ -126,7 +126,6 @@ fun MainScreen(
     effects: kotlinx.coroutines.flow.Flow<MainEffect>,
     useRail: Boolean,
     onOpenSettings: () -> Unit,
-    onNavigateToChat: () -> Unit,
     onNavigateToSearch: (String?) -> Unit,
     onNavigateToScopedSearch: (String) -> Unit,
     onNavigateToRemoteImport: () -> Unit,
@@ -605,7 +604,6 @@ fun MainScreen(
                             )
                             MainDestination.My -> MyRouteScreen(
                                 onOpenSettings = onOpenSettings,
-                                onNavigateToChat = onNavigateToChat,
                                 onNavigate = { event ->
                                     when (event) {
                                         PrefClickEvent.OpenBookCacheManage -> onNavigateToBookCacheManage()

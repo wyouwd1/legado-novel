@@ -7,16 +7,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import io.legado.app.data.dao.AiArtifactDao
-import io.legado.app.data.dao.AiChatDao
-import io.legado.app.data.dao.AiMemoryDao
-import io.legado.app.data.dao.AiProfileDao
-import io.legado.app.data.dao.AiPromptPresetDao
 import io.legado.app.data.dao.BookChapterDao
 import io.legado.app.data.dao.BookContentProcessDao
 import io.legado.app.data.dao.BookDao
 import io.legado.app.data.dao.BookGroupDao
-import io.legado.app.data.dao.BookKnowledgeDao
 import io.legado.app.data.dao.BookMarkingDao
 import io.legado.app.data.dao.BookSourceDao
 import io.legado.app.data.dao.BookmarkDao
@@ -41,24 +35,11 @@ import io.legado.app.data.dao.SearchKeywordDao
 import io.legado.app.data.dao.ServerDao
 import io.legado.app.data.dao.TagGroupRuleDao
 import io.legado.app.data.dao.TxtTocRuleDao
-import io.legado.app.data.entities.AiArtifact
-import io.legado.app.data.entities.AiChatConversation
-import io.legado.app.data.entities.AiChatMessage
-import io.legado.app.data.entities.AiMemory
-import io.legado.app.data.entities.AiModelProfile
-import io.legado.app.data.entities.AiPromptPreset
-import io.legado.app.data.entities.AiProviderProfile
-import io.legado.app.data.entities.AiTaskPreset
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
-import io.legado.app.data.entities.BookCharacterEvent
-import io.legado.app.data.entities.BookCharacterProfile
-import io.legado.app.data.entities.BookCharacterRelation
 import io.legado.app.data.entities.BookContentProcess
 import io.legado.app.data.entities.BookGroup
-import io.legado.app.data.entities.BookKnowledgeEntry
 import io.legado.app.data.entities.BookMarking
-import io.legado.app.data.entities.BookOutlineNode
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.BookSourcePart
 import io.legado.app.data.entities.Bookmark
@@ -100,7 +81,7 @@ val appDb by lazy {
 }
 
 @Database(
-    version = 106,
+    version = 107,
     exportSchema = true,
     entities = [Book::class, BookGroup::class, BookSource::class, BookChapter::class,
         ReplaceRule::class, SearchBook::class, SearchKeyword::class, Cookie::class,
@@ -109,12 +90,8 @@ val appDb by lazy {
         RssStar::class, TxtTocRule::class, ReadRecord::class, Cache::class,
         RuleSub::class, KeyboardAssist::class, Server::class,
         SearchContentHistory::class, HomepageModule::class, HomepageCustomSet::class,
-        HighlightRule::class, AiProviderProfile::class, AiModelProfile::class,
-        AiTaskPreset::class, AiArtifact::class, AiChatConversation::class,
-        AiChatMessage::class, AiMemory::class, HighlightTagRule::class, TagGroupRule::class,
-        BookContentProcess::class, AiPromptPreset::class, BookCharacterProfile::class,
-        BookCharacterEvent::class, BookCharacterRelation::class, BookKnowledgeEntry::class,
-        BookOutlineNode::class,
+        HighlightRule::class, HighlightTagRule::class, TagGroupRule::class,
+        BookContentProcess::class,
         ExactChapterPageCountEntity::class,
         BookMarking::class],
     views = [BookSourcePart::class],
@@ -187,7 +164,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val bookSourceDao: BookSourceDao
     abstract val bookChapterDao: BookChapterDao
     abstract val bookContentProcessDao: BookContentProcessDao
-    abstract val bookKnowledgeDao: BookKnowledgeDao
     abstract val replaceRuleDao: ReplaceRuleDao
     abstract val searchBookDao: SearchBookDao
     abstract val searchKeywordDao: SearchKeywordDao
@@ -211,11 +187,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val highlightRuleDao: HighlightRuleDao
     abstract val highlightTagRuleDao: HighlightTagRuleDao
     abstract val tagGroupRuleDao: TagGroupRuleDao
-    abstract val aiProfileDao: AiProfileDao
-    abstract val aiArtifactDao: AiArtifactDao
-    abstract val aiChatDao: AiChatDao
-    abstract val aiMemoryDao: AiMemoryDao
-    abstract val aiPromptPresetDao: AiPromptPresetDao
 
     companion object {
 
