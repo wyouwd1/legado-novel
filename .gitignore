@@ -22,3 +22,4 @@ node_modules/
 __pycache__/
 *.py[cod]
 .pi-lens.json
+**/.pi/tasks/
