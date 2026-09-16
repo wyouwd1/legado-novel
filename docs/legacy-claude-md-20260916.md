@@ -1,3 +1,7 @@
+> ⚠️ 存档文件（2026-09-16 Claude Code 清退）：原 `CLAUDE.md` 全文原样存档，**内容已冻结，不再维护**。
+> 现行有效文档见 [`../AGENTS.md`](../AGENTS.md)；Compose 迁移/审查模板见 `.agents/skills/legado-compose-review/`（原文中的 `.claude/skills/` 路径为历史路径）。
+> 构建命令以 AGENTS.md 为准（本存档中的 `./gradlew test` / `./gradlew lint` 与 JDK 17 CI 记载已过时）。
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.

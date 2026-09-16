@@ -46,6 +46,14 @@
 - `domain/` 是迁移目标边界，但当前仍存在 Android/JVM 类型渗透；不要把“目标纯净度”描述成已完成事实。
 - 长期目标是渐进演进为 KMP/CMP。详细目标结构、阶段和门禁见 `docs/dev/kmp-cmp-modernization.md`。
 
+### 工程速览（原 CLAUDE.md 精简并入，2026-09-16）
+
+- 三层 Clean Architecture：`data/`（Room）、`domain/`（Gateway/UseCase，无框架依赖）、`ui/`（Compose + 遗留 View）；另有顶层包：`help/`（OkHttp+Cronet、内容处理、备份/WebDAV、JS 引擎、配置）、`model/`（`ReadBook` 等运行时协调者，非实体）、`service/`、`web/`（Ktor 嵌入式服务）、`lib/`（MOBI、WebDAV、遗留 View 主题、cronet 封装）、`base/`、`utils/`。
+- 主题系统双引擎：Material 3 Expressive（默认，`MotionScheme.expressive()`）与 Miuix（`top.yukonga.miuix.kmp`），共 14 种 `AppThemeMode`（Dynamic Monet / 12 预设 / MaterialKolor 自定义 / Transparent）；遗留 View 主题在 `lib/theme/`。
+- Koin 在 `App.onCreate()` 加载 `appDatabaseModule`（AppDatabase + DAO 绑定）与 `appModule` 两个模块；Gateway→Repository 保持显式绑定（见下文数据边界）。
+- 导航：`MainActivity` 持有单个 `NavDisplay` + `entryProvider`；`Launcher0`–`LauncherW` 为多图标别名入口。
+- APK 按 ABI 拆分（`armeabi-v7a` / `arm64-v8a` / universal）；含 Firebase Analytics/Performance。
+
 ### Feature-first 过渡结构
 
 - 新 Compose-first Feature 和完成整页迁移的代码使用 `io.legado.app.feature.<name>`；目录、Gradle
@@ -159,6 +167,15 @@ platform implementations (Android/JVM/iOS/...)
 # Release/R8 相关
 .\gradlew.bat assembleAppRelease
 .\gradlew.bat assembleAppNoR8
+
+# 单测类过滤（以主验证集任务名为准）
+.\gradlew.bat testAppDebugUnitTest --tests "io.legado.app.model.cache.CacheDownloadQueueTest"
+
+# 设备连接测试（Android instrumented）
+.\gradlew.bat connectedAndroidTest
+
+# 更新 Cronet（修改 gradle.properties 的 CronetVersion 后）
+.\gradlew.bat app:downloadCronet
 
 # Web 前端
 pnpm --dir modules/web build
