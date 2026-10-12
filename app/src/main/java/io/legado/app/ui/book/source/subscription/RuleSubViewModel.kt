@@ -1,4 +1,4 @@
-package io.legado.app.ui.rss.subscription
+package io.legado.app.ui.book.source.subscription
 
 import android.app.Application
 import androidx.compose.runtime.Stable

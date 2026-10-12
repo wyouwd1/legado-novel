@@ -92,7 +92,6 @@ import io.legado.app.ui.main.bookshelf.BookshelfViewModel
 import io.legado.app.ui.main.home.HomeRouteScreen
 import io.legado.app.ui.main.my.MyRouteScreen
 import io.legado.app.ui.main.my.PrefClickEvent
-import io.legado.app.ui.main.rss.RssRouteScreen
 import io.legado.app.ui.theme.LegadoTheme
 import io.legado.app.ui.theme.ThemeResolver
 import io.legado.app.ui.widget.components.AppScaffold
@@ -152,17 +151,6 @@ fun MainScreen(
     onNavigateToBookSourceManage: () -> Unit,
     onNavigateToReplaceRules: () -> Unit,
     onNavigateToBookSourceEdit: (String?) -> Unit,
-    onNavigateToRssSourceManage: () -> Unit,
-    onNavigateToRssSourceEdit: (String?) -> Unit,
-    onNavigateToRssSort: (sourceUrl: String, sortUrl: String?, key: String?) -> Unit,
-    onNavigateToRssRead: (
-        title: String?,
-        origin: String,
-        link: String?,
-        openUrl: String?,
-        startPage: Boolean
-    ) -> Unit,
-    onNavigateToRssFavorites: () -> Unit,
     onNavigateToRuleSub: () -> Unit,
     onNavigateToReadRecord: () -> Unit,
     onNavigateToReadRecordOverview: () -> Unit,
@@ -595,24 +583,6 @@ fun MainScreen(
                                 },
                                 onOpenEdit = onNavigateToBookSourceEdit,
                                 onOpenSearch = onNavigateToScopedSearch,
-                            )
-                            MainDestination.Rss -> RssRouteScreen(
-                                onOpenSort = { sourceUrl, sortUrl, key ->
-                                    onNavigateToRssSort(sourceUrl, sortUrl, key)
-                                },
-                                onOpenRead = { title, origin, link, openUrl, startPage ->
-                                    onNavigateToRssRead(title, origin, link, openUrl, startPage)
-                                },
-                                onOpenFavorites = onNavigateToRssFavorites,
-                                onOpenRuleSub = onNavigateToRuleSub,
-                                onOpenLogin = { sourceUrl ->
-                                    onNavigateToSourceLogin(
-                                        io.legado.app.ui.login.SourceLoginType.RssSource,
-                                        sourceUrl,
-                                    )
-                                },
-                                onOpenSourceEdit = onNavigateToRssSourceEdit,
-                                onOpenSourceManage = onNavigateToRssSourceManage,
                             )
                             MainDestination.My -> MyRouteScreen(
                                 onOpenSettings = onOpenSettings,

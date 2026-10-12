@@ -71,7 +71,7 @@ data class ThemeExportData(
     val tabletInterface: String = "auto",
     val labelVisibilityMode: String = "auto",
     val defaultHomePage: String = "bookshelf",
-    val mainNavigationOrder: String = "home,bookshelf,explore,rss,my",
+    val mainNavigationOrder: String = "home,bookshelf,explore,my",
     val navIconHome: String = "",
     val navIconBookshelf: String = "",
     val navIconExplore: String = "",

@@ -18,14 +18,12 @@ import io.legado.app.api.ReturnData
 import io.legado.app.api.controller.BookController
 import io.legado.app.api.controller.BookSourceController
 import io.legado.app.api.controller.ReplaceRuleController
-import io.legado.app.api.controller.RssSourceController
 import io.legado.app.model.localBook.LocalBook
 import io.legado.app.service.WebService
 import io.legado.app.utils.LogUtils
 import io.legado.app.utils.stackTraceStr
 import io.legado.app.web.socket.BookSearchWebSocket
 import io.legado.app.web.socket.BookSourceDebugWebSocket
-import io.legado.app.web.socket.RssSourceDebugWebSocket
 import io.legado.app.web.utils.AssetsWeb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -111,9 +109,6 @@ class KtorServer(private val port: Int) {
                     }
                 }
                 post("/saveReadConfig") { handlePost { BookController.saveWebReadConfig(it) } }
-                post("/saveRssSource") { handlePost { RssSourceController.saveSource(it) } }
-                post("/saveRssSources") { handlePost { RssSourceController.saveSources(it) } }
-                post("/deleteRssSources") { handlePost { RssSourceController.deleteSources(it) } }
                 post("/saveReplaceRule") { handlePost { ReplaceRuleController.saveRule(it) } }
                 post("/deleteReplaceRule") { handlePost { ReplaceRuleController.delete(it) } }
                 post("/testReplaceRule") { handlePost { ReplaceRuleController.testRule(it) } }
@@ -127,8 +122,6 @@ class KtorServer(private val port: Int) {
                 get("/cover") { handleGet { BookController.getCover(it) } }
                 get("/image") { handleGet { BookController.getImg(it) } }
                 get("/getReadConfig") { handleGet { BookController.getWebReadConfig() } }
-                get("/getRssSource") { handleGet { RssSourceController.getSource(it) } }
-                get("/getRssSources") { handleGet { RssSourceController.sources } }
                 get("/getReplaceRules") { handleGet { ReplaceRuleController.allRules } }
 
                 get("{...}") {
@@ -156,9 +149,6 @@ class KtorServer(private val port: Int) {
             routing {
                 webSocket("/bookSourceDebug") {
                     BookSourceDebugWebSocket(this).handle()
-                }
-                webSocket("/rssSourceDebug") {
-                    RssSourceDebugWebSocket(this).handle()
                 }
                 webSocket("/searchBook") {
                     BookSearchWebSocket(this).handle()

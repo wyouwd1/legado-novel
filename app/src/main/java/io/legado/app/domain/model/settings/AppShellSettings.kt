@@ -16,7 +16,7 @@ data class AppShellSettings(
     val tabletInterface: String = "auto",
     val labelVisibilityMode: String = "auto",
     val defaultHomePage: String = "bookshelf",
-    val mainNavigationOrder: String = "home,bookshelf,explore,rss,my",
+    val mainNavigationOrder: String = "home,bookshelf,explore,my",
     val navExtended: Boolean = false,
     val navIconHome: String = "",
     val navIconBookshelf: String = "",

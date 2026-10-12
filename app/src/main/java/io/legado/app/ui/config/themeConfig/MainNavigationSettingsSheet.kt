@@ -63,7 +63,6 @@ fun MainNavigationSettingsSheet(
     fun isRouteVisible(route: String): Boolean = when (route) {
         MainDestination.Home.route -> settings.showHome
         MainDestination.Explore.route -> settings.showDiscovery
-        MainDestination.Rss.route -> settings.showRss
         else -> true
     }
 
@@ -113,12 +112,10 @@ fun MainNavigationSettingsSheet(
                 settings.navIconHome,
                 settings.navIconBookshelf,
                 settings.navIconExplore,
-                settings.navIconRss,
                 settings.navIconMy,
                 settings.navIconHomeSelected,
                 settings.navIconBookshelfSelected,
                 settings.navIconExploreSelected,
-                settings.navIconRssSelected,
                 settings.navIconMySelected,
             ).count { it.isNotEmpty() }
             CompactClickableSettingItem(

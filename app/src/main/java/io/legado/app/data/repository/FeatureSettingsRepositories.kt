@@ -295,7 +295,7 @@ internal fun Preferences.toAppShellSettings(): AppShellSettings = AppShellSettin
     labelVisibilityMode = compatDsString(PreferKey.labelVisibilityMode) ?: "auto",
     defaultHomePage = compatDsString(PreferKey.defaultHomePage) ?: "bookshelf",
     mainNavigationOrder = compatDsString(PreferKey.mainNavigationOrder)
-        ?: "home,bookshelf,explore,rss,my",
+        ?: "home,bookshelf,explore,my",
     navExtended = compatDsBoolean(PreferKey.navExtended) ?: false,
     navIconHome = compatDsString(PreferKey.navIconHome) ?: "",
     navIconBookshelf = compatDsString(PreferKey.navIconBookshelf) ?: "",

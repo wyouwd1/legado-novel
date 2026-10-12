@@ -100,7 +100,6 @@ private fun buildMainUiState(
         when (it) {
             MainDestination.Home -> appShell.showHome
             MainDestination.Explore -> appShell.showDiscovery
-            MainDestination.Rss -> appShell.showRss
             else -> true
         }
     }
@@ -115,12 +114,10 @@ private fun buildMainUiState(
         navIconHome = appShell.navIconHome,
         navIconBookshelf = appShell.navIconBookshelf,
         navIconExplore = appShell.navIconExplore,
-        navIconRss = appShell.navIconRss,
         navIconMy = appShell.navIconMy,
         navIconHomeSelected = appShell.navIconHomeSelected,
         navIconBookshelfSelected = appShell.navIconBookshelfSelected,
         navIconExploreSelected = appShell.navIconExploreSelected,
-        navIconRssSelected = appShell.navIconRssSelected,
         navIconMySelected = appShell.navIconMySelected,
         deepPersonalizationActive = theme.appTheme == "12" && theme.enableDeepPersonalization,
         secondaryThemeColor = theme.secondaryThemeColor,

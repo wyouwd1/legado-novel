@@ -15,11 +15,6 @@
         <item>三列</item>
     </string-array>
 
-    <string-array name="rss_type">
-        <item>网页</item>
-        <item>图片</item>
-        <item>视频</item>
-    </string-array>
 
     <string-array name="group_style">
         <item>标签</item>

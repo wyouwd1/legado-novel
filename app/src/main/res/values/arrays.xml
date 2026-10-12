@@ -20,11 +20,6 @@
 		<item>Three Columns</item>
 	</string-array>
 
-	<string-array name="rss_type">
-		<item>Web Page</item>
-		<item>Image</item>
-		<item>Video</item>
-	</string-array>
 
 	<string-array name="group_style">
 		<item>Tab</item>
@@ -280,7 +275,6 @@
 		<item>@string/home</item>
 		<item>@string/bookshelf</item>
         <item>@string/discovery</item>
-		<item>@string/rss</item>
 		<item>@string/my</item>
 	</string-array>
 
@@ -296,7 +290,6 @@
 		<item>home</item>
 		<item>bookshelf</item>
 		<item>explore</item>
-		<item>rss</item>
 		<item>my</item>
 	</string-array>
 

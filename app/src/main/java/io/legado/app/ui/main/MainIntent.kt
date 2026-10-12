@@ -37,15 +37,8 @@ object MainIntent {
     const val EXTRA_WEB_VIEW_REFETCH = "refetchAfterSuccess"
     const val EXTRA_WEB_VIEW_HTML = "html"
 
-    const val EXTRA_RSS_SOURCE_URL = "extra_rss_source_url"
-    const val EXTRA_RSS_SORT_URL = "extra_rss_sort_url"
-    const val EXTRA_RSS_KEY = "extra_rss_key"
     const val EXTRA_WEB_SERVICE_LOCAL_NETWORK = "webServiceLocalNetwork"
 
-    const val EXTRA_RSS_READ_TITLE = "extra_rss_read_title"
-    const val EXTRA_RSS_READ_ORIGIN = "extra_rss_read_origin"
-    const val EXTRA_RSS_READ_LINK = "extra_rss_read_link"
-    const val EXTRA_RSS_READ_OPEN_URL = "extra_rss_read_open_url"
 
     fun createLauncherIntent(context: Context): Intent {
         val launcherComponent =
@@ -78,7 +71,7 @@ object MainIntent {
         sourceKey: String? = null,
         bookUrl: String? = null,
     ): Intent = createLauncherIntent(context).apply {
-        // NEW_TASK: 支持从 Application context（如 RssJsExtensions）启动；
+        // NEW_TASK: 支持从 Application context（如 BaseJsExtensions）启动；
         // SINGLE_TOP: MainActivity 已在栈顶时复用现有实例走 onNewIntent，直接把登录路由
         // 压进 nav3 back stack，避免 standard launchMode 下新建 MainActivity 先回主页面。
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -129,62 +122,15 @@ object MainIntent {
             putExtra(EXTRA_SOURCE_URL, sourceUrl)
         }
 
-    fun createRssSourceManageIntent(context: Context): Intent =
-        createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_RSS_SOURCE_MANAGE)
-        }
-
-    fun createRssSourceEditIntent(context: Context, sourceUrl: String? = null): Intent =
-        createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_RSS_SOURCE_EDIT)
-            putExtra(EXTRA_SOURCE_URL, sourceUrl)
-        }
-
     fun createBookSourceDebugIntent(context: Context, sourceUrl: String?): Intent =
         createLauncherIntent(context).apply {
             putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_BOOK_SOURCE_DEBUG)
             putExtra(EXTRA_SOURCE_URL, sourceUrl)
         }
 
-    fun createRssSourceDebugIntent(context: Context, sourceUrl: String?): Intent =
-        createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_RSS_SOURCE_DEBUG)
-            putExtra(EXTRA_SOURCE_URL, sourceUrl)
-        }
-
     fun createIntent(context: Context, configTag: String? = null): Intent {
         return createLauncherIntent(context).apply {
             putExtra(EXTRA_START_ROUTE, routeForConfigTag(configTag))
-        }
-    }
-
-    fun createRssSortIntent(
-        context: Context,
-        sourceUrl: String,
-        sortUrl: String? = null,
-        key: String? = null
-    ): Intent {
-        return createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_RSS_SORT)
-            putExtra(EXTRA_RSS_SOURCE_URL, sourceUrl)
-            putExtra(EXTRA_RSS_SORT_URL, sortUrl)
-            putExtra(EXTRA_RSS_KEY, key)
-        }
-    }
-
-    fun createRssReadIntent(
-        context: Context,
-        title: String? = null,
-        origin: String,
-        link: String? = null,
-        openUrl: String? = null
-    ): Intent {
-        return createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_RSS_READ)
-            putExtra(EXTRA_RSS_READ_TITLE, title)
-            putExtra(EXTRA_RSS_READ_ORIGIN, origin)
-            putExtra(EXTRA_RSS_READ_LINK, link)
-            putExtra(EXTRA_RSS_READ_OPEN_URL, openUrl)
         }
     }
 

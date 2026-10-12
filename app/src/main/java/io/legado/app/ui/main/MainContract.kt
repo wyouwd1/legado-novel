@@ -16,12 +16,10 @@ data class MainUiState(
     val navIconHome: String = "",
     val navIconBookshelf: String = "",
     val navIconExplore: String = "",
-    val navIconRss: String = "",
     val navIconMy: String = "",
     val navIconHomeSelected: String = "",
     val navIconBookshelfSelected: String = "",
     val navIconExploreSelected: String = "",
-    val navIconRssSelected: String = "",
     val navIconMySelected: String = "",
     val deepPersonalizationActive: Boolean = false,
     val secondaryThemeColor: Int = 0,
@@ -31,7 +29,6 @@ data class MainUiState(
         MainDestination.Home -> navIconHome
         MainDestination.Bookshelf -> navIconBookshelf
         MainDestination.Explore -> navIconExplore
-        MainDestination.Rss -> navIconRss
         MainDestination.My -> navIconMy
     }
 
@@ -39,7 +36,6 @@ data class MainUiState(
         MainDestination.Home -> navIconHomeSelected
         MainDestination.Bookshelf -> navIconBookshelfSelected
         MainDestination.Explore -> navIconExploreSelected
-        MainDestination.Rss -> navIconRssSelected
         MainDestination.My -> navIconMySelected
     }
 }

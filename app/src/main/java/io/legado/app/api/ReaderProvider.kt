@@ -12,7 +12,6 @@ import android.net.Uri
 import com.google.gson.Gson
 import io.legado.app.api.controller.BookController
 import io.legado.app.api.controller.BookSourceController
-import io.legado.app.api.controller.RssSourceController
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -21,7 +20,6 @@ import kotlinx.coroutines.runBlocking
 class ReaderProvider : ContentProvider() {
     private enum class RequestCode {
         SaveBookSource, SaveBookSources, DeleteBookSources, GetBookSource, GetBookSources,
-        SaveRssSource, SaveRssSources, DeleteRssSources, GetRssSource, GetRssSources,
         SaveBook, GetBookshelf, RefreshToc, GetChapterList, GetBookContent, GetBookCover,
         SaveBookProgress
     }
@@ -35,11 +33,6 @@ class ReaderProvider : ContentProvider() {
                 addURI(authority, "bookSources/delete", RequestCode.DeleteBookSources.ordinal)
                 addURI(authority, "bookSource/query", RequestCode.GetBookSource.ordinal)
                 addURI(authority, "bookSources/query", RequestCode.GetBookSources.ordinal)
-                addURI(authority, "rssSource/insert", RequestCode.SaveRssSource.ordinal)
-                addURI(authority, "rssSources/insert", RequestCode.SaveRssSources.ordinal)
-                addURI(authority, "rssSources/delete", RequestCode.DeleteRssSources.ordinal)
-                addURI(authority, "rssSource/query", RequestCode.GetRssSource.ordinal)
-                addURI(authority, "rssSources/query", RequestCode.GetRssSources.ordinal)
                 addURI(authority, "book/insert", RequestCode.SaveBook.ordinal)
                 addURI(authority, "books/query", RequestCode.GetBookshelf.ordinal)
                 addURI(authority, "book/refreshToc/query", RequestCode.RefreshToc.ordinal)
@@ -65,7 +58,6 @@ class ReaderProvider : ContentProvider() {
         if (sMatcher.match(uri) < 0) return -1
         when (RequestCode.entries[sMatcher.match(uri)]) {
             RequestCode.DeleteBookSources -> BookSourceController.deleteSources(selection)
-            RequestCode.DeleteRssSources -> RssSourceController.deleteSources(selection)
             else -> throw IllegalStateException(
                 "Unexpected value: " + RequestCode.entries[sMatcher.match(uri)].name
             )
@@ -85,14 +77,6 @@ class ReaderProvider : ContentProvider() {
 
                 RequestCode.SaveBookSources -> values?.let {
                     BookSourceController.saveSources(values.getAsString(postBodyKey))
-                }
-
-                RequestCode.SaveRssSource -> values?.let {
-                    RssSourceController.saveSource(values.getAsString(postBodyKey))
-                }
-
-                RequestCode.SaveRssSources -> values?.let {
-                    RssSourceController.saveSources(values.getAsString(postBodyKey))
                 }
 
                 RequestCode.SaveBook -> values?.let {
@@ -128,8 +112,6 @@ class ReaderProvider : ContentProvider() {
         return if (sMatcher.match(uri) < 0) null else when (RequestCode.entries[sMatcher.match(uri)]) {
             RequestCode.GetBookSource -> SimpleCursor(BookSourceController.getSource(map))
             RequestCode.GetBookSources -> SimpleCursor(BookSourceController.sources)
-            RequestCode.GetRssSource -> SimpleCursor(RssSourceController.getSource(map))
-            RequestCode.GetRssSources -> SimpleCursor(RssSourceController.sources)
             RequestCode.GetBookshelf -> SimpleCursor(BookController.bookshelf)
             RequestCode.GetBookContent -> SimpleCursor(BookController.getBookContent(map))
             RequestCode.RefreshToc -> SimpleCursor(BookController.refreshToc(map))

@@ -63,12 +63,6 @@ class DebugScenarioActivity : AppCompatActivity() {
                         this@DebugScenarioActivity,
                         ConfigTag.THEME_CONFIG,
                     )
-                    ENTRY_RSS_READ -> MainIntent.createRssReadIntent(
-                        context = this@DebugScenarioActivity,
-                        title = "DEBUG RSS 日夜切换",
-                        origin = DEBUG_ORIGIN,
-                        openUrl = DEBUG_RSS_HTML,
-                    )
                     else -> MainIntent.createReadBookIntent(this@DebugScenarioActivity, bookUrl)
                 }
                 startActivity(

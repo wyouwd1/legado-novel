@@ -87,7 +87,7 @@ class ThemePackageSettingsRepository : ThemePackageSettingsGateway {
         defaultHomePage = string(PreferKey.defaultHomePage, "bookshelf"),
         mainNavigationOrder = string(
             PreferKey.mainNavigationOrder,
-            "home,bookshelf,explore,rss,my",
+            "home,bookshelf,explore,my",
         ),
         navIconHome = string(PreferKey.navIconHome, ""),
         navIconBookshelf = string(PreferKey.navIconBookshelf, ""),

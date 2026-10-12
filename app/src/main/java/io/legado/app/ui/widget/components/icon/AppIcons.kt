@@ -18,14 +18,12 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Replay
-import androidx.compose.material.icons.filled.RssFeed
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -142,12 +140,6 @@ object AppIcons {
                 if (selected) MiuixIcons.Regular.Album else MiuixIcons.Regular.Album
             } else {
                 if (selected) Icons.Default.Explore else Icons.Outlined.Explore
-            }
-
-            MainDestination.Rss -> if (isMiuix) {
-                if (selected) MiuixIcons.Regular.Favorites else MiuixIcons.Regular.Favorites
-            } else {
-                if (selected) Icons.Default.RssFeed else Icons.Outlined.RssFeed
             }
 
             MainDestination.My -> if (isMiuix) {

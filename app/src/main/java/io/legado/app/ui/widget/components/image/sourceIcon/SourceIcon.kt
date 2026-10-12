@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.RssFeed
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -46,7 +46,7 @@ fun SourceIcon(
     imageLoader: ImageLoader = koinInject(),
     placeholderIcon: @Composable () -> Unit = {
         Icon(
-            Icons.Default.RssFeed,
+            Icons.Default.Book,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.outlineVariant,
             modifier = Modifier.fillMaxSize(0.7f)

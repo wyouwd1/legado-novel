@@ -301,12 +301,6 @@ class ThemeConfigViewModel(
                     defaultHomePage = current.fallbackHomePage(intent),
                 )
             }
-            MainDestination.Rss.route -> { current ->
-                current.copy(
-                    showRss = intent.visible,
-                    defaultHomePage = current.fallbackHomePage(intent),
-                )
-            }
             else -> return
         }
         updateAppShell(transform = transform)
@@ -340,9 +334,6 @@ class ThemeConfigViewModel(
             MainDestination.Explore.route -> { settings ->
                 settings.copy(navIconExplore = intent.path)
             }
-            MainDestination.Rss.route -> { settings ->
-                settings.copy(navIconRss = intent.path)
-            }
             MainDestination.My.route -> { settings ->
                 settings.copy(navIconMy = intent.path)
             }
@@ -358,9 +349,6 @@ class ThemeConfigViewModel(
                 settings.copy(navIconExploreSelected = intent.path)
             }
 
-            "${MainDestination.Rss.route}:selected" -> { settings ->
-                settings.copy(navIconRssSelected = intent.path)
-            }
 
             "${MainDestination.My.route}:selected" -> { settings ->
                 settings.copy(navIconMySelected = intent.path)
@@ -385,12 +373,10 @@ class ThemeConfigViewModel(
         MainDestination.Home.route -> navIconHome
         MainDestination.Bookshelf.route -> navIconBookshelf
         MainDestination.Explore.route -> navIconExplore
-        MainDestination.Rss.route -> navIconRss
         MainDestination.My.route -> navIconMy
         "${MainDestination.Home.route}:selected" -> navIconHomeSelected
         "${MainDestination.Bookshelf.route}:selected" -> navIconBookshelfSelected
         "${MainDestination.Explore.route}:selected" -> navIconExploreSelected
-        "${MainDestination.Rss.route}:selected" -> navIconRssSelected
         "${MainDestination.My.route}:selected" -> navIconMySelected
         else -> ""
     }
@@ -399,12 +385,10 @@ class ThemeConfigViewModel(
         navIconHome,
         navIconBookshelf,
         navIconExplore,
-        navIconRss,
         navIconMy,
         navIconHomeSelected,
         navIconBookshelfSelected,
         navIconExploreSelected,
-        navIconRssSelected,
         navIconMySelected,
     ).count { it == path }
 

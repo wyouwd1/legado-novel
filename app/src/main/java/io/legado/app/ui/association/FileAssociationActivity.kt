@@ -109,7 +109,6 @@ class FileAssociationActivity : BaseComposeActivity(transparent = true) {
                     startActivity(MainActivity.createBookSourceManageIntent(this, it.second))
                     finish()
                 }
-                "rssSource" -> showDialogFragment(ImportRssSourceDialog(it.second, true))
                 "replaceRule" -> showDialogFragment(ImportReplaceRuleDialog(it.second, true))
                 "httpTts" -> showDialogFragment(ImportHttpTtsDialog(it.second, true))
                 "theme" -> showDialogFragment(ImportThemeDialog(it.second, true))

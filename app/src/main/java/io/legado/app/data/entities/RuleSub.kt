@@ -8,7 +8,6 @@ import androidx.room.PrimaryKey
  */
 object RuleSubType {
     const val BOOK_SOURCE = 0    // 书源
-    const val RSS_SOURCE = 1     // 订阅源
     const val REPLACE_RULE = 2   // 替换规则
     const val AUTO = 3           // 自动识别
 }

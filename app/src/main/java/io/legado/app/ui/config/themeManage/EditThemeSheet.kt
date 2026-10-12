@@ -194,11 +194,6 @@ fun EditThemeSheet(
                 onCheckedChange = { data = data.copy(showDiscovery = it) }
             )
             CompactSwitchSettingItem(
-                title = "RSS",
-                checked = data.showRss,
-                onCheckedChange = { data = data.copy(showRss = it) }
-            )
-            CompactSwitchSettingItem(
                 title = stringResource(R.string.show_bottom_nav),
                 checked = data.showBottomView,
                 onCheckedChange = { data = data.copy(showBottomView = it) }

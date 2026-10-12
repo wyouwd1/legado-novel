@@ -71,7 +71,6 @@ fun NavIconManageSheet(
             settings.navIconExplore,
             settings.navIconExploreSelected,
         ),
-        NavIconDestination("rss", R.string.rss, settings.navIconRss, settings.navIconRssSelected),
         NavIconDestination("my", R.string.my, settings.navIconMy, settings.navIconMySelected),
     )
 
@@ -220,6 +219,5 @@ private val NavIconDestination.mainDestination: MainDestination
         MainDestination.Home.route -> MainDestination.Home
         MainDestination.Bookshelf.route -> MainDestination.Bookshelf
         MainDestination.Explore.route -> MainDestination.Explore
-        MainDestination.Rss.route -> MainDestination.Rss
         else -> MainDestination.My
     }

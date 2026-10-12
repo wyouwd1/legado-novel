@@ -181,34 +181,11 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         fun createBookSourceEditIntent(context: Context, sourceUrl: String? = null) =
             MainIntent.createBookSourceEditIntent(context, sourceUrl)
 
-        fun createRssSourceManageIntent(context: Context) =
-            MainIntent.createRssSourceManageIntent(context)
-
-        fun createRssSourceEditIntent(context: Context, sourceUrl: String? = null) =
-            MainIntent.createRssSourceEditIntent(context, sourceUrl)
-
         fun createBookSourceDebugIntent(context: Context, sourceUrl: String?) =
             MainIntent.createBookSourceDebugIntent(context, sourceUrl)
 
-        fun createRssSourceDebugIntent(context: Context, sourceUrl: String?) =
-            MainIntent.createRssSourceDebugIntent(context, sourceUrl)
         fun createIntent(context: Context, configTag: String? = null): Intent =
             MainIntent.createIntent(context, configTag)
-
-        fun createRssSortIntent(
-            context: Context,
-            sourceUrl: String,
-            sortUrl: String? = null,
-            key: String? = null
-        ): Intent = MainIntent.createRssSortIntent(context, sourceUrl, sortUrl, key)
-
-        fun createRssReadIntent(
-            context: Context,
-            title: String? = null,
-            origin: String,
-            link: String? = null,
-            openUrl: String? = null
-        ): Intent = MainIntent.createRssReadIntent(context, title, origin, link, openUrl)
 
         fun createBookshelfManageScreenIntent(context: Context, groupId: Long = -1L): Intent =
             MainIntent.createBookshelfManageScreenIntent(context, groupId)

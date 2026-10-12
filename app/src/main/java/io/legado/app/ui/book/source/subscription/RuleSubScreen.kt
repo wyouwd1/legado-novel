@@ -1,4 +1,4 @@
-package io.legado.app.ui.rss.subscription
+package io.legado.app.ui.book.source.subscription
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +40,6 @@ import io.legado.app.R
 import io.legado.app.data.entities.RuleSub
 import io.legado.app.data.entities.RuleSubType
 import io.legado.app.ui.association.ImportReplaceRuleDialog
-import io.legado.app.ui.association.ImportRssSourceDialog
 import io.legado.app.ui.theme.LegadoTheme
 import io.legado.app.ui.theme.adaptiveContentPadding
 import io.legado.app.ui.widget.components.AppFloatingActionButton
@@ -74,10 +73,6 @@ fun RuleSubRouteScreen(
                     val ruleSub = effect.rule
                     when (ruleSub.type) {
                         RuleSubType.BOOK_SOURCE -> onImportBookSource(ruleSub.url)
-                        RuleSubType.RSS_SOURCE ->
-                            (context as? AppCompatActivity)?.showDialogFragment(
-                                ImportRssSourceDialog(ruleSub.url)
-                            )
                         RuleSubType.REPLACE_RULE ->
                             (context as? AppCompatActivity)?.showDialogFragment(
                                 ImportReplaceRuleDialog(ruleSub.url)
