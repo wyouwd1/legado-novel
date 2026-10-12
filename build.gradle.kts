@@ -269,7 +269,7 @@ val verifyConfigArchitecture = tasks.register<VerifyConfigArchitectureTask>(
             "io/legado/app/ui/config/bookshelfConfig/BookshelfManageScreenConfig.kt" to 1,
             "io/legado/app/ui/main/MainNavGraph.kt" to 2,
             "io/legado/app/ui/rss/article/RssArticlesCompose.kt" to 1,
-            "io/legado/app/ui/rss/read/RssJsExtensions.kt" to 8,
+            "io/legado/app/ui/rss/read/RssJsExtensions.kt" to 6,
             "io/legado/app/ui/widget/dialog/BottomWebViewDialog.kt" to 1,
         )
     )

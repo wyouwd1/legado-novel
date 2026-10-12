@@ -8,82 +8,36 @@ import io.legado.app.data.entities.BaseSource
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.RssReadRecord
 import io.legado.app.data.entities.RssSource
-import io.legado.app.help.JsExtensions
-import io.legado.app.model.analyzeRule.AnalyzeRule
-import io.legado.app.ui.association.AddToBookshelfDialog
+import io.legado.app.help.webView.BaseJsExtensions
 import io.legado.app.ui.login.SourceLoginType
 import io.legado.app.ui.main.MainActivity
-import io.legado.app.ui.widget.dialog.PhotoDialog
 import io.legado.app.utils.isJsonObject
-import io.legado.app.utils.showDialogFragment
 import io.legado.app.utils.toastOnUi
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.lang.ref.WeakReference
 
-
+/**
+ * RSS 订阅源 WebView 的 JS 扩展。
+ *
+ * 通用能力（put/get/searchBook/addBook/showPhoto/getStringList/getString、search/explore）
+ * 已上移到 [BaseJsExtensions]；本类只保留 RSS 专属分支：login（含订阅源登录）、sort、rss。
+ */
 @Suppress("unused")
-open class RssJsExtensions(activity: AppCompatActivity?, source: BaseSource?) : JsExtensions {
-
-    val activityRef: WeakReference<AppCompatActivity> = WeakReference(activity)
-    val sourceRef: WeakReference<BaseSource?> = WeakReference(source)
-
-    override fun getSource(): BaseSource? {
-        return sourceRef.get()
-    }
-
-    override fun getTag(): String? {
-        return getSource()?.getTag()
-    }
+open class RssJsExtensions(
+    activity: AppCompatActivity?,
+    source: BaseSource?
+) : BaseJsExtensions(activity, source) {
 
     @JavascriptInterface
-    fun put(key: String, value: String): String {
-        getSource()?.put(key, value)
-        return value
-    }
-
-    @JavascriptInterface
-    fun get(key: String): String {
-        return getSource()?.get(key) ?: ""
-    }
-
-    @JavascriptInterface
-    fun searchBook(key: String) {
-        searchBook(key, null)
-    }
-
-    @JavascriptInterface
-    fun searchBook(key: String, searchScope: String?) {
-        activityRef.get()?.let {
-            it.startActivity(MainActivity.createSearchIntent(it, key, searchScope))
+    @JvmOverloads
+    override fun open(name: String, url: String?, title: String?, origin: String?) {
+        if (name !in rssActions) {
+            super.open(name, url, title, origin)
+            return
         }
-    }
-
-    @JavascriptInterface
-    fun addBook(bookUrl: String) {
-        activityRef.get()?.showDialogFragment(AddToBookshelfDialog(bookUrl))
-    }
-
-    fun showPhoto(src: String) {
-        activityRef.get()?.showDialogFragment(PhotoDialog(src, getSource()?.getKey()))
-    }
-
-    @JvmOverloads
-    fun getStringList(rule: String?, mContent: Any? = null, isUrl: Boolean = false): List<String>? {
-        return AnalyzeRule(null, source = getSource()).getStringList(rule, mContent, isUrl)
-    }
-
-    @JvmOverloads
-    fun getString(ruleStr: String?, mContent: Any? = null, isUrl: Boolean = false): String {
-        return AnalyzeRule(null, source = getSource()).getString(ruleStr, mContent, isUrl)
-    }
-
-    @JavascriptInterface
-    @JvmOverloads
-    open fun open(name: String, url: String? = null, title: String? = null, origin: String? = null) {
         val activity = activityRef.get() ?: return
         activity.lifecycleScope.launch(IO) {
             val source = getSource() ?: return@launch
@@ -173,38 +127,12 @@ open class RssJsExtensions(activity: AppCompatActivity?, source: BaseSource?) : 
                         )
                     }
                 }
-
-                "search" -> {
-                    title?.let {
-                        val searchScope = origin?.let { o ->
-                            appDb.bookSourceDao.getBookSource(o)?.let { s ->
-                                "${s.bookSourceName.replace(":", "")}::${o}"
-                            }
-                        }
-                        withContext(Main) {
-                            searchBook(it, searchScope)
-                        }
-                    }
-                }
-
-                "explore" -> {
-                    val toSource = origin?.let { o ->
-                        appDb.bookSourceDao.getBookSource(o)
-                    } ?: (source as? BookSource) ?: return@launch
-                    val sourceUrl = toSource.bookSourceUrl
-                    withContext(Main) {
-                        activity.startActivity(
-                            MainActivity.createExploreShowIntent(
-                                context = activity,
-                                exploreName = title,
-                                sourceUrl = sourceUrl,
-                                exploreUrl = url
-                            )
-                        )
-                    }
-                }
             }
         }
+    }
+
+    private companion object {
+        val rssActions = setOf("login", "sort", "rss")
     }
 
 }

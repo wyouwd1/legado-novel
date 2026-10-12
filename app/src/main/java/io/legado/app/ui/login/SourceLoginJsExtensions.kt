@@ -6,9 +6,9 @@ import io.legado.app.R
 import io.legado.app.constant.EventBus
 import io.legado.app.data.entities.BaseSource
 import io.legado.app.data.entities.HttpTTS
+import io.legado.app.help.webView.BaseJsExtensions
 import io.legado.app.model.ReadAloud
 import io.legado.app.ui.main.MainActivity
-import io.legado.app.ui.rss.read.RssJsExtensions
 import io.legado.app.ui.widget.dialog.BottomWebViewDialog
 import io.legado.app.utils.FileUtils
 import io.legado.app.utils.postEvent
@@ -25,7 +25,7 @@ class SourceLoginJsExtensions(
     activity: AppCompatActivity?, source: BaseSource?,
     private val bookType: Int = 0,
     callback: Callback? = null
-) : RssJsExtensions(activity, source) {
+) : BaseJsExtensions(activity, source) {
     private val callbackRef: WeakReference<Callback> = WeakReference(callback)
     interface Callback {
         fun upUiData(data: Map<String, Any?>?)

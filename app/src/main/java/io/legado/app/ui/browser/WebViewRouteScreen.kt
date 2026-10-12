@@ -41,7 +41,7 @@ import io.legado.app.help.http.CookieStore
 import io.legado.app.help.source.SourceVerificationHelp
 import io.legado.app.model.Download
 import io.legado.app.ui.association.OnLineImportActivity
-import io.legado.app.ui.rss.read.VisibleWebViewCompose
+import io.legado.app.help.webView.VisibleWebViewCompose
 import io.legado.app.ui.widget.components.AppScaffold
 import io.legado.app.ui.widget.components.modalBottomSheet.OptionCard
 import io.legado.app.ui.widget.components.modalBottomSheet.OptionSheet
