@@ -68,17 +68,6 @@ object MainNavigator {
             }
         }
 
-        if (route is MainRouteReadManga) {
-            val existingReaderIndex = backStack.indexOfLast { it is MainRouteReadManga }
-            if (existingReaderIndex >= 0) {
-                while (backStack.lastIndex > existingReaderIndex) {
-                    backStack.removeAt(backStack.lastIndex)
-                }
-                backStack[existingReaderIndex] = route
-                return
-            }
-        }
-
         // 朗读通知的「回到正在读的书」不带 bookUrl（空即最后读过的那本），路由键和栈顶那份必然不相等。
         // 栈顶已经是阅读页时再压一份，返回就要连点同样多次才出得了阅读页，所以在这里收住不压栈。
         if (route is MainRouteReadBook &&
@@ -161,8 +150,7 @@ object MainNavigator {
             MainRouteImportRemote,
             is MainRouteCache,
             MainRouteBookCacheManage,
-            is MainRouteReadBook,
-            is MainRouteReadManga -> {
+            is MainRouteReadBook -> {
                 if (
                     currentRoute == MainRouteHome ||
                     currentRoute is MainRouteBookInfo
@@ -222,8 +210,7 @@ object MainNavigator {
                     currentRoute is MainRouteExploreShow ||
                     currentRoute is MainRouteBookInfo ||
                     currentRoute is MainRouteCache ||
-                    currentRoute is MainRouteReadBook ||
-                    currentRoute is MainRouteReadManga
+                    currentRoute is MainRouteReadBook
                 ) {
                     backStack.add(route)
                 } else {
@@ -255,8 +242,7 @@ object MainNavigator {
                     currentRoute is MainRouteBookKnowledgeDetail ||
                     currentRoute is MainRouteBookEventList ||
                     currentRoute is MainRouteBookEventDetail ||
-                    currentRoute is MainRouteReadBook ||
-                    currentRoute is MainRouteReadManga
+                    currentRoute is MainRouteReadBook
                 ) {
                     backStack.add(route)
                 } else {
@@ -447,15 +433,6 @@ object MainNavigator {
                     MainIntent.EXTRA_CHAPTER_CHANGED,
                     false
                 ) == true,
-            )
-            MainRouteConst.ROUTE_READ_MANGA -> MainRouteReadManga(
-                bookUrl = intent?.getStringExtra(MainIntent.EXTRA_BOOK_URL),
-                inBookshelf = intent?.getBooleanExtra(MainIntent.EXTRA_IN_BOOKSHELF, true) != false,
-                chapterChanged = intent?.getBooleanExtra(
-                    MainIntent.EXTRA_CHAPTER_CHANGED,
-                    false,
-                ) == true,
-                openRequestId = System.nanoTime(),
             )
             MainRouteConst.ROUTE_AUDIO_PLAY -> MainRouteAudioPlay(
                 bookUrl = intent?.getStringExtra(MainIntent.EXTRA_BOOK_URL),

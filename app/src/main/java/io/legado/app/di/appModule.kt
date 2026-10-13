@@ -65,7 +65,6 @@ import io.legado.app.data.repository.ImportBookSettingsRepository
 import io.legado.app.data.repository.LabSettingsRepository
 import io.legado.app.data.repository.LocalBookRepository
 import io.legado.app.data.repository.LocalPasswordRepository
-import io.legado.app.data.repository.MangaSettingsRepository
 import io.legado.app.data.repository.OtherConfigSystemRepository
 import io.legado.app.data.repository.OtherSettingsRepository
 import io.legado.app.data.repository.PrivateAccessRepository
@@ -93,9 +92,6 @@ import io.legado.app.data.repository.TxtTocRuleRepository
 import io.legado.app.data.repository.UploadRepository
 import io.legado.app.data.repository.WebDavBackupRepository
 import io.legado.app.data.repository.WebDavReadingProgressRepository
-import io.legado.app.data.repository.manga.DefaultMangaReaderSession
-import io.legado.app.data.repository.manga.MangaReaderActionRepository
-import io.legado.app.data.repository.manga.MangaReaderDataRepository
 import io.legado.app.data.security.CloudTtsCredentialCipher
 import io.legado.app.domain.gateway.AiArtifactGateway
 import io.legado.app.domain.gateway.AiChatGateway
@@ -142,9 +138,6 @@ import io.legado.app.domain.gateway.ImportBookSettingsGateway
 import io.legado.app.domain.gateway.LabSettingsGateway
 import io.legado.app.domain.gateway.LocalBookGateway
 import io.legado.app.domain.gateway.LocalPasswordGateway
-import io.legado.app.domain.gateway.MangaReaderDataGateway
-import io.legado.app.domain.gateway.MangaReaderSessionFactory
-import io.legado.app.domain.gateway.MangaSettingsGateway
 import io.legado.app.domain.gateway.OtherConfigSystemGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.domain.gateway.PlaybackCapsuleGateway
@@ -220,7 +213,6 @@ import io.legado.app.help.coil.CoverFetcher
 import io.legado.app.help.coil.CoverInterceptor
 import io.legado.app.help.config.ThemePackageManager
 import io.legado.app.help.http.okHttpClient
-import io.legado.app.help.http.okHttpClientManga
 import io.legado.app.model.LegacyReaderSession
 import io.legado.app.model.ReadAloudSessionStore
 import io.legado.app.model.ReaderSession
@@ -254,7 +246,6 @@ import io.legado.app.ui.book.knowledge.BookEventListViewModel
 import io.legado.app.ui.book.knowledge.BookKnowledgeDetailViewModel
 import io.legado.app.ui.book.knowledge.BookKnowledgeListViewModel
 import io.legado.app.ui.book.manage.BookshelfManageScreenViewModel
-import io.legado.app.ui.book.manga.MangaReaderViewModel
 import io.legado.app.ui.book.read.ReadBookViewModel
 import io.legado.app.ui.book.read.ReaderSessionViewModel
 import io.legado.app.ui.book.readRecord.ReadRecordOverviewViewModel
@@ -389,7 +380,6 @@ val appModule = module {
     single<CoverSettingsGateway> { CoverSettingsRepository() }
     single<BackupSettingsGateway> { BackupSettingsRepository() }
     single<LabSettingsGateway> { LabSettingsRepository() }
-    single<MangaSettingsGateway> { MangaSettingsRepository() }
     single<ChangeSourceSettingsGateway> { ChangeSourceSettingsRepository() }
     single<ImportBookSettingsGateway> { ImportBookSettingsRepository() }
     single<TranslationSettingsGateway> { TranslationSettingsRepository() }
@@ -414,18 +404,6 @@ val appModule = module {
     singleOf(::ReadStyleConfigStore)
     singleOf(::ReadBookStyleConfigRepository)
     single<ReadStyleGateway> { get<ReadBookStyleConfigRepository>() }
-    factoryOf(::MangaReaderDataRepository)
-    factoryOf(::MangaReaderActionRepository)
-    factory<MangaReaderDataGateway> { get<MangaReaderDataRepository>() }
-    factory<MangaReaderSessionFactory> {
-        MangaReaderSessionFactory {
-            DefaultMangaReaderSession(
-                dataGateway = get<MangaReaderDataGateway>(),
-                stateDispatcher = Dispatchers.Default,
-                ioDispatcher = Dispatchers.IO,
-            )
-        }
-    }
     singleOf(::ExploreBooksUseCase)
     singleOf(::ExploreKindUiUseCase)
     singleOf(::SaveSearchBooksUseCase)
@@ -544,7 +522,7 @@ val appModule = module {
                 }
                 add(SvgDecoder.Factory())
                 add(CoverInterceptor())
-                add(CoverFetcher.Factory(okHttpClient, okHttpClientManga))
+                add(CoverFetcher.Factory(okHttpClient))
             }
             .crossfade(true)
             .build()
@@ -739,7 +717,6 @@ val appModule = module {
             bookKnowledgeGateway = get(),
         )
     }
-    viewModelOf(::MangaReaderViewModel)
     viewModelOf(::ReaderSessionViewModel)
     viewModel {
         ReadBookViewModel(

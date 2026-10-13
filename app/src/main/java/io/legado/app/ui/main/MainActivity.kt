@@ -58,7 +58,6 @@ import io.legado.app.constant.EventBus
 import io.legado.app.core.ui.player.playerUnderlaySemantics
 import io.legado.app.data.repository.ReadAloudSettingsRepository
 import io.legado.app.domain.gateway.BackupSettingsGateway
-import io.legado.app.domain.gateway.MangaSettingsGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.domain.gateway.PlaybackCapsuleGateway
 import io.legado.app.domain.model.PlaybackCapsuleSource
@@ -213,18 +212,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         fun createReadBookMediaControlIntent(context: Context): Intent =
             MainIntent.createReadBookMediaControlIntent(context)
 
-        fun createReadMangaIntent(
-            context: Context,
-            bookUrl: String? = null,
-            inBookshelf: Boolean = true,
-            chapterChanged: Boolean = false,
-        ): Intent = MainIntent.createReadMangaIntent(
-            context = context,
-            bookUrl = bookUrl,
-            inBookshelf = inBookshelf,
-            chapterChanged = chapterChanged,
-        )
-
         fun createAudioPlayIntent(
             context: Context,
             bookUrl: String? = null,
@@ -300,7 +287,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
     private val viewModel by viewModel<MainViewModel>()
     private val bookshelfCoverPreloader by inject<BookshelfCoverPreloader>()
     private val otherSettingsGateway by inject<OtherSettingsGateway>()
-    private val mangaSettingsGateway by inject<MangaSettingsGateway>()
     private val backupSettingsGateway by inject<BackupSettingsGateway>()
     private val readAloudSettingsRepository by inject<ReadAloudSettingsRepository>()
     internal val navRouteTracker by inject<MainNavRouteTracker>()
@@ -331,7 +317,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
     private var restoredReadBookRoute: MainRouteReadBook? = null
     internal var activeReadBookInputHandler: ReadBookInputHandler? = null
     internal var activeReadBookRoute: MainRouteReadBook? = null
-    internal var activeMangaKeyHandler: ((Int) -> Boolean)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -449,10 +434,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         val defaultToRead by defaultToReadFlow.collectAsStateWithLifecycle(
             otherSettingsGateway.currentSettings.defaultToRead,
         )
-        val mangaSettings by mangaSettingsGateway.settings.collectAsStateWithLifecycle(
-            mangaSettingsGateway.currentSettings,
-        )
-
         val useRail = when (tabletInterface) {
             "always" -> true
             "landscape" -> orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -723,7 +704,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
                             entryProvider = mainEntryProvider(
                                 backStack = backStack,
                                 configuration = configuration,
-                                showMangaUi = mangaSettings.showMangaUi,
                                 useRail = useRail,
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 onNavigateToRoute = { route ->
@@ -1020,7 +1000,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (activeMangaKeyHandler?.invoke(keyCode) == true) return true
         if (activeReadBookInputHandler?.onKeyDown(keyCode, event) == true) return true
         return super.onKeyDown(keyCode, event)
     }

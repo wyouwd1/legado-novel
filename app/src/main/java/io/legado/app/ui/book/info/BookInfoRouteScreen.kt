@@ -63,7 +63,6 @@ fun BookInfoRouteScreen(
     onOpenToc: (String) -> Unit,
     onOpenInfoEdit: (String) -> Unit,
     onOpenReader: (bookUrl: String, inBookshelf: Boolean, chapterChanged: Boolean) -> Unit = { _, _, _ -> },
-    onOpenMangaReader: (bookUrl: String, inBookshelf: Boolean, chapterChanged: Boolean) -> Unit = { _, _, _ -> },
     onOpenAudioPlay: (bookUrl: String, inBookshelf: Boolean) -> Unit = { _, _ -> },
     onNavigateToBookInfo: (name: String?, author: String?, bookUrl: String, origin: String?, coverPath: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToExploreShow: (title: String?, sourceUrl: String, exploreUrl: String?) -> Unit = { _, _, _ -> },
@@ -82,7 +81,6 @@ fun BookInfoRouteScreen(
     val activity = context as AppCompatActivity
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val showMangaUi by rememberUpdatedState(uiState.showMangaUi)
     // 资源串在 composable 作用域内解析，避免 LocalContext.current.getString 拿到过期值
     val unlockTitle = stringResource(R.string.private_unlock_title)
     val unlockSubtitle = stringResource(R.string.private_unlock_subtitle)
@@ -111,7 +109,6 @@ fun BookInfoRouteScreen(
             coverPath = coverPath
         )
     }
-
 
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
@@ -144,13 +141,6 @@ fun BookInfoRouteScreen(
                             effect.inBookshelf
                         )
 
-                        !effect.book.isLocal && effect.book.isImage && showMangaUi -> {
-                            onOpenMangaReader(
-                                effect.book.bookUrl,
-                                effect.inBookshelf,
-                                effect.chapterChanged,
-                            )
-                        }
                         else -> {
                         onOpenReader(
                             effect.book.bookUrl,
@@ -182,7 +172,6 @@ fun BookInfoRouteScreen(
                 is BookInfoEffect.RunIntroJs -> {
                     runIntroJs(activity, effect)
                 }
-
 
                 is BookInfoEffect.NavigateToBookInfo -> {
                     onNavigateToBookInfo(effect.name, effect.author, effect.bookUrl, effect.origin, effect.coverPath)

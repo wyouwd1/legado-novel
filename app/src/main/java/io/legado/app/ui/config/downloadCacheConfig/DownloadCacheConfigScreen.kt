@@ -81,20 +81,6 @@ fun DownloadCacheConfigScreen(
                             )
                         }
                     )
-                    ClickableSettingItem(
-                        title = stringResource(R.string.manga_cache),
-                        description = stringResource(
-                            R.string.cache_size_mb,
-                            state.mangaCacheSizeMb
-                        ),
-                        onClick = {
-                            onIntent(
-                                DownloadCacheConfigIntent.ShowDialog(
-                                    DownloadCacheConfigDialog.ClearMangaCache
-                                )
-                            )
-                        }
-                    )
                 }
 
                 SplicedColumnGroup(title = stringResource(R.string.download_setting)) {
@@ -229,17 +215,6 @@ fun DownloadCacheConfigScreen(
             show = state.dialog == DownloadCacheConfigDialog.ClearCoverCache,
             onDismissRequest = { onIntent(DownloadCacheConfigIntent.DismissDialog) },
             title = stringResource(R.string.cover_cache),
-            text = stringResource(R.string.sure_del),
-            onConfirm = {
-                onIntent(DownloadCacheConfigIntent.ConfirmDialog)
-            },
-            onDismiss = { onIntent(DownloadCacheConfigIntent.DismissDialog) }
-        )
-
-        AppAlertDialog(
-            show = state.dialog == DownloadCacheConfigDialog.ClearMangaCache,
-            onDismissRequest = { onIntent(DownloadCacheConfigIntent.DismissDialog) },
-            title = stringResource(R.string.manga_cache),
             text = stringResource(R.string.sure_del),
             onConfirm = {
                 onIntent(DownloadCacheConfigIntent.ConfirmDialog)

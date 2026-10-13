@@ -65,9 +65,6 @@ class CoverFetcher(
 
     override suspend fun fetch(): FetchResult {
         val source = options.extras[CoverExtras.Source]
-        val isManga = options.extras[CoverExtras.Manga] == true
-        val mangaBook = options.extras[CoverExtras.MangaBookUrl]
-            ?.let { bookUrl -> withContext(Dispatchers.IO) { appDb.bookDao.getBook(bookUrl) } }
 
         if (url.startsWith("data:", true)) {
             val base64Data = url.substringAfter("base64,", "")
@@ -99,7 +96,7 @@ class CoverFetcher(
         val progressUrl = options.extras[CoverExtras.OriginalUrl] ?: url
         // 无需书源二次解密时可以把响应流直接交给解码器边下边解，
         // 省掉“整张图先落一份 ByteArray”这一步（高画质大图时这就是转圈等很久的主因）
-        val canStream = isManga && ImageUtils.skipDecode(source, !isManga)
+        val canStream = false
         var streamedSource: ImageSource? = null
 
         // ===== 第二级：OkHttp HTTP 缓存（FORCE_CACHE 只读缓存，miss 返回 504，不碰网络）=====
@@ -177,7 +174,7 @@ class CoverFetcher(
                 markFailed(url)
                 // 网络彻底失败（断网/源挂）时回退到本书别名缓存：
                 // 只要这本书曾经成功加载过封面，弱网/断网下仍显示上次缓存的封面，而不是灰图。
-                if (!isManga && bookUrl != null) {
+                if (bookUrl != null) {
                     val stale = withContext(Dispatchers.IO) {
                         CoverFileCache.readByBookUrl(bookUrl)?.let { f ->
                             try {
@@ -217,15 +214,11 @@ class CoverFetcher(
         val fetchedBytes = rawBytes ?: throw IOException("封面数据为空: $url")
 
         // Decrypt if needed (applies to both cached and network bytes)
-        val decodedBytes = if (ImageUtils.skipDecode(source, !isManga)) {
+        val decodedBytes = if (ImageUtils.skipDecode(source, true)) {
             fetchedBytes
         } else {
             withContext(Dispatchers.IO) {
-                if (isManga) {
-                    ImageUtils.decode(url, fetchedBytes, false, source, mangaBook)
-                } else {
-                    ImageUtils.decode(url, fetchedBytes, true, source)
-                }
+                ImageUtils.decode(url, fetchedBytes, true, source)
             } ?: throw IOException("图片解密失败")
         }
 
@@ -233,7 +226,7 @@ class CoverFetcher(
         // 网络/OkHttp 缓存/解密完成后，按原始 URL 精确键 + bookUrl 别名键双写持久缓存：
         // 下次冷启动由 CoverInterceptor 快速路径直接命中；书源刷新换了带 token 的新链接时，
         // 书架靠别名键也能秒出旧图。仅书维度请求（bookUrl 非空）写入。
-        if (!isManga && bookUrl != null) {
+        if (bookUrl != null) {
             withContext(Dispatchers.IO) { CoverFileCache.write(originalUrl, decodedBytes, bookUrl) }
         }
         return SourceFetchResult(
@@ -248,15 +241,13 @@ class CoverFetcher(
 
     class Factory(
         private val okHttpClient: OkHttpClient,
-        private val okHttpClientManga: OkHttpClient,
-    ) : Fetcher.Factory<coil3.Uri> {
+            ) : Fetcher.Factory<coil3.Uri> {
         override fun create(data: coil3.Uri, options: Options, imageLoader: ImageLoader): Fetcher? {
             val scheme = data.scheme
             if (scheme != "http" && scheme != "https" && scheme != "data") return null
 
-            val isManga = options.extras[CoverExtras.Manga] == true
             val loadOnlyWifi = options.extras[CoverExtras.LoadOnlyWifi] == true
-            val client = if (isManga) okHttpClientManga else okHttpClient
+            val client = okHttpClient
 
             return CoverFetcher(data.toString(), options, client, loadOnlyWifi)
         }

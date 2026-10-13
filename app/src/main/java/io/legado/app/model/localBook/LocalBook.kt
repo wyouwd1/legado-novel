@@ -248,7 +248,6 @@ object LocalBook {
      */
     fun importFile(uri: Uri): Book {
         val input = FileDoc.fromUri(uri, false)
-        if (input.isDir) return importMangaDirectory(input)
         val bookUrl: String
         //updateTime变量不要修改,否则会导致读取不到缓存
         val (fileName, _, _, updateTime, _) = FileDoc.fromUri(uri, false).apply {
@@ -339,32 +338,6 @@ object LocalBook {
         return reboundBook
     }
 
-    fun importMangaDirectory(directory: FileDoc): Book {
-        require(directory.isDir) { "Expected a directory" }
-        val bookUrl = directory.toString()
-        val existing = appDb.bookDao.getBook(bookUrl)
-        val book = existing ?: Book(
-            type = BookType.local or BookType.image,
-            bookUrl = bookUrl,
-            name = directory.name,
-            author = "",
-            originName = directory.name,
-            origin = BookType.localTag,
-            latestChapterTime = directory.lastModified,
-            order = appDb.bookDao.minOrder - 1,
-        )
-        book.type = BookType.local or BookType.image
-        book.origin = BookType.localTag
-        book.originName = directory.name
-        book.latestChapterTime = directory.lastModified
-        book.upKind()
-        if (existing == null) appDb.bookDao.insert(book) else {
-            appDb.bookChapterDao.delByBook(bookUrl)
-            appDb.bookDao.update(book)
-        }
-        return book
-    }
-
     fun upBookInfo(book: Book) {
         when {
             book.isEpub -> EpubFile.upBookInfo(book)
@@ -404,20 +377,7 @@ object LocalBook {
         val fileDoc = FileDoc.fromUri(uri, false)
         if (ArchiveUtils.isArchive(fileDoc.name)) {
             val entries = ArchiveUtils.getArchiveFilesName(fileDoc)
-            val isComicArchive = entries.any { entry ->
-                entry.substringAfterLast('.', "").lowercase() in
-                        setOf("jpg", "jpeg", "png", "webp", "gif", "avif", "bmp")
-            }
-            if (isComicArchive) {
-                books += importFile(uri).apply {
-                    type = BookType.local or BookType.image or BookType.archive
-                    origin = BookType.localTag
-                    upKind()
-                    save()
-                }
-            } else {
-                books.addAll(importArchiveFile(uri) { it.matches(AppPattern.bookFileRegex) })
-            }
+            books.addAll(importArchiveFile(uri) { it.matches(AppPattern.bookFileRegex) })
         } else {
             books.add(importFile(uri))
         }

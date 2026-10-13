@@ -15,7 +15,6 @@ import io.legado.app.ui.widget.components.variable.VariableEditorUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-
 @Stable
 data class HighlightedTag(
     val matchedLabels: List<String>,
@@ -53,7 +52,6 @@ data class BookInfoUiState(
     val loadCoverOnlyOnWifi: Boolean = false,
     val defaultCover: String = "",
     val defaultCoverDark: String = "",
-    val showMangaUi: Boolean = true,
     /** 加入书架时发现的疑似重复；非空时由冲突 Sheet 决定共存还是迁移。 */
     val shelfConflict: BookshelfConflict? = null,
     val isResolvingShelfConflict: Boolean = false,

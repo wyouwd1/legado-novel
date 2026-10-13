@@ -95,7 +95,6 @@ import splitties.init.appCtx
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
-
 /**
  * ReadBook 会话的权威只读快照。
  *
@@ -180,7 +179,6 @@ object ReadBook : CoroutineScope by MainScope(), KoinComponent {
     var isUiActive = false
     val isAutoSaveSessionRunning: Boolean
         get() = autoSaveJob != null
-
 
     /* 跳转进度前进度记录 */
     var lastBookProgress: BookProgress? = null
@@ -698,7 +696,6 @@ object ReadBook : CoroutineScope by MainScope(), KoinComponent {
 
     fun upReadBookConfig(book: Book) {
         val oldIndex = ReadBookConfig.styleSelect
-        ReadSessionState.isComic = book.isImage
         if (oldIndex != ReadBookConfig.styleSelect) {
             ReadConfigUpdateBus.post(
                 setOf(
@@ -2027,7 +2024,6 @@ object ReadBook : CoroutineScope by MainScope(), KoinComponent {
         callBack?.notifyBookChanged()
         callBack = cb
     }
-
 
     /**
      * 注册渲染回调（UI 层渲染控制器）。视图就绪后立即同步一次当前内容，

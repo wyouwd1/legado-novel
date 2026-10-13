@@ -25,15 +25,13 @@ class BookInfoWithSettingsTest {
                 bookInfoFollowCoverColor = false,
             ),
             cover = CoverSettings(loadOnlyOnWifi = true),
-            other = OtherSettings(showMangaUi = false),
+            other = OtherSettings(),
         )
 
         assertEquals("off", result.bookInfoNetworkCoverBackground)
         assertEquals("off_for_default", result.bookInfoDefaultCoverBackground)
         assertFalse(result.bookInfoFollowCoverColor)
         assertTrue(result.loadCoverOnlyOnWifi)
-        // 修复前被漏掉、仍会复发的字段
-        assertFalse(result.showMangaUi)
     }
 
     @Test

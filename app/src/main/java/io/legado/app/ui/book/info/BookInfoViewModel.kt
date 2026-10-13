@@ -2124,7 +2124,6 @@ internal fun BookInfoUiState.withSettings(
     loadCoverOnlyOnWifi = cover.loadOnlyOnWifi,
     defaultCover = cover.defaultCover,
     defaultCoverDark = cover.defaultCoverDark,
-    showMangaUi = other.showMangaUi,
 )
 
 private val BookInfoWebFile.suffix: String

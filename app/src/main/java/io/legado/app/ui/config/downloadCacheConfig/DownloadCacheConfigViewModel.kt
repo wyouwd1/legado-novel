@@ -78,7 +78,6 @@ class DownloadCacheConfigViewModel(
             _uiState.update {
                 it.copy(
                     coverCacheSizeMb = getHttpCacheSize(HttpCacheType.COVER) / (1024.0 * 1024.0),
-                    mangaCacheSizeMb = getHttpCacheSize(HttpCacheType.MANGA) / (1024.0 * 1024.0),
                 )
             }
         }
@@ -92,10 +91,6 @@ class DownloadCacheConfigViewModel(
                 DownloadCacheConfigDialog.ClearCoverCache -> {
                     clearHttpCache(HttpCacheType.COVER)
                     _uiState.update { it.copy(coverCacheSizeMb = 0.0) }
-                }
-                DownloadCacheConfigDialog.ClearMangaCache -> {
-                    clearHttpCache(HttpCacheType.MANGA)
-                    _uiState.update { it.copy(mangaCacheSizeMb = 0.0) }
                 }
                 DownloadCacheConfigDialog.ClearBookCache -> {
                     clearBookCacheUseCase.executeAll()

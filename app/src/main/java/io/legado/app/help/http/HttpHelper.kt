@@ -146,32 +146,8 @@ val okHttpClient: OkHttpClient by lazy {
     }
 }
 
-val okHttpClientManga by lazy {
-    okHttpClient.newBuilder().run {
-        cache(Cache(File(appCtx.cacheDir, "manga_cache"), 100L * 1024L * 1024L))
-        val interceptors = interceptors()
-        interceptors.add(1) { chain ->
-            val request = chain.request()
-            val response = chain.proceed(request)
-            // 漫画正文地址会被书源规则改写，进度必须回报给“原始地址”才能与阅读页的
-            // page.imageUrl 对上；普通封面请求没有 tag，退回最终 URL。
-            val url = request.tag(ProgressUrlTag::class.java)?.url ?: request.url.toString()
-            response.newBuilder()
-                .body(ProgressResponseBody(url, LISTENER, response.body))
-                .build()
-        }
-        interceptors.add(1) { chain ->
-            ConcurrentRateLimiter(chain.request().tag(BaseSource::class.java)).withLimitBlocking {
-                chain.proceed(chain.request())
-            }
-        }
-        build()
-    }
-}
-
 enum class HttpCacheType(val dirName: String, val maxSize: Long) {
     COVER("http_cache", 100L * 1024 * 1024),
-    MANGA("manga_cache", 100L * 1024 * 1024),
 }
 
 fun getHttpCacheSize(type: HttpCacheType): Long {
@@ -189,7 +165,6 @@ fun clearHttpCache(type: HttpCacheType) {
             okHttpClient.cache?.delete()
             io.legado.app.help.coil.CoverFileCache.clear()
         }
-        HttpCacheType.MANGA -> okHttpClientManga.cache?.delete()
     }
 }
 

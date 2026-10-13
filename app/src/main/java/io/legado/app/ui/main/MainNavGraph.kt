@@ -93,9 +93,6 @@ import io.legado.app.ui.book.knowledge.CharacterDetailIntent
 import io.legado.app.ui.book.knowledge.deleteCharacterAvatar
 import io.legado.app.ui.book.knowledge.saveCharacterAvatar
 import io.legado.app.ui.book.manage.BookshelfManageRouteScreen
-import io.legado.app.ui.book.manga.MangaReaderIntent
-import io.legado.app.ui.book.manga.MangaReaderRouteScreen
-import io.legado.app.ui.book.manga.MangaReaderViewModel
 import io.legado.app.ui.book.read.ReadBookController
 import io.legado.app.ui.book.read.ReadBookInitRequest
 import io.legado.app.ui.book.read.ReadBookIntent
@@ -301,7 +298,6 @@ private fun ConsumeBookPageResult(
 fun MainActivity.mainEntryProvider(
     backStack: MutableList<NavKey>,
     configuration: AppUiConfiguration,
-    showMangaUi: Boolean,
     useRail: Boolean,
     sharedTransitionScope: SharedTransitionScope,
     onNavigateToRoute: (NavKey) -> Unit,
@@ -513,13 +509,6 @@ fun MainActivity.mainEntryProvider(
                 if (book.isAudio) {
                     onNavigateToRoute(
                         MainRouteAudioPlay(
-                            bookUrl = book.bookUrl,
-                            sharedCoverKey = sharedCoverKey
-                        )
-                    )
-                } else if (!book.isLocal && book.isImage && showMangaUi) {
-                    onNavigateToRoute(
-                        MainRouteReadManga(
                             bookUrl = book.bookUrl,
                             sharedCoverKey = sharedCoverKey
                         )
@@ -988,71 +977,6 @@ fun MainActivity.mainEntryProvider(
         }
     }
 
-    entry<MainRouteReadManga>(
-        metadata = readerEntryMetadata(configuration.appShell.predictiveBackEnabled)
-    ) { route ->
-        val mangaViewModel = koinViewModel<MangaReaderViewModel>(
-            key = "ReadManga:${route.bookUrl ?: "last-read"}",
-        )
-        ConsumeBookPageResult(route, backStack.lastOrNull() == route, navRouteTracker) { result ->
-            when (result) {
-                is BookPageResult.ChapterSelected ->
-                    mangaViewModel.onIntent(
-                        MangaReaderIntent.OpenChapter(
-                            result.index,
-                            result.position
-                        )
-                    )
-
-                BookPageResult.BookDeleted -> MainNavigator.navigateBack(
-                    this@mainEntryProvider, backStack, navRouteTracker, fromRoute = route,
-                )
-
-                else -> Unit
-            }
-        }
-        MangaReaderRouteScreen(
-            bookUrl = route.bookUrl,
-            inBookshelf = route.inBookshelf,
-            chapterChanged = route.chapterChanged,
-            openRequestId = route.openRequestId,
-            viewModel = mangaViewModel,
-            onOpenToc = { bookUrl, page -> onNavigateToRoute(MainRouteToc(bookUrl, page)) },
-            restoreSystemBarsVisible = configuration.appShell.showStatusBar,
-            sharedTransitionScope = sharedTransitionScope,
-            animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-            sharedCoverKey = route.sharedCoverKey,
-            isTopRoute = backStack.lastOrNull() == route,
-            onFinish = {
-                MainNavigator.navigateBack(
-                    this@mainEntryProvider,
-                    backStack,
-                    navRouteTracker,
-                    fromRoute = route,
-                )
-            },
-            onOpenBookInfo = { name, author, bookUrl ->
-                onNavigateToRoute(
-                    MainRouteBookInfo(
-                        name, author, bookUrl,
-                        openRequestId = System.nanoTime(),
-                    )
-                )
-            },
-            onOpenSourceLogin = { sourceUrl ->
-                onNavigateToRoute(MainRouteSourceLogin(SourceLoginType.BookSource, sourceUrl))
-            },
-            onOpenSourceEdit = { sourceUrl ->
-                onNavigateToRoute(MainRouteBookSourceEdit(sourceUrl))
-            },
-            onOpenWebView = { title, url, sourceOrigin, sourceName, sourceType ->
-                onNavigateToRoute(
-                    MainRouteWebView(title, url, sourceOrigin, sourceName, sourceType)
-                )
-            },
-        )
-    }
-
     entry<MainRouteReadAloudPlayer>(metadata = modalOverlayEntryMetadata()) {
         LaunchedEffect(Unit) {
             ReadAloudPlayerOverlayBus.request(PlaybackCapsuleState(source = PlaybackCapsuleSource.ReadAloud))
@@ -1222,8 +1146,6 @@ fun MainActivity.mainEntryProvider(
                             parent,
                             resultCode == Activity.RESULT_OK
                         )
-                    } else if (parent is MainRouteReadManga && resultCode == Activity.RESULT_OK) {
-                        navRouteTracker.reportBookPageResult(parent, BookPageResult.BookDeleted)
                     }
                 }
                 popped
@@ -1248,17 +1170,6 @@ fun MainActivity.mainEntryProvider(
                         inBookshelf = inBookshelf,
                         chapterChanged = chapterChanged,
                         // 与详情页封面登记在同一个 key 上，封面才能从详情页继续飞进阅读页。
-                        sharedCoverKey = route.sharedCoverKey ?: bookCoverSharedElementKey(bookUrl),
-                    )
-                )
-            },
-            onOpenMangaReader = { bookUrl, inBookshelf, chapterChanged ->
-                onNavigateToRoute(
-                    MainRouteReadManga(
-                        bookUrl = bookUrl,
-                        inBookshelf = inBookshelf,
-                        chapterChanged = chapterChanged,
-                        openRequestId = System.nanoTime(),
                         sharedCoverKey = route.sharedCoverKey ?: bookCoverSharedElementKey(bookUrl),
                     )
                 )

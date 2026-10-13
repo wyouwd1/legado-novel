@@ -22,7 +22,7 @@ internal fun MainActivity.closeBookPage(
     val parent = backStack.getOrNull(backStack.lastIndex - 1)
     val popped = MainNavigator.navigateBack(this, backStack, navRouteTracker, fromRoute)
     if (popped && resolvedResult != null &&
-        (parent is MainRouteReadBook || parent is MainRouteReadManga || parent is MainRouteBookInfo)
+        (parent is MainRouteReadBook || parent is MainRouteBookInfo)
     ) {
         navRouteTracker.reportBookPageResult(parent, resolvedResult)
     }

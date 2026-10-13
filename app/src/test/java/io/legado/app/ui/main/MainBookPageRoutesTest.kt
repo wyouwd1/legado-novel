@@ -26,7 +26,7 @@ class MainBookPageRoutesTest {
 
     @Test
     fun `rule editor preserves toc and editing preserves book info`() {
-        val reader = MainRouteReadManga(bookUrl = "book")
+        val reader = MainRouteReadBook("book")
         val toc = MainRouteToc("book")
         val rules = MainRouteReplaceRules("book")
         val editor = MainRouteReplaceEdit(ReplaceEditRoute(sessionId = "test"))
@@ -72,12 +72,5 @@ class MainBookPageRoutesTest {
         assertEquals(BookPageResult.InfoEdited, tracker.bookPageResults.value[detail])
         tracker.onBackStackChanged(listOf(MainRouteHome, reader))
         assertNull(tracker.takeBookPageResult(detail))
-
-        val manga = MainRouteReadManga("manga")
-        tracker.reportBookPageResult(manga, BookPageResult.BookDeleted)
-        tracker.onBackStackChanged(listOf(MainRouteHome, manga))
-        assertNull(tracker.takeBookPageResult(reader))
-        assertEquals(BookPageResult.BookDeleted, tracker.takeBookPageResult(manga))
-        assertNull(tracker.takeBookPageResult(manga))
     }
 }

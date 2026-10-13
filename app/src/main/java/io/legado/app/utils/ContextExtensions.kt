@@ -44,7 +44,6 @@ import io.legado.app.help.book.isImage
 import io.legado.app.help.config.AppConfigStore
 import io.legado.app.help.config.SettingsWriter
 import io.legado.app.domain.gateway.BookshelfSettingsGateway
-import io.legado.app.domain.gateway.MangaSettingsGateway
 import io.legado.app.ui.main.MainActivity
 import io.legado.app.ui.main.bookshelf.BookShelfItem
 import kotlinx.coroutines.runBlocking
@@ -63,9 +62,6 @@ inline fun <reified A : Activity> Context.startActivity(configIntent: Intent.() 
     startActivity(intent)
 }
 
-private val mangaSettingsGateway
-    get() = GlobalContext.get().get<MangaSettingsGateway>()
-
 private val bookshelfSettingsGateway
     get() = GlobalContext.get().get<BookshelfSettingsGateway>()
 
@@ -75,13 +71,10 @@ fun Context.startActivityForBook(
 ) {
     val intent = when {
         book.isAudio -> MainActivity.createAudioPlayIntent(this, book.bookUrl)
-        book.isImage && mangaSettingsGateway.currentSettings.showMangaUi ->
-            MainActivity.createReadMangaIntent(this, book.bookUrl)
-
         else -> MainActivity.createReadBookIntent(this, book.bookUrl)
     }
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (book.isAudio || (book.isImage && mangaSettingsGateway.currentSettings.showMangaUi)) {
+    if (book.isAudio) {
         intent.putExtra("bookUrl", book.bookUrl)
     }
     intent.apply(configIntent)
@@ -94,13 +87,10 @@ fun Context.startActivityForBook(
 ) {
     val intent = when {
         book.isAudio -> MainActivity.createAudioPlayIntent(this, book.bookUrl)
-        book.isImage && mangaSettingsGateway.currentSettings.showMangaUi ->
-            MainActivity.createReadMangaIntent(this, book.bookUrl)
-
         else -> MainActivity.createReadBookIntent(this, book.bookUrl)
     }
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (book.isAudio || (book.isImage && mangaSettingsGateway.currentSettings.showMangaUi)) {
+    if (book.isAudio) {
         intent.putExtra("bookUrl", book.bookUrl)
     }
     intent.apply(configIntent)
@@ -237,7 +227,6 @@ fun Context.putPrefStringSet(key: String, value: MutableSet<String>) {
 fun Context.removePref(key: String) {
     AppConfigStore.remove(key)
 }
-
 
 fun Context.getCompatColor(@ColorRes id: Int): Int = ContextCompat.getColor(this, id)
 

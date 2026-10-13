@@ -23,7 +23,6 @@ import io.legado.app.data.entities.BaseSource
 import io.legado.app.data.entities.Book
 import io.legado.app.domain.gateway.AppShellSettingsGateway
 import io.legado.app.domain.gateway.CoverSettingsGateway
-import io.legado.app.domain.gateway.MangaSettingsGateway
 import io.legado.app.help.CacheManager
 import io.legado.app.help.DefaultData
 import io.legado.app.help.glide.BlurTransformation
@@ -53,7 +52,6 @@ object BookCover : KoinComponent {
     private val coverAlbumUseCase: CoverAlbumUseCase by inject()
     private val shellSettingsGateway: AppShellSettingsGateway by inject()
     private val coverSettingsGateway: CoverSettingsGateway by inject()
-    private val mangaSettingsGateway: MangaSettingsGateway by inject()
 
     private val isNightTheme: Boolean
         get() = when (shellSettingsGateway.currentSettings.themeMode) {
@@ -160,59 +158,6 @@ object BookCover : KoinComponent {
             .error(currentDefault)
             .centerCrop()
     }
-
-
-
-    /**
-     * 加载漫画图片
-     */
-    fun loadManga(
-        context: Context,
-        path: String?,
-        loadOnlyWifi: Boolean = false,
-        sourceOrigin: String? = null,
-        transformation: Transformation<Bitmap>? = null,
-    ): RequestBuilder<Drawable> {
-        var options = RequestOptions().set(OkHttpModelLoader.loadOnlyWifiOption, loadOnlyWifi)
-            .set(OkHttpModelLoader.mangaOption, true)
-        if (sourceOrigin != null) {
-            options = options.set(OkHttpModelLoader.sourceOriginOption, sourceOrigin)
-        }
-        var builder = ImageLoader.load(context, path)
-            .apply(options)
-            .override(context.resources.displayMetrics.widthPixels, SIZE_ORIGINAL)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .skipMemoryCache(true)
-        if (transformation != null) {
-            builder = builder.transform(transformation)
-        }
-        builder = if (mangaSettingsGateway.currentSettings.disableMangaCrossFade) {
-            builder
-        } else {
-            builder.transition(DrawableTransitionOptions.withCrossFade())
-        }
-
-        return builder
-    }
-
-
-    fun preloadManga(
-        context: Context,
-        path: String?,
-        loadOnlyWifi: Boolean = false,
-        sourceOrigin: String? = null,
-    ): RequestBuilder<File?> {
-        var options = RequestOptions().set(OkHttpModelLoader.loadOnlyWifiOption, loadOnlyWifi)
-            .set(OkHttpModelLoader.mangaOption, true)
-        if (sourceOrigin != null) {
-            options = options.set(OkHttpModelLoader.sourceOriginOption, sourceOrigin)
-        }
-        return Glide.with(context)
-            .downloadOnly()
-            .apply(options)
-            .load(path)
-    }
-
     /**
      * 加载模糊封面
      */
