@@ -46,7 +46,7 @@
 | W1-0 | 共享点剥离独立提交（细则见上）：`RssJsExtensions` → `help/webView/BaseJsExtensions`、`VisibleWebView` 搬家、Coil 漫画分支剥离 | Surgeon-shared（主控执行） | 🟢 | 提交 `ae3e09b3d`；编译 `BUILD SUCCESSFUL`；架构门 `RssJsExtensions` 8→6 |
 | W1-1 | RSS 域（D2） | Surgeon-rss（主控执行） | 🟢 | 提交 `2318cfb84`；删除 **79 文件 / -7,698 行**；编译 0 错；单测 **1702/0**；详见 `VERIFICATION.md` §7.1 |
 | W1-2 | 漫画域（D3，含 20 测试、类型位、偏好键） | Surgeon-manga（主控执行） | 🟢 | 提交 `df02effd7`；删除 **55 文件 / -13,968 行**；编译 6 轮收敛 623→**0** 错；完整验证集 **BUILD SUCCESSFUL**；单测 **1578/0**；APK arm64 −2.7MB；详见 `VERIFICATION.md` §7.2 |
-| W1-3 | AI + 知识库 + 配音的**界面层**（D5/D6/D4c） | Surgeon-ai（主控执行） | 🟢 | 净删 **51 文件 / -14,983 行**；编译 14 轮收敛 485→**0**；完整验证集 **BUILD SUCCESSFUL 5m31s**；单测 **1571/0**；架构门基线 74→**73**；lint 基线 425→**330**（纯删除）；详见 `VERIFICATION.md` §7.3 与 `W1-3-SCOPE.md` |
+| W1-3 | AI + 知识库 + 配音的**界面层**（D5/D6/D4c） | Surgeon-ai（主控执行） | 🟢 | 提交 `7a14c1f8b`；净删 **51 文件 / -14,983 行**；编译 14 轮收敛 485→**0**；完整验证集 **BUILD SUCCESSFUL 5m31s**；单测 **1571/0**；架构门基线 74→**73**；lint 基线 425→**330**（纯删除）；详见 `VERIFICATION.md` §7.3 与 `W1-3-SCOPE.md` |
 | W1-4 | 知识库/评论（D6） | Surgeon-knowledge | ⚪ | **已并入 W1-3**（知识库界面与 AI 界面共用组件，无法分开删） |
 | W1-5 | **热点收口**：导航 / DI / AppDatabase 注册 / PreferKey / 基线 | Integrator | 🟢 | 已在 W1-3 内完成导航、DI、`appModule`、架构门键与 lint 基线；strings 清理转 W5-6 |
 | W1-6 | 独立验证：编译、单测、架构门、反证 grep | Verifier | ⬜ | `VERIFICATION.md` W1 段 |
