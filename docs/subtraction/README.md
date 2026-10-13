@@ -80,8 +80,52 @@ git diff --check
 .\gradlew.bat testAppDebugUnitTest lintAppDebug verifyConfigArchitecture assembleAppDebug --continue --no-configuration-cache
 ```
 
-- 架构门 `verifyConfigArchitecture` 是**双向棘轮**：删代码导致基线计数下降必须同步下调，
-  否则门禁报红；基线条目对应的文件被删除会**硬失败**（见根 `build.gradle.kts:216-302`）。
+### 5.1 架构门 `verifyConfigArchitecture` 机制（W2 实测，必须理解）
+
+定义在根 `build.gradle.kts:216-302`（`VerifyConfigArchitectureTask`），被**所有** `compile*`/`assemble*`
+前置依赖（`:281`），因此它报红时表象是“编译失败” —— **先看它的输出**。
+它是**根项目**任务，不能写成 `:app:verifyConfigArchitecture`。
+
+三条基线（`MapProperty<String, Int>`，键 = 相对 `app/src/main/java` 的文件路径，值 = 允许的违规数）：
+
+| 基线 | 约束对象 | W0 基线值 |
+|---|---|---|
+| `legacyPreferenceCallBaseline` | 旧偏好 API 直连（`getPref*`/`putPref*`） | 23 键 / 74 |
+| `legacyDaoInjectionBaseline` | **文件名含 `ViewModel`** 的文件注入 DAO | 2 键 / 13 |
+| `legacyUiDaoAccessBaseline` | 其余 UI 层文件直连 DAO（宽松档，防止把债“洗白”） | 11 键 / 30 |
+
+**两条不变式（缺一即报红）**：
+
+1. **计数棘轮（双向）**：实际违规数 > 基线 → 失败；删代码使计数下降后**必须同步下调基线**。
+   门禁不接受“先放宽基线再迁移”。
+2. **键 ↔ 文件存在性（硬失败）**：基线键指向的文件被删除时必须同步删键，否则直接失败，报错原文：
+
+   ```
+   配置架构护栏失败:
+     app/src/main/java/io/legado/app/ui/.../XxxViewModel.kt: 文件已移除，请删除 DAO 直连基线
+   ```
+
+   ⇒ **每个波次删除被基线跟踪的文件后，必须同一步删键**（W1-3 删 `CheckSourceConfig.kt` 键、
+   W2 删 `CloudTtsViewModel.kt to 13` 键都是这条规则）。危险信号：编译 `exit=1` 但 `grep -c '^e: '` 为 **0**。
+
+**0 值哨兵**：形如 `"ReadBookViewModel.kt" to 0` 的条目**是刻意的**，源码注释写明“保留 0 值条目让棘轮
+继续盯着这个文件——新增一处直连就报红”。清理过时条目时**不要删 0 值条目**。
+
+**与 `app/lint-baseline.xml` 的区别（别混用手段）**：
+
+| | 架构门基线 | lint 基线 |
+|---|---|---|
+| 位置 | 根 `build.gradle.kts` | `app/lint-baseline.xml` |
+| 不匹配时 | **硬失败**（计数超限或文件不存在） | 过时条目仅**警告**，不失败 |
+| 放宽手段 | 手工改 map（`updateLintBaseline` 管不到） | ⚠️ `./gradlew :app:updateLintBaseline` 会把**当前全部问题**写进基线（W1-3 实测 425 → 502），**等于放宽棘轮，禁止使用** |
+| 清理过时条目 | 按内容精确删行 | 文本级按块删除（只删指向不存在文件的 `issue`，保持纯删除 0 插入） |
+
+**波次收尾核对**：列出三条基线中指向不存在文件的键（脚本见 `VERIFICATION.md` §1.2），逐个处理；
+删域后同步下调计数。`git diff --check` 与这一项都要过。
+
+**删键操作纪律**：删除基线键时**只删该行**，不得把它“替换”为另一个文件或别的计数——
+那等于凭空给未审计的文件发放额度（W2 实操中犯过，已修正为纯删除）。同时不要删 0 值哨兵。
+
 - 波次提交信息格式：`refactor(subtract): W<N> 删除 <域>（文件 N / 行 M）`，正文附验证命令与结果。
 
 ---
@@ -105,3 +149,12 @@ git diff --check
 **5. 热点文件串行。** `ui/main/{MainNavGraph,MainNavKey,MainNavigator,MainIntent,MainActivity,...}.kt`、`di/appModule.kt`、`res/values*/strings.xml` 同一时刻只能一个波次改。
 
 **6. 不确定的自建改动优先回滚重做。** 一旦发现脚本/编辑破坏了既有结构，不要在其上继续修补（会叠加语义漂移），而是 `git checkout -- <file>` 恢复到上一个已知良好状态后精确重做。
+
+**7. 提交前必须核对索引内容。** `git commit` 提交的是**整个索引**，不是“本次 `git add` 的那些”。当工作区已有 `git rm`/`git add` 暂存的改动时（例如波次删除正在进行中），只 `git add docs/` 再 commit 会把**已暂存的代码删除**一并提交，污染历史。
+
+- 每次 commit 前跑 `git diff --cached --stat` 核对文件集；
+- 只想提交部分路径时，先 `git reset -- <其他路径>` 把它们移出索引（**工作区不受影响**）；
+- 一旦发生，用 `git reset --soft HEAD~1` → `git reset -- <路径>` → 重新 `git add`/`commit` 修正；`--soft` 不改工作区，无损失；
+- 判断是否踩中：`git show --stat --format='' HEAD | tail -1` 的文件数/行数远大于预期。
+
+W2 实操事故：本应是纯文档的提交 `8e5426555` 实际含 **229 文件 / −50,034 行**（因为 W2a 的 225 个 `git rm` 已在索引里），已用上述方法修正为 4 文件纯文档提交。

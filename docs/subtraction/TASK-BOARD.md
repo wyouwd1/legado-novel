@@ -105,14 +105,45 @@
 
 | # | 步骤 | 认领 | 状态 | 出口 |
 |---|---|---|---|---|
-| W2-S0 | 改测试硬约束（`MainNavigatorReadAloudTest.kt:77`、`ReadBookDomainSplitBoundaryTest.kt:49-50,321`）+ 基线下调 | Surgeon-readaloud（主控执行） | 🟢 | 实际约束点比侦察多 3 处：①删 `MainNavigatorReadAloudTest.kt`（唯一通用测试并入 `MainNavigatorBackStackTest`，消掉读 `BaseReadAloudService.kt` 源码的断言）；②`runtimeFiles` 去 4 个朗读文件；③DOMAINS 去【多角色分配】【朗读】两条。验证：测试编译 0 错 + 59 测试通过。**基线下调与 `hostOwnedState` 两条字段条目（`_readAloudProgress`/`closeReadBookKeepReadAloud`）必须等产线文件/字段删除**（架构门为双向棘轮，先删键会失败） |
-| W2-S1 | 摘引用：`ui/book/read/**` → `model/{ReadBook,CacheBookModel,ReadAloud*}.kt` → `ui/main/**` → `di/appModule.kt` | Integrator（串行） | ⬜ | 编译通过 |
-| W2-S2 | 剥共享核心：`feature/reader/**` 分页/绘制链路 + `CastMarkers` 收敛为纯文本标记 | Surgeon-reader | ⬜ | 编译 + 阅读行为不变 |
-| W2-S3 | 删叶节点：`help/{TTS,MediaHelp,exoplayer,readaloud}/**`、`ui/book/{readaloud,audio}/**`、4 个 service、`model/ReadAloud*`、`domain/model/readaloud/**`、`feature/readaloud/**`、dao/entity/repository/gateway | Surgeon-readaloud | ⬜ | 编译通过 |
-| W2-S4 | 清接线：Manifest、NotificationId、AppConst、IntentAction、PreferKey、四语言 strings、MediaButtonReceiver | Integrator | ⬜ | 编译 + lint 通过 |
-| W2-S5 | 数据层：entities/dao/repository/gateway/usecase + `appDatabaseModule` 绑定（新 migration 见 W4） | Migrator | ⬜ | 编译通过 |
-| W2-S6 | 依赖与门禁：media3 是否可删（取决于 `AnalyzeUrl.kt:816`）、`BookType.audio` 类型位另立一步 | Integrator | ⬜ | 依赖树证据 |
-| W2-V | 独立验证：编译、单测、架构门、反证 grep、朗读残留检索 | Verifier | ⬜ | `VERIFICATION.md` W2 段 |
+| W2-S0 | 改测试硬约束（`MainNavigatorReadAloudTest.kt:77`、`ReadBookDomainSplitBoundaryTest.kt:49-50,321`）+ 基线下调 | Surgeon-readaloud（主控执行） | 🟢 | 实际约束点比侦察多 3 处：①删 `MainNavigatorReadAloudTest.kt`（唯一通用测试并入 `MainNavigatorBackStackTest`，消掉读 `BaseReadAloudService.kt` 源码的断言）；②`runtimeFiles` 去 4 个朗读文件；③DOMAINS 去【多角色分配】【朗读】两条。验证：测试编译 0 错 + 59 测试通过。提交 `2fa89aadc`。**基线下调与 `hostOwnedState` 两条字段条目（`_readAloudProgress`/`closeReadBookKeepReadAloud`）必须等产线文件/字段删除**（架构门为双向棘轮，先删键会失败） |
+| W2a | **UI 页面层删除**（独立页面/叶节点） | Surgeon-readaloud | 🔵 | 实际已删 **225 文件**（UI 页面 + 服务/合成层 + 领域/数据实现层一并删，因分层在朗读域不成立）：`ui/book/{audio,readaloud}/**`、`feature/readaloud/**`、`service/{readaloud,playback}/**`、4 个朗读 service、`help/{readaloud,exoplayer,TTS,MediaHelp}`、`domain/model/readaloud/**`、7 个 usecase、6 个 gateway、6 个 repository、阅读页朗读件与 9 个 sheet、`MediaButtonReceiver`。编译收敛 **1299 → 708 → 629**；已修 10 个接入点。剩余 20 个接入点：`MainNavGraph`(133)、`ReadBookViewModel`(117)、`appModule`(88)、`MainActivity`(85)、`model/ReadBook`(51)、`ReadBookController`(37)、`ReadBookScreen`(25)、`MainScreen`(18)、`TocViewModel`(14)、`ReaderCanvasSurface`(14) 等 |
+| W2b | **服务与合成层删除**：`service/{BaseReadAloudService,HttpReadAloudService,TTSReadAloudService,AudioPlayService}.kt`、`service/readaloud/**`、`service/playback/**`、`model/{ReadAloud,AudioPlay,ReadAloudSessionStore,ReadAloudLayoutPolicy}.kt`、`help/TTS.kt`、`help/MediaHelp.kt`、`help/exoplayer/**`、`help/readaloud/**`(45)、`domain/model/readaloud/**`(13)、`domain/usecase/{AnalyzeChapterSpeech,BuildSpeechPlan,PrepareChapterSpeechPlan,Sync*}.kt` | Surgeon-readaloud | ⬜ | 编译 0 错 |
+| W2c | **剥阅读页耦合**（热点串行）：`ui/book/read/{ReadAloudDelegate,ReadAloudCastDelegate,ReadAloudCapsule,ReadAloudControlsRequestBus}.kt`、`ui/book/read/sheet/` 朗读簇、`feature/reader/core/cast/**`（`CastMarkers` 收敛为纯文本标记，**不删文件**）、`feature/reader/core/readaloud/**`、`ReaderPaginator`/`ReaderChapterBlockMeasurer`/`LegacyReaderChapterPaginator`/`ReaderChapterSource`/`ReaderCanvasSurface`/`LegacyReaderStyleRangeMapper` 去 cast 字段、`model/{ReadBook,CacheBookModel}.kt` 保住重载不跳位语义 | Surgeon-reader | ⬜ | 编译 + 阅读行为不变 |
+| W2-S4 | 清接线：Manifest、`NotificationId`、`AppConst`、`IntentAction`、`PreferKey`、四语言 strings、MediaButtonReceiver、`ui/main/**` 导航/Intent | Integrator | ⬜ | 编译 + lint 通过 |
+| W2-S5 | 数据层：entity/dao/repository/gateway/usecase 删除 + `appDatabaseModule` 绑定（**不改历史 migration**；新迁移归 W4） | Migrator | ⬜ | 编译通过 |
+| W2-S6 | 依赖与门禁：media3 保留（`AnalyzeUrl.kt:816`）；`BookType.audio` 类型位另立一步；架构门基线键同步移除 | Integrator | ⬜ | 依赖树证据 |
+| W2-V | 独立验证：编译、完整验证集、架构门、反证 grep | Verifier | ⬜ | `VERIFICATION.md` W2 段 |
+
+### W2 中断恢复指引（2026-10-14，工作区未提交）
+
+W2a 删除已落盘（**225 文件 `git rm` 已暂存**）+ 11 个接入点已修，但**编译尚未通过**（629 错误 / 20 接入点），因此尚未提交。若会话中断，按以下顺序恢复：
+
+1. `git status --porcelain | grep -c '^D'` 应为 225；`git diff --cached --stat | tail -1` 看规模
+2. 继续修接入点（按错误数降序，逐个“读精确上下文 → 精确文本编辑”）：
+   `ui/main/MainNavGraph.kt`(133) → `ui/book/read/ReadBookViewModel.kt`(117) → `di/appModule.kt`(88) →
+   `ui/main/MainActivity.kt`(85) → `model/ReadBook.kt`(51) → `ui/book/read/ReadBookController.kt`(37) →
+   `ui/book/read/ReadBookScreen.kt`(25) → `ui/main/MainScreen.kt`(18) → `ui/book/toc/TocViewModel.kt`(14) →
+   `feature/reader/ReaderCanvasSurface.kt`(14) → `ui/book/read/ReadBookMenuBar.kt`(12) → `ReadBookContract.kt`(9)
+   小件：`ReadBookRouteScreen`、`SourceLoginJsExtensions`、`ReadBookLoadDelegate`、`OnLineImportActivity`、
+   `AnalyzeUrl`、`Restore`、`CrashHandler`、`PlayerMorphHost`、`App.kt`、`SourceLoginRoute`、
+   `FileAssociationActivity`、`SharedReceiverActivity`、`AppConfig`
+3. 错误提取模板：`grep '^e: ' /tmp/w2aN.log | sed 's|.*/io/legado/app/||' | sed 's/:[0-9]*:[0-9]* .*//' | sort | uniq -c | sort -rn`
+4. **关键同步约束**：`di/appModule.kt` 里 `ReadBookViewModel` 的注入参数
+   （`readAloudSettingsRepository` / `aiCastAssignUseCase` / `aiSceneAssignUseCase` /
+   `syncReadAloudVoicesUseCase` / `readAloudSessionStore` / `httpTtsRepository`）
+   **必须与 `ReadBookViewModel` 的构造参数同一步删除**，否则会持续报“No parameter with name”
+5. 若确认不可继续：`git checkout HEAD -- app/src` + `git reset` 可完整回滚（无历史损失）
+
+**已修完的接入点（勿重复）**：`appModule`(41 行 import/绑定)、`AppConfig`、`ReadConfig`、`OtherConfig`×3、
+`SourceLogin`×2、`Restore`、`ReadContentProcessDelegate`、`SourceHelp`、`WebJsExtensions`、
+`BookInfoViewModel`、`LegacyReaderChapterPaginator`；整文件删除：`MediaButtonReceiver`、`IdentifyBookCharactersUseCase`
+
+### W2 规模实测（2026-10-14，主控测绘）
+
+- `find` 按 `*readaloud*/*tts*/*audio*/*cast*/*bgm*/*speech*/*voice*/*playback*/*player*/*exoplayer*` 命中 **195 文件**；
+  排除通用组件（`core/ui/player/**` morph、`ui/widget/components/player/**`）后真身约 **150 文件**，估 **4 万+ 行**。
+- 按子波切分的理由：整波一次性删除会产生数百编译错误且上下文不可控；
+  子波每步可编译、可提交、可回滚（W1-1/W1-2/W1-3 已验证该模式）。
 
 ## W3 · 外围域（2–3 路并行）
 

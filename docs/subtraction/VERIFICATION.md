@@ -46,6 +46,55 @@ W4 追加：
 pnpm --dir modules/web build          # 仅当 D8 保留网页端
 ```
 
+### 1.2 架构门实测记录（W2，2026-10-14）
+
+**触发场景**：W2 删除朗读域 225 文件后首次编译，`exit=1` 但 `grep -c '^e: '` 为 **0** —— 即“失败但无 Kotlin 错误”。日志尾部：
+
+```
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':verifyConfigArchitecture' (registered in build file 'build.gradle.kts').
+> 配置架构护栏失败:
+  app/src/main/java/io/legado/app/ui/book/readaloud/cloudtts/CloudTtsViewModel.kt: 文件已移除，请删除 DAO 直连基线
+```
+
+**结论**：架构门对**基线键 ↔ 文件存在性**做硬校验；删除被跟踪文件后必须同步删键。
+删掉该键后重编译，错误数从 0 跳到实际的 **466** —— 即架构门先把编译挡住了，误判成
+“编译无错却失败”会浪费一整轮。
+
+**基线值变化（本工程实测）**：
+
+| 时点 | legacyPreferenceCallBaseline | legacyDaoInjectionBaseline | legacyUiDaoAccessBaseline |
+|---|---|---|---|
+| W0 基线 | 23 键 / 74 | 2 键 / 13 | 11 键 / 30 |
+| W1-0 后 | 22 键 / 73 | 2 / 13 | 11 / 30 |
+| W1-3 后 | 22 键 / 73 | 2 / 13 | 8 键 / 20 |
+| W2（删 `CloudTtsViewModel` + `MediaButtonReceiver` 键） | **21 键 / 71** | **1 键 / 0** | 8 / 20 |
+
+> `legacyDaoInjectionBaseline` 剩下的 `ReadBookViewModel.kt to 0` 是**0 值哨兵**，不是遗漏。
+
+**诊断命令**（列出指向不存在文件的基线键，应在每波提交前跑）：
+
+```bash
+python3 - <<'PY'
+import re, os
+src = open('build.gradle.kts', encoding='utf-8').read()
+for name in ['legacyPreferenceCallBaseline', 'legacyDaoInjectionBaseline', 'legacyUiDaoAccessBaseline']:
+    m = re.search(name + r'\.set\(\s*mapOf\((.*?)\n\s*\)', src, re.S)
+    if not m:
+        print(name, '未找到'); continue
+    keys = re.findall(r'"([^"]+)"\s+to\s+(\d+)', m.group(1))
+    missing = [(k, v) for k, v in keys if not os.path.exists(os.path.join('app/src/main/java', k))]
+    print(f"{name}: {len(keys)} 键 / 总计 {sum(int(v) for _, v in keys)}；缺失文件 {len(missing)}")
+    for k, v in missing:
+        print('   缺失:', k, '->', v)
+PY
+```
+
+**任务名坑**：`verifyConfigArchitecture` 是**根项目**任务。写成 `:app:verifyConfigArchitecture` 会直接
+“Selection failed / task not found”，而非报护栏错误。
+
 ---
 
 ## 2. 基线快照（W0 填写，后续每波对照）
