@@ -18,17 +18,6 @@
         errorLine1="        super.onCleared()"
         errorLine2="              ~~~~~~~~~">
         <location
-            file="src/main/java/io/legado/app/ui/book/changesource/ChangeBookSourceViewModel.kt"
-            line="155"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="EmptySuperCall"
-        message="No need to call `super.onCleared`; the super method is defined to be empty"
-        errorLine1="        super.onCleared()"
-        errorLine2="              ~~~~~~~~~">
-        <location
             file="src/main/java/io/legado/app/ui/book/changecover/ChangeCoverViewModel.kt"
             line="181"
             column="15"/>
@@ -84,39 +73,6 @@
         errorLine1="        super.onCleared()"
         errorLine2="              ~~~~~~~~~">
         <location
-            file="src/main/java/io/legado/app/ui/book/manga/ReadMangaViewModel.kt"
-            line="424"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="EmptySuperCall"
-        message="No need to call `super.onCleared`; the super method is defined to be empty"
-        errorLine1="        super.onCleared()"
-        errorLine2="              ~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/rss/read/ReadRssViewModel.kt"
-            line="374"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="EmptySuperCall"
-        message="No need to call `super.onCleared`; the super method is defined to be empty"
-        errorLine1="    override fun onCleared() { session?.cancel(); session = null; super.onCleared() }"
-        errorLine2="                                                                        ~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/rss/source/debug/RssSourceDebugViewModel.kt"
-            line="99"
-            column="73"/>
-    </issue>
-
-    <issue
-        id="EmptySuperCall"
-        message="No need to call `super.onCleared`; the super method is defined to be empty"
-        errorLine1="        super.onCleared()"
-        errorLine2="              ~~~~~~~~~">
-        <location
             file="src/main/java/io/legado/app/ui/book/search/SearchViewModel.kt"
             line="345"
             column="15"/>
@@ -159,39 +115,6 @@
             file="src/main/java/io/legado/app/ui/widget/SimpleCounterView.kt"
             line="68"
             column="64"/>
-    </issue>
-
-    <issue
-        id="CustomViewStyleable"
-        message="By convention, the custom view (`SimpleSliderView`) and the declare-styleable (`DetailSeekBar`) should have the same name (various editor features rely on this convention)"
-        errorLine1="        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.DetailSeekBar)"
-        errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/SimpleSliderView.kt"
-            line="66"
-            column="64"/>
-    </issue>
-
-    <issue
-        id="CustomViewStyleable"
-        message="By convention, the custom view (`SimpleSliderView`) and the declare-styleable (`SimpleCounterView`) should have the same name (various editor features rely on this convention)"
-        errorLine1="        val ta = context.obtainStyledAttributes(attrs, R.styleable.SimpleCounterView)"
-        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/SimpleSliderView.kt"
-            line="74"
-            column="56"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="        this.type = StringUtil.isNotBlank(type) ? type.toLowerCase() : null;"
-        errorLine2="                                                       ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/domain/GuideReference.java"
-            line="90"
-            column="56"/>
     </issue>
 
     <issue
@@ -284,28 +207,6 @@
 
     <issue
         id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toUpperCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                        .getByIdOrHref(possibleNcxItemId.toUpperCase());"
-        errorLine2="                                                         ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/epub/PackageDocumentReader.java"
-            line="412"
-            column="58"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toUpperCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                            + Constants.DEFAULT_TOC_ID.toUpperCase()"
-        errorLine2="                                                       ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/epub/PackageDocumentReader.java"
-            line="424"
-            column="56"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
         message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
         errorLine1="            String.format(&quot;%.1f万字&quot;, words / 10000f)"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -313,28 +214,6 @@
             file="src/main/java/io/legado/app/ui/book/readRecord/ReadRecordFormatter.kt"
             line="11"
             column="13"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
-        errorLine1="                    tvCount.text = String.format(&quot;%.1f%%&quot;, item.progressPercent)"
-        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/searchContent/SearchContentAdapter.kt"
-            line="43"
-            column="36"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
-        errorLine1="                    tvCount.text = String.format(&quot;%.1f%%&quot;, item.progressPercent)"
-        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/searchContent/SearchContentAdapter.kt"
-            line="43"
-            column="36"/>
     </issue>
 
     <issue
@@ -350,50 +229,6 @@
 
     <issue
         id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                .toLowerCase().endsWith(suffix.toLowerCase());"
-        errorLine2="                 ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/util/StringUtil.java"
-            line="111"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                .toLowerCase().endsWith(suffix.toLowerCase());"
-        errorLine2="                                               ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/util/StringUtil.java"
-            line="111"
-            column="48"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                .toLowerCase().startsWith(prefix.toLowerCase());"
-        errorLine2="                 ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/util/StringUtil.java"
-            line="125"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                .toLowerCase().startsWith(prefix.toLowerCase());"
-        errorLine2="                                                 ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/util/StringUtil.java"
-            line="125"
-            column="50"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
         message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
         errorLine1="                else -> String.format(&quot;%.1f MB&quot;, bytes / (1024.0 * 1024.0))"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -401,17 +236,6 @@
             file="src/main/java/io/legado/app/ui/book/readaloud/cache/TtsCacheViewModel.kt"
             line="229"
             column="25"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toUpperCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="            sb.append(sTmp.toUpperCase());"
-        errorLine2="                           ~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/umdlib/tool/UmdUtils.java"
-            line="64"
-            column="28"/>
     </issue>
 
     <issue
@@ -775,17 +599,6 @@
             file="src/main/java/io/legado/app/utils/ViewExtensions.kt"
             line="72"
             column="44"/>
-    </issue>
-
-    <issue
-        id="AppCompatResource"
-        message="Should use `app:showAsAction` with the appcompat library with `xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;`"
-        errorLine1="        android:showAsAction=&quot;always&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/main_my.xml"
-            line="8"
-            column="9"/>
     </issue>
 
     <issue
@@ -1454,17 +1267,6 @@
         errorLine1="    modifier: Modifier = Modifier,"
         errorLine2="    ~~~~~~~~">
         <location
-            file="src/main/java/io/legado/app/ui/book/knowledge/KnowledgeSharedComponents.kt"
-            line="44"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierParameter"
-        message="Modifier parameter should be the first optional parameter"
-        errorLine1="    modifier: Modifier = Modifier,"
-        errorLine2="    ~~~~~~~~">
-        <location
             file="src/main/java/io/legado/app/ui/main/homepage/modules/RankingModule.kt"
             line="53"
             column="5"/>
@@ -1531,17 +1333,6 @@
         errorLine1="    modifier: Modifier = Modifier"
         errorLine2="    ~~~~~~~~">
         <location
-            file="src/main/java/io/legado/app/ui/book/readRecord/component/ReadRecordListItems.kt"
-            line="195"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierParameter"
-        message="Modifier parameter should be the first optional parameter"
-        errorLine1="    modifier: Modifier = Modifier"
-        errorLine2="    ~~~~~~~~">
-        <location
             file="src/main/java/io/legado/app/ui/book/readRecord/ReadRecordScreen.kt"
             line="1009"
             column="5"/>
@@ -1588,17 +1379,6 @@
         <location
             file="src/main/java/io/legado/app/ui/widget/components/menuItem/RoundDropdownMenuItem.kt"
             line="48"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierParameter"
-        message="Modifier parameter should be the first optional parameter"
-        errorLine1="    modifier: Modifier = Modifier"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/rss/article/RssArticlesCompose.kt"
-            line="100"
             column="5"/>
     </issue>
 
@@ -2051,28 +1831,6 @@
             file="src/debug/java/io/legado/app/debug/DebugThemeAssetProvider.kt"
             line="35"
             column="13"/>
-    </issue>
-
-    <issue
-        id="LogNotTimber"
-        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
-        errorLine1="                Log.i(&quot;LegadoDebug&quot;, &quot;READER_PAGE &quot; + text.replace(&quot;\n&quot;, &quot; &quot;))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/ReadView.kt"
-            line="629"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="LogNotTimber"
-        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
-        errorLine1="                    Log.i(&quot;LegadoDebug&quot;, &quot;READER_PAGE_PLACEHOLDER_FRAME&quot;)"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/ReadView.kt"
-            line="633"
-            column="21"/>
     </issue>
 
     <issue
@@ -2631,50 +2389,6 @@
     </issue>
 
     <issue
-        id="WebViewClientOnReceivedSslError"
-        message="Permitting connections with SSL-related errors could allow eavesdroppers to intercept data sent by your app, which impacts the privacy of your users. Consider canceling the connections by invoking `SslErrorHandler#cancel()`."
-        errorLine1="            handler?.proceed()"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/rss/read/RssReadWebController.kt"
-            line="275"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="WebViewClientOnReceivedSslError"
-        message="Permitting connections with SSL-related errors could allow eavesdroppers to intercept data sent by your app, which impacts the privacy of your users. Consider canceling the connections by invoking `SslErrorHandler#cancel()`."
-        errorLine1="            handler?.proceed()"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/rss/read/RssReadWebController.kt"
-            line="275"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="DrawAllocation"
-        message="Avoid object allocations during draw/layout operations (preallocate and reuse instead)"
-        errorLine1="        val paint = Paint().apply { this.alpha = alpha }"
-        errorLine2="                    ~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/FadePageDelegate.kt"
-            line="110"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/me/ag2s/epublib/util/commons/io/BOMInputStream.java"
-            line="161"
-            column="13"/>
-    </issue>
-
-    <issue
         id="ObsoleteSdkInt"
         message="Unnecessary; `SDK_INT` is always >= 26"
         errorLine1="            isRedirect = isRedirect || if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
@@ -2683,17 +2397,6 @@
             file="src/main/java/io/legado/app/help/http/BackstageWebView.kt"
             line="188"
             column="44"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="    private val atLeastApi24 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N"
-        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/utils/canvasrecorder/CanvasRecorderFactory.kt"
-            line="8"
-            column="32"/>
     </issue>
 
     <issue
@@ -2716,83 +2419,6 @@
             file="src/main/java/io/legado/app/help/http/ObsoleteUrlFactory.kt"
             line="849"
             column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        ) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/script/rhino/RhinoClassShutter.kt"
-            line="138"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/script/rhino/RhinoClassShutter.kt"
-            line="158"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="304"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="362"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="399"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="470"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 26"
-        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="501"
-            column="13"/>
     </issue>
 
     <issue
@@ -2936,17 +2562,6 @@
 
     <issue
         id="AutoboxingStateCreation"
-        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
-        errorLine1="    var elapsedSeconds by mutableStateOf(0f)"
-        errorLine2="                          ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/ai/chat/AiReasoningCard.kt"
-            line="69"
-            column="27"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
         message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
         errorLine1="    var liveSeconds by remember { mutableStateOf(0) }"
         errorLine2="                                  ~~~~~~~~~~~~~~">
@@ -2981,17 +2596,6 @@
     <issue
         id="AutoboxingStateCreation"
         message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
-        errorLine1="    var removeTagIndex by remember { mutableStateOf(-1) }"
-        errorLine2="                                     ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/knowledge/KnowledgeSharedComponents.kt"
-            line="112"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
-        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
         errorLine1="    var pendingDeleteCount by remember { mutableStateOf(1) }"
         errorLine2="                                         ~~~~~~~~~~~~~~">
         <location
@@ -3017,30 +2621,8 @@
         errorLine1="    android:background=&quot;@color/transparent50&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/activity_source_login.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/transparent50` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;@color/transparent50&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
             file="src/main/res/layout/activity_translucence.xml"
             line="6"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/translucent` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;@color/translucent&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_click_action_config.xml"
-            line="8"
             column="5"/>
     </issue>
 
@@ -3072,160 +2654,6 @@
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/item_app_log.xml"
-            line="6"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/book_ant_10` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;@color/book_ant_10&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_book_manga_edge.xml"
-            line="8"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/book_ant_10` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;@color/book_ant_10&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_book_manga_page.xml"
-            line="8"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_book_source.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_bookmark.xml"
-            line="10"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_dict_rule.xml"
-            line="8"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_download.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_find_book.xml"
-            line="15"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_http_tts.xml"
-            line="8"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_import_book.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_rss_read_record.xml"
-            line="6"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_rss_source.xml"
-            line="6"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_rule_sub.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_search_history.xml"
-            line="8"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
             file="src/main/res/layout/item_source_import.xml"
             line="6"
             column="5"/>
@@ -3248,41 +2676,8 @@
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/item_toc_regex.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_txt_toc_rule.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
             file="src/main/res/layout/view_preference.xml"
             line="5"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/transparent` with a theme that also paints a background (inferred theme is `@style/Base.AppTheme`)"
-        errorLine1="    android:background=&quot;@color/transparent&quot;/>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_tab_layout.xml"
-            line="7"
             column="5"/>
     </issue>
 
@@ -3295,17 +2690,6 @@
             file="build.gradle.kts"
             line="102"
             column="33"/>
-    </issue>
-
-    <issue
-        id="UselessLeaf"
-        message="This `LinearLayout` view is unnecessary (no children, no `background`, no `id`, no `style`)"
-        errorLine1="    &lt;LinearLayout"
-        errorLine2="     ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_font_config.xml"
-            line="149"
-            column="6"/>
     </issue>
 
     <issue
@@ -3434,42 +2818,6 @@
     </issue>
 
     <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/image_rss.jpg` in densityless folder">
-        <location
-            file="src/main/res/drawable/image_rss.jpg"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/image_rss_article.jpg` in densityless folder">
-        <location
-            file="src/main/res/drawable/image_rss_article.jpg"/>
-    </issue>
-
-    <issue
-        id="ViewConstructor"
-        message="Custom view `PageView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
-        errorLine1="class PageView("
-        errorLine2="      ~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/PageView.kt"
-            line="48"
-            column="7"/>
-    </issue>
-
-    <issue
-        id="ViewConstructor"
-        message="Custom view `ReadView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
-        errorLine1="class ReadView("
-        errorLine2="      ~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/ReadView.kt"
-            line="52"
-            column="7"/>
-    </issue>
-
-    <issue
         id="ReportShortcutUsage"
         message="Calling this method indicates use of dynamic shortcuts, but there are no calls to methods that track shortcut usage, such as `pushDynamicShortcut` or `reportShortcutUsed`. Calling these methods is recommended, as they track shortcut usage and allow launchers to adjust which shortcuts appear based on activation history. Please see https://developer.android.com/develop/ui/views/launch/shortcuts/managing-shortcuts#track-usage"
         errorLine1="        ShortcutManagerCompat.setDynamicShortcuts("
@@ -3592,17 +2940,6 @@
 
     <issue
         id="UseKtx"
-        message="Use the KTX extension function `Canvas.withSave` instead?"
-        errorLine1="                    canvas.save()"
-        errorLine2="                    ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/config/BgImageSpan.kt"
-            line="91"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
         message="Use the KTX extension function `Bitmap.get` instead?"
         errorLine1="            pixel = this.getPixel("
         errorLine2="                    ^">
@@ -3691,28 +3028,6 @@
 
     <issue
         id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                    val uri = Uri.parse(backupPath)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/about/CrashLogsDialog.kt"
-            line="117"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                    val uri = Uri.parse(backupPath)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/about/CrashLogsDialog.kt"
-            line="151"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
         message="Use the KTX extension function `Context.withStyledAttributes` instead?"
         errorLine1="        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.DetailSeekBar)"
         errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -3720,39 +3035,6 @@
             file="src/main/java/io/legado/app/ui/widget/DetailSeekBar.kt"
             line="56"
             column="26"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Context.withStyledAttributes` instead?"
-        errorLine1="        val a = context.obtainStyledAttributes(attrs)"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/recycler/DividerNoLast.kt"
-            line="39"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Canvas.withSave` instead?"
-        errorLine1="        canvas.save()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/recycler/DividerNoLast.kt"
-            line="94"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Canvas.withSave` instead?"
-        errorLine1="        canvas.save()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/recycler/DividerNoLast.kt"
-            line="121"
-            column="9"/>
     </issue>
 
     <issue
@@ -3823,17 +3105,6 @@
 
     <issue
         id="UseKtx"
-        message="Use the KTX extension function `Bitmap.get` instead?"
-        errorLine1="                    generateParticle(bitmap.getPixel((j + 1) * w, (i + 1) * h), random)"
-        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/anima/explosion_field/ExplosionAnimator.kt"
-            line="43"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
         message="Use the KTX extension function `String.toUri` instead?"
         errorLine1="                importBook(Uri.parse(treeUriStr), uri)"
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~">
@@ -3852,28 +3123,6 @@
             file="src/main/java/io/legado/app/ui/widget/image/FilletImageView.kt"
             line="26"
             column="21"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                            val uri = Uri.parse(url)"
-        errorLine2="                                      ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/file/HandleFileActivity.kt"
-            line="140"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                            Uri.parse(path)"
-        errorLine2="                            ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/file/HandleFileActivity.kt"
-            line="153"
-            column="29"/>
     </issue>
 
     <issue
@@ -3907,17 +3156,6 @@
             file="src/main/java/io/legado/app/help/glide/ImageLoader.kt"
             line="76"
             column="73"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                    val uri = Uri.parse(mText)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/association/ImportBookSourceViewModel.kt"
-            line="170"
-            column="31"/>
     </issue>
 
     <issue
@@ -4098,50 +3336,6 @@
 
     <issue
         id="UseKtx"
-        message="Use the KTX extension function `Canvas.withClip` instead?"
-        errorLine1="        canvas.save()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="302"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Canvas.withSave` instead?"
-        errorLine1="        canvas.save()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="398"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Canvas.withClip` instead?"
-        errorLine1="        canvas.save()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="468"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Canvas.withSave` instead?"
-        errorLine1="        canvas.save()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-            line="500"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
         message="Use the KTX extension function `Canvas.withTranslation` instead?"
         errorLine1="                canvas.save()"
         errorLine2="                ~~~~~~~~~~~~~">
@@ -4170,72 +3364,6 @@
         <location
             file="src/main/java/io/legado/app/utils/SystemUtils.kt"
             line="27"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Canvas.withTranslation` instead?"
-        errorLine1="        canvas.save()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/entities/TextLine.kt"
-            line="523"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Canvas.withSave` instead?"
-        errorLine1="                canvas.save()"
-        errorLine2="                ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/entities/TextLine.kt"
-            line="575"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Bitmap.get` instead?"
-        errorLine1="            val color = if (horizontal) bitmap.getPixel(position, 0) else bitmap.getPixel(0, position)"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/entities/TextLine.kt"
-            line="821"
-            column="41"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Bitmap.get` instead?"
-        errorLine1="            val color = if (horizontal) bitmap.getPixel(position, 0) else bitmap.getPixel(0, position)"
-        errorLine2="                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/entities/TextLine.kt"
-            line="821"
-            column="75"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `Bitmap.scale` instead?"
-        errorLine1="            val scaled = Bitmap.createScaledBitmap(source, width, height, true)"
-        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/entities/TextLine.kt"
-            line="944"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                    val uri = android.net.Uri.parse(path)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/book/read/page/entities/TextLine.kt"
-            line="959"
             column="31"/>
     </issue>
 
@@ -4340,17 +3468,6 @@
 
     <issue
         id="UseKtx"
-        message="Use the KTX function `createBitmap` instead?"
-        errorLine1="            return Bitmap.createBitmap(width, height, config)"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/anima/explosion_field/Utils.kt"
-            line="69"
-            column="20"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
         message="Use the KTX extension function `Context.withStyledAttributes` instead?"
         errorLine1="            val a = context.obtainStyledAttributes(attrs, R.styleable.VerticalSeekBar)"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -4402,39 +3519,6 @@
             file="src/main/java/io/legado/app/lib/theme/ViewUtils.kt"
             line="35"
             column="19"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                return shouldOverrideUrlLoading(Uri.parse(it))"
-        errorLine2="                                                ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/browser/WebViewActivity.kt"
-            line="257"
-            column="49"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                return shouldOverrideUrlLoading(Uri.parse(url))"
-        errorLine2="                                                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/login/WebViewLoginFragment.kt"
-            line="107"
-            column="49"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="                return shouldOverrideUrlLoading(Uri.parse(url))"
-        errorLine2="                                                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/login/WebViewLoginFragment.kt"
-            line="107"
-            column="49"/>
     </issue>
 
     <issue
@@ -4495,17 +3579,6 @@
     <issue
         id="SetTextI18n"
         message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
-        errorLine1="            binding.checkSourceTimeout.setText((timeoutMillis / 1000).toString())"
-        errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/config/CheckSourceConfig.kt"
-            line="62"
-            column="48"/>
-    </issue>
-
-    <issue
-        id="SetTextI18n"
-        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
         errorLine1="            text = R.string.empty.toString()"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4523,94 +3596,6 @@
             file="src/main/java/io/legado/app/ui/association/OpenUrlConfirmDialog.kt"
             line="69"
             column="32"/>
-    </issue>
-
-    <issue
-        id="SetTextI18n"
-        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
-        errorLine1="        tvCount.text = selectCount.toString()"
-        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/SelectActionBar.kt"
-            line="81"
-            column="24"/>
-    </issue>
-
-    <issue
-        id="SetTextI18n"
-        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
-        errorLine1="        tvCountAll.text = allCount.toString()"
-        errorLine2="                          ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/legado/app/ui/widget/SelectActionBar.kt"
-            line="82"
-            column="27"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;|&quot;, should use `@string` resource"
-        errorLine1="                            android:text=&quot;|&quot;"
-        errorLine2="                            ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/activity_book_info.xml"
-            line="325"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;|&quot;, should use `@string` resource"
-        errorLine1="                        android:text=&quot;|&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_book_info.xml"
-            line="328"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;4/30&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;4/30&quot; />"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_manga_footer_setting.xml"
-            line="194"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;1 / 45&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;1 / 45&quot; />"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_manga_footer_setting.xml"
-            line="217"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;2.1%&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;2.1%&quot; />"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_manga_footer_setting.xml"
-            line="233"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;variable&quot;, should use `@string` resource"
-        errorLine1="                android:hint=&quot;variable&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_variable.xml"
-            line="33"
-            column="17"/>
     </issue>
 
     <issue
@@ -4633,28 +3618,6 @@
             file="src/main/java/io/legado/app/ui/book/read/ReadBookController.kt"
             line="572"
             column="39"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;60dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginRight=&quot;60dp&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_progressbar_view.xml"
-            line="15"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;20dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginRight=&quot;20dp&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_progressbar_view.xml"
-            line="22"
-            column="9"/>
     </issue>
 
 </issues>

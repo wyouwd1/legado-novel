@@ -407,12 +407,6 @@ internal fun buildReadMenuActionDefs(
         def("refresh_current") {
             onIntent(ReadBookIntent.RefreshCurrentChapter)
         },
-        def("ai_summary") {
-            onIntent(ReadBookIntent.OpenChapterSummary)
-        },
-        def("ai_rewrite") {
-            onIntent(ReadBookIntent.OpenAiCurrentChapterRewrite)
-        },
         def("multi_role_read", isActive = state.useMultiSpeaker) {
             onIntent(ReadBookIntent.SetUseMultiSpeaker(!state.useMultiSpeaker))
         },

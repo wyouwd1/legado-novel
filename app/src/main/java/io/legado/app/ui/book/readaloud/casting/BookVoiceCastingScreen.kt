@@ -86,7 +86,6 @@ fun BookVoiceCastingScreen(
     effects: Flow<BookVoiceCastingEffect>,
     onBack: () -> Unit,
     onManageCloudTts: () -> Unit,
-    onOpenCharacterDetail: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -146,7 +145,6 @@ fun BookVoiceCastingScreen(
             VoiceCastingList(
                 state = state,
                 onIntent = onIntent,
-                onOpenCharacterDetail = onOpenCharacterDetail,
                 contentPadding = paddingValues,
                 modifier = Modifier.fillMaxSize(),
             )
@@ -158,7 +156,6 @@ fun BookVoiceCastingScreen(
 private fun VoiceCastingList(
     state: BookVoiceCastingUiState,
     onIntent: (BookVoiceCastingIntent) -> Unit,
-    onOpenCharacterDetail: (String) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -257,7 +254,6 @@ private fun VoiceCastingList(
                     item = item,
                     voices = state.voices,
                     onIntent = onIntent,
-                    onOpenCharacterDetail = onOpenCharacterDetail,
                     editing = editingId == item.subjectId,
                     onToggleEdit = {
                         editingId = if (editingId == item.subjectId) null else item.subjectId
@@ -297,7 +293,6 @@ private fun VoiceCastingList(
                             item = item,
                             voices = state.voices,
                             onIntent = onIntent,
-                            onOpenCharacterDetail = onOpenCharacterDetail,
                             editing = editingId == item.subjectId,
                             onToggleEdit = {
                                 editingId = if (editingId == item.subjectId) null else item.subjectId
@@ -437,7 +432,6 @@ private fun VoiceCastingCard(
     item: VoiceCastingItemUi,
     voices: List<VoiceOptionUi>,
     onIntent: (BookVoiceCastingIntent) -> Unit,
-    onOpenCharacterDetail: (String) -> Unit,
     editing: Boolean = false,
     onToggleEdit: () -> Unit = {},
     onDelete: () -> Unit = {},
@@ -469,13 +463,9 @@ private fun VoiceCastingCard(
             .fillMaxWidth()
             .then(dragModifier),
         onClick = {
-            // 人物行点下去是官方的人物详情页（改名、头像、简介、事记都在那边），
-            // 正在编辑时再点一下收起；旁白点下去直接展开它的音色编辑。
-            if (isCharacter) {
-                if (editing) onToggleEdit() else onOpenCharacterDetail(item.subjectId)
-            } else {
-                onToggleEdit()
-            }
+            // 人物行与旁白行点下去都是展开/收起音色编辑。
+            // 原「打开知识库人物详情」入口随知识库域移除（D6）。
+            onToggleEdit()
         },
         containerColor = roleVisuals.containerColor,
         border = roleVisuals.border,

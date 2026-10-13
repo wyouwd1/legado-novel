@@ -49,7 +49,6 @@ import io.legado.app.ui.book.group.GroupDeleteAction
 import io.legado.app.ui.book.group.GroupEditContent
 import io.legado.app.ui.book.group.GroupResetCoverAction
 import io.legado.app.ui.book.group.GroupViewModel
-import io.legado.app.ui.main.bookshelf.autoGroup.AiAutoGroupSheet
 import io.legado.app.ui.tagGroupRule.TagGroupRuleEditSheet
 import io.legado.app.ui.tagGroupRule.TagGroupRuleIntent
 import io.legado.app.ui.tagGroupRule.TagGroupRuleViewModel
@@ -91,8 +90,6 @@ fun GroupManageSheet(
 
     var editingTagRule by remember { mutableStateOf<io.legado.app.data.entities.TagGroupRule?>(null) }
     var showTagRuleEdit by remember { mutableStateOf(false) }
-    var showAiAutoGroup by remember { mutableStateOf(false) }
-    var aiAutoGroupSessionKey by rememberSaveable { mutableStateOf(0L) }
 
     var editingGroupTagRule by remember { mutableStateOf<io.legado.app.data.entities.TagGroupRule?>(null) }
 
@@ -161,15 +158,6 @@ fun GroupManageSheet(
                                 editingGroup = null
                                 coverPath = null
                                 isEditing = true
-                            }
-                        )
-                        RoundDropdownMenuItem(
-                            text = stringResource(R.string.ai_auto_group),
-                            leadingIcon = { Icon(Icons.Default.AutoAwesome, null) },
-                            onClick = {
-                                showMenu = false
-                                aiAutoGroupSessionKey += 1L
-                                showAiAutoGroup = true
                             }
                         )
                         RoundDropdownMenuItem(
@@ -277,12 +265,6 @@ fun GroupManageSheet(
                 tagGroupRuleViewModel.onIntent(TagGroupRuleIntent.CopyRule(rule))
             },
             onPaste = { tagGroupRuleViewModel.pasteRule() }
-        )
-
-        AiAutoGroupSheet(
-            show = showAiAutoGroup,
-            sessionKey = aiAutoGroupSessionKey,
-            onDismissRequest = { showAiAutoGroup = false }
         )
     }
 }

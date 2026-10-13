@@ -592,7 +592,6 @@ private fun ActionMenuItem.builtInIcon(): ImageVector? = when (id) {
     R.id.menu_dict -> Icons.AutoMirrored.Outlined.MenuBook
     R.id.menu_replace -> Icons.Outlined.FindReplace
     R.id.menu_edit -> Icons.Outlined.Edit
-    R.id.menu_ai_clean, R.id.menu_ai_rewrite -> Icons.Outlined.SmartToy
     R.id.menu_search_content -> Icons.Outlined.Search
     // 手动分配背景音乐场景：两个都是音乐图标，前/后靠文案区分
     R.id.menu_insert_bgm_before -> Icons.Outlined.QueueMusic

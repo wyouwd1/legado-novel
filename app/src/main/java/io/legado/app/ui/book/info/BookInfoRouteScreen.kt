@@ -66,11 +66,6 @@ fun BookInfoRouteScreen(
     onOpenAudioPlay: (bookUrl: String, inBookshelf: Boolean) -> Unit = { _, _ -> },
     onNavigateToBookInfo: (name: String?, author: String?, bookUrl: String, origin: String?, coverPath: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToExploreShow: (title: String?, sourceUrl: String, exploreUrl: String?) -> Unit = { _, _, _ -> },
-    onOpenCharacterDetail: (bookUrl: String, characterId: String?) -> Unit = { _, _ -> },
-    onOpenCharacterNetwork: (bookUrl: String) -> Unit = {},
-    onOpenCharacterList: (bookUrl: String) -> Unit = {},
-    onOpenKnowledgeList: (bookUrl: String) -> Unit = {},
-    onOpenEventList: (bookUrl: String) -> Unit = {},
     /** 私密功能需要本地密码，未设置时引导去设置页（与书架同一条路径） */
     onOpenSettings: () -> Unit = {},
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -179,26 +174,6 @@ fun BookInfoRouteScreen(
 
                 is BookInfoEffect.NavigateToExploreShow -> {
                     onNavigateToExploreShow(effect.title, effect.sourceUrl, effect.exploreUrl)
-                }
-
-                is BookInfoEffect.OpenCharacterDetail -> {
-                    onOpenCharacterDetail(effect.bookUrl, effect.characterId)
-                }
-
-                is BookInfoEffect.OpenCharacterNetwork -> {
-                    onOpenCharacterNetwork(effect.bookUrl)
-                }
-
-                is BookInfoEffect.OpenKnowledgeList -> {
-                    onOpenKnowledgeList(effect.bookUrl)
-                }
-
-                is BookInfoEffect.OpenCharacterList -> {
-                    onOpenCharacterList(effect.bookUrl)
-                }
-
-                is BookInfoEffect.OpenEventList -> {
-                    onOpenEventList(effect.bookUrl)
                 }
 
                 BookInfoEffect.RequestBiometricUnlock -> {

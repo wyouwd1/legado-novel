@@ -203,3 +203,43 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 3. `MainActivity`/`MainNavigator`/`MainNavGraph`/`MainNavKey`：`drop_method` 对**表达式体函数**与**多行 `data class`** 配平失败，静默吃掉扩展函数与大段代码（`resolveStartRoute`/`navigateBack` 等整段消失）。
 
 → 结论已固化为 `README.md` §六「协作协议」条目 1。
+
+### 7.3 W1-3 · AI / 知识库 / 配音界面层删除（2026-10-14）
+
+**决策**：D5（AI 全删）、D6（知识库删）、D4c（配音删）。
+**实际边界**（与最初计划不同，见下「三次转向」）：只删**用户界面与入口**，AI 底座与朗读配音链整体保留到 W2。
+
+| 项 | 结果 |
+|---|---|
+| 规模 | **净删 51 文件**（主源 48 + 测试 3）；主源 1,681→**1,631** 文件、318,075→**303,092** 行（−14,983） |
+| 删除分组 | `ui/book/knowledge`(19)、`ui/config/ai`(15)、`ui/ai`(7，保留 `chat/` 思考卡片三件套)、`ui/main/bookshelf/autoGroup`(4)、`ui/book/read/sheet` 的 AI 面板(4)、`ReadAi{Contract,Delegate}`(2) |
+| 编译 | `:app:compileAppDebugKotlin` **0 错**；主源+测试源 `BUILD SUCCESSFUL`。**14 轮收敛**：485 → 340 → 261 → 195 → 61 → 12 → 6 → 1 → 0（另 5 轮为回滚重试） |
+| 完整验证集 | `testAppDebugUnitTest lintAppDebug verifyConfigArchitecture assembleAppDebug` → **BUILD SUCCESSFUL in 5m 31s**（140 actionable tasks）；清基线后复跑 **BUILD SUCCESSFUL** |
+| 单测 | **1571 / 0 失败 / 0 错误**（W1-2 后 1578，少 7 = 删除的 `AiAutoGroupViewModelTest`） |
+| APK | arm64 **69M**、armv7 **68M**、universal **75M**（与 W1-2 持平：本波删的是 UI 与死代码，未被 R8 计入体积） |
+| 架构门 | `verifyConfigArchitecture` 通过；`legacyPreferenceCallBaseline` **74 → 73**（删 `CheckSourceConfig.kt` 键，23 → 22 键） |
+| lint 基线 | `app/lint-baseline.xml` **425 → 330 issue / 428 → 333 location**（纯删除 0 插入） |
+| 反证检索 | 见下 |
+
+**反证检索**：`grep -rn "ui\.book\.knowledge\|ui\.config\.ai\|ReadAiDelegate\|AiAutoGroup" app/src/main` → 0 命中（仅剩 W1-3-SCOPE 登记的保留项）。
+
+**三次转向（本波核心方法学）**：
+
+1. 原计划把 AI 域作独立一波整体删除。侦察发现 AI 底座被**朗读链反向依赖**（`AiReasoningLevel`/`AiProfileGateway`/`AiCastAssignUseCase` 等），整域删除会连锁拖入整个 W2。
+2. 转向「先删上层消费者（知识库+配音）再删底座」；实测仍失败：`AiReasoningModeButton`/`AiThinkingCard` 被 `AiCastDialogSheet`（配音）与 `BookCharacterListScreen`（知识库）**共用**，删任一层都让另一层断；试图「保留契约」则需连带保留 `data/repository/ai/**` 与 4 个 AI 用例，等于底座整体保留。
+3. 最终定界：**只删界面与入口**，底座整体留给 W2。此边界编译后立即收敛，且不制造任何临时垫片。
+
+**方法论事故与修复（新增三条纪律实践）**：
+
+1. `git rm` 整文件删除**安全**（91 文件一次删净）；风险全部来自「接入点编辑」。
+2. `sed -i '335,357d'` 删 `BookInfoContract` 时**行号偏移**误删接口抽象成员 → 编译报「未实现抽象成员」+ 语法错误 → `git checkout --` 回滚后用精确文本编辑重做。
+3. `sed -i '428,476d'` 在 `MainNavigator` 留残余行 → 编译报「返回类型不匹配」→ 定位后精确修正。
+4. **`updateLintBaseline` 会放宽基线**：425 → 502 issue（把当前全部 502 问题写入）。这违反 D12「不接受先放宽基线再迁移」→ 立即 `git checkout --` 回滚，改用自写文本级按块删除脚本（只删指向不存在文件的 `issue`/`location`，逐行保留原文）→ 425 → 330，diff 为 **纯删除 0 插入**。
+
+**未验证项 / 遗留**：
+
+- **真机手测未做**：知识库/配音入口消失后，书籍详情页与朗读设置页在真机上的布局、滚动、返回行为未验证。
+- **翻译状态刷新语义变化（未验证风险）**：`ReadBookViewModel` 原通过 `ReadAiDelegate.observeChapterTranslation` **订阅**翻译任务流；AI 域移除后改为在 `syncFromReadBook` 中直接读 `TranslationManager.getChapterTaskStateFlow(...).value`。失去持续订阅，翻译状态仅在 `syncFromReadBook` 被触发时刷新。**需 W3 翻译域收敛时校正为正确订阅**。
+- **翻译的 AI provider 入口断链**：`TranslationConfigScreen` 删除了跳转 AI 配置的入口，但设置项仍可选 `PROVIDER_APP_AI` → 用户选中后无处配置。登记 W3 处理。
+- **lint 基线仍有 33 条过时条目**（指向**存在**的文件、但问题已消失）：静态脚本无法判定，需用 lint 报告精确清理 → 登记 W5。
+- **AI/知识库专用 strings 未清理**（4 语言，含 `ai_*`、`book_characters`、`character_network`、`plot_events` 等）→ 登记 W5；当前仅产生 lint warning，不影响构建。

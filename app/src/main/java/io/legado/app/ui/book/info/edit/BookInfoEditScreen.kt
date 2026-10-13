@@ -85,10 +85,6 @@ fun BookInfoEditScreen(
     viewModel: BookInfoEditViewModel,
     onBack: () -> Unit,
     onSave: () -> Unit,
-    onOpenCharacterList: (String) -> Unit,
-    onOpenCharacterNetwork: (String) -> Unit,
-    onOpenKnowledgeList: (String) -> Unit,
-    onOpenEventList: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = GlassTopAppBarDefaults.defaultScrollBehavior()
@@ -124,10 +120,6 @@ fun BookInfoEditScreen(
                         .verticalScroll(rememberScrollState()),
                     uiState = uiState,
                     viewModel = viewModel,
-                    onOpenCharacterList = onOpenCharacterList,
-                    onOpenCharacterNetwork = onOpenCharacterNetwork,
-                    onOpenKnowledgeList = onOpenKnowledgeList,
-                    onOpenEventList = onOpenEventList,
                 )
             }
         }
@@ -140,10 +132,6 @@ fun BookInfoEditContent(
     modifier: Modifier = Modifier,
     uiState: BookInfoEditUiState,
     viewModel: BookInfoEditViewModel,
-    onOpenCharacterList: (String) -> Unit,
-    onOpenCharacterNetwork: (String) -> Unit,
-    onOpenKnowledgeList: (String) -> Unit,
-    onOpenEventList: (String) -> Unit,
 ) {
     val context = LocalContext.current
     var showChangeCoverSheet by remember { mutableStateOf(false) }
@@ -220,14 +208,6 @@ fun BookInfoEditContent(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        BookKnowledgeEditCard(
-            bookUrl = uiState.book?.bookUrl.orEmpty(),
-            onOpenCharacterList = onOpenCharacterList,
-            onOpenCharacterNetwork = onOpenCharacterNetwork,
-            onOpenKnowledgeList = onOpenKnowledgeList,
-            onOpenEventList = onOpenEventList,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
         SwitchSettingItem(
             title = stringResource(R.string.fixed_book_type),
             description = stringResource(R.string.fixed_book_type_summary),
@@ -290,61 +270,6 @@ fun BookInfoEditContent(
             backgroundColor = LegadoTheme.colorScheme.surfaceInput,
             modifier = Modifier.fillMaxWidth()
         )
-    }
-}
-
-@Composable
-private fun BookKnowledgeEditCard(
-    bookUrl: String,
-    onOpenCharacterList: (String) -> Unit,
-    onOpenCharacterNetwork: (String) -> Unit,
-    onOpenKnowledgeList: (String) -> Unit,
-    onOpenEventList: (String) -> Unit,
-) {
-    NormalCard(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            AppText(
-                text = stringResource(R.string.book_info_knowledge),
-                style = LegadoTheme.typography.titleMedium,
-            )
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                item {
-                    MediumOutlinedButton(
-                        onClick = { onOpenCharacterList(bookUrl) },
-                        enabled = bookUrl.isNotEmpty(),
-                        icon = Icons.AutoMirrored.Outlined.FormatListBulleted,
-                        text = stringResource(R.string.book_characters),
-                    )
-                }
-                item {
-                    MediumOutlinedButton(
-                        onClick = { onOpenCharacterNetwork(bookUrl) },
-                        enabled = bookUrl.isNotEmpty(),
-                        icon = Icons.Default.Group,
-                        text = stringResource(R.string.character_network),
-                    )
-                }
-                item {
-                    MediumOutlinedButton(
-                        onClick = { onOpenKnowledgeList(bookUrl) },
-                        enabled = bookUrl.isNotEmpty(),
-                        icon = Icons.Default.Book,
-                        text = stringResource(R.string.book_knowledge),
-                    )
-                }
-                item {
-                    MediumOutlinedButton(
-                        onClick = { onOpenEventList(bookUrl) },
-                        enabled = bookUrl.isNotEmpty(),
-                        icon = Icons.Default.Timeline,
-                        text = stringResource(R.string.plot_events),
-                    )
-                }
-            }
-        }
     }
 }
 

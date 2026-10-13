@@ -80,29 +80,6 @@ data object MainRouteSettingsTheme : MainRoute
 data object MainRouteSettingsBackup : MainRoute
 
 @Serializable
-data object MainRouteSettingsAi : MainRoute
-
-@Serializable
-data object MainRouteAiChat : MainRoute
-
-@Serializable
-data class MainRouteSettingsAiProviderEdit(
-    val providerId: String? = null
-) : MainRoute
-
-@Serializable
-data class MainRouteSettingsAiModelEdit(
-    val providerId: String? = null,
-    val modelProfileId: String? = null
-) : MainRoute
-
-@Serializable
-data object MainRouteSettingsAiSummary : MainRoute
-
-@Serializable
-data object MainRouteSettingsAiPrompt : MainRoute
-
-@Serializable
 data object MainRouteSettingsCustomTheme : MainRoute
 
 @Serializable
@@ -172,22 +149,6 @@ data class MainRouteBookInfo(
 ) : MainRoute
 
 @Serializable
-data class MainRouteBookCharacterDetail(
-    val bookUrl: String,
-    val characterId: String? = null,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookCharacterNetwork(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookCharacterList(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
 data class MainRouteBookVoiceCasting(
     val bookUrl: String,
 ) : MainRoute
@@ -197,28 +158,6 @@ data class MainRouteCloudTtsEngines(val bookUrl: String? = null) : MainRoute
 
 @Serializable
 data object MainRouteTtsCache : MainRoute
-
-@Serializable
-data class MainRouteBookKnowledgeList(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookKnowledgeDetail(
-    val bookUrl: String,
-    val entryId: String? = null,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookEventList(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteBookEventDetail(
-    val bookUrl: String,
-    val eventId: String? = null,
-) : MainRoute
 
 @Serializable
 data object MainRouteRuleSub : MainRoute

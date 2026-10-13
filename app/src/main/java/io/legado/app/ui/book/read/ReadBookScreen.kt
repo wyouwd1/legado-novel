@@ -17,12 +17,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.legado.app.R
 import io.legado.app.data.repository.ReadPreferences
 import io.legado.app.domain.usecase.BookmarkTargetVerdict
-import io.legado.app.ui.book.read.sheet.AiRewritePresetConfigSheet
-import io.legado.app.ui.book.read.sheet.AiTextCleanSheet
-import io.legado.app.ui.book.read.sheet.AiTextRewriteSheet
 import io.legado.app.ui.book.read.sheet.BgTextConfigSheet
 import io.legado.app.ui.book.read.sheet.ChangeChapterSourceSheet
-import io.legado.app.ui.book.read.sheet.ChapterSummarySheet
 import io.legado.app.ui.book.read.sheet.CharsetConfigSheet
 import io.legado.app.ui.book.read.sheet.ClickActionConfigSheet
 import io.legado.app.ui.book.read.sheet.ContentEditSheet
@@ -71,12 +67,6 @@ fun ReadBookOverlayRoute(
     onPickBookmarkBadgeImage: () -> Unit,
     onResetBookmarkBadge: () -> Unit,
 ) {
-    val aiActive = rememberFeatureActivated(
-        state.activeSheet is ReadBookSheet.ChapterSummary ||
-            state.activeSheet is ReadBookSheet.AiTextClean ||
-            state.activeSheet is ReadBookSheet.AiTextRewrite ||
-            state.activeSheet is ReadBookSheet.AiRewritePresetConfig
-    )
     val highlightActive = rememberFeatureActivated(
         state.activeSheet is ReadBookSheet.HighlightRuleConfig
     )
@@ -85,9 +75,6 @@ fun ReadBookOverlayRoute(
     val contentProcessActive = rememberFeatureActivated(
         state.activeSheet is ReadBookSheet.TextProcessing
     )
-    val aiState = if (aiActive) {
-        viewModel.aiState.collectAsStateWithLifecycle().value
-    } else ReadAiUiState()
     val highlightRuleState = if (highlightActive) {
         viewModel.highlightRuleState.collectAsStateWithLifecycle().value
     } else HighlightRuleConfigUiState()
@@ -102,7 +89,6 @@ fun ReadBookOverlayRoute(
     } else ContentProcessConfigUiState()
     ReadBookScreen(
         state = state,
-        aiState = aiState,
         highlightRuleState = highlightRuleState,
         markingState = markingState,
         contentEditState = contentEditState,
@@ -127,7 +113,6 @@ private fun rememberFeatureActivated(active: Boolean): Boolean {
 @Composable
 fun ReadBookScreen(
     state: ReadBookUiState,
-    aiState: ReadAiUiState,
     highlightRuleState: HighlightRuleConfigUiState,
     markingState: MarkingUiState,
     contentEditState: ContentEditUiState,
@@ -432,30 +417,6 @@ fun ReadBookScreen(
         state = contentEditState,
         onIntent = onIntent,
         onDismissRequest = dismissSheet,
-    )
-    ChapterSummarySheet(
-        show = state.activeSheet is ReadBookSheet.ChapterSummary,
-        state = aiState.chapterSummary,
-        onIntent = onIntent,
-        onDismissRequest = dismissSheet,
-    )
-    AiTextCleanSheet(
-        show = state.activeSheet is ReadBookSheet.AiTextClean,
-        state = aiState.aiTextClean,
-        onIntent = onIntent,
-        onDismissRequest = dismissSheet,
-    )
-    AiTextRewriteSheet(
-        show = state.activeSheet is ReadBookSheet.AiTextRewrite,
-        state = aiState.aiTextRewrite,
-        onIntent = onIntent,
-        onDismissRequest = dismissSheet,
-    )
-    AiRewritePresetConfigSheet(
-        show = state.activeSheet is ReadBookSheet.AiRewritePresetConfig,
-        state = aiState.aiRewritePresetConfig,
-        onIntent = onIntent,
-        onDismissRequest = { onIntent(ReadBookIntent.CloseAiRewritePresetConfig) },
     )
     MoreConfigSheet(
         show = state.activeSheet is ReadBookSheet.MoreConfig,

@@ -25,14 +25,12 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TranslationConfigRouteScreen(
     onBackClick: () -> Unit,
-    onNavigateToAi: () -> Unit,
     viewModel: TranslationConfigViewModel = koinViewModel(),
 ) {
     TranslationConfigScreen(
         state = viewModel.uiState.collectAsStateWithLifecycle().value,
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
-        onNavigateToAi = onNavigateToAi,
     )
 }
 
@@ -42,7 +40,6 @@ fun TranslationConfigScreen(
     state: TranslationConfigUiState,
     onIntent: (TranslationConfigIntent) -> Unit,
     onBackClick: () -> Unit,
-    onNavigateToAi: () -> Unit,
 ) {
     val settings = state.settings
     val scrollBehavior = GlassTopAppBarDefaults.defaultScrollBehavior()
@@ -93,17 +90,6 @@ fun TranslationConfigScreen(
                             onIntent(TranslationConfigIntent.SetMaxCharsPerChunk(it.toInt()))
                         },
                     )
-                }
-            }
-            if (settings.provider == TranslationConstants.PROVIDER_APP_AI) {
-                item {
-                    SplicedColumnGroup(title = stringResource(R.string.ai_config)) {
-                        ClickableSettingItem(
-                            title = stringResource(R.string.translation_app_ai_provider),
-                            description = stringResource(R.string.translation_app_ai_provider_summary),
-                            onClick = onNavigateToAi,
-                        )
-                    }
                 }
             }
         }

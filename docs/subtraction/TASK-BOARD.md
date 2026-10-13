@@ -45,13 +45,38 @@
 |---|---|---|---|---|
 | W1-0 | 共享点剥离独立提交（细则见上）：`RssJsExtensions` → `help/webView/BaseJsExtensions`、`VisibleWebView` 搬家、Coil 漫画分支剥离 | Surgeon-shared（主控执行） | 🟢 | 提交 `ae3e09b3d`；编译 `BUILD SUCCESSFUL`；架构门 `RssJsExtensions` 8→6 |
 | W1-1 | RSS 域（D2） | Surgeon-rss（主控执行） | 🟢 | 提交 `2318cfb84`；删除 **79 文件 / -7,698 行**；编译 0 错；单测 **1702/0**；详见 `VERIFICATION.md` §7.1 |
-| W1-2 | 漫画域（D3，含 20 测试、类型位、偏好键） | Surgeon-manga（主控执行） | 🟢 | 删除 **55 文件 / -13,968 行**；编译 6 轮收敛 623→**0** 错；完整验证集 **BUILD SUCCESSFUL**；单测 **1578/0**；APK arm64 −2.7MB；详见 `VERIFICATION.md` §7.2 |
-| W1-3 | AI 域（D5，含 autoGroup、阅读页 AI sheet） | Surgeon-ai | ⬜ | 侦察地图已入 `TASK-BOARD.md` §W1-3；难点：`ReadAiDelegate`/`AiTextFactoryUseCase` 被正文链引用 |
-| W1-4 | 知识库/评论（D6） | Surgeon-knowledge | ⬜ | 同上 |
-| W1-5 | **热点收口**：导航 / DI / AppDatabase 注册 / strings / PreferKey / 基线 | Integrator | ⬜ | 编译 + 架构门通过 |
+| W1-2 | 漫画域（D3，含 20 测试、类型位、偏好键） | Surgeon-manga（主控执行） | 🟢 | 提交 `df02effd7`；删除 **55 文件 / -13,968 行**；编译 6 轮收敛 623→**0** 错；完整验证集 **BUILD SUCCESSFUL**；单测 **1578/0**；APK arm64 −2.7MB；详见 `VERIFICATION.md` §7.2 |
+| W1-3 | AI + 知识库 + 配音的**界面层**（D5/D6/D4c） | Surgeon-ai（主控执行） | 🟢 | 净删 **51 文件 / -14,983 行**；编译 14 轮收敛 485→**0**；完整验证集 **BUILD SUCCESSFUL 5m31s**；单测 **1571/0**；架构门基线 74→**73**；lint 基线 425→**330**（纯删除）；详见 `VERIFICATION.md` §7.3 与 `W1-3-SCOPE.md` |
+| W1-4 | 知识库/评论（D6） | Surgeon-knowledge | ⚪ | **已并入 W1-3**（知识库界面与 AI 界面共用组件，无法分开删） |
+| W1-5 | **热点收口**：导航 / DI / AppDatabase 注册 / PreferKey / 基线 | Integrator | 🟢 | 已在 W1-3 内完成导航、DI、`appModule`、架构门键与 lint 基线；strings 清理转 W5-6 |
 | W1-6 | 独立验证：编译、单测、架构门、反证 grep | Verifier | ⬜ | `VERIFICATION.md` W1 段 |
 
-### W1-3 执行细则（AI 域，2026-10-14 侦察）
+### W1-3 实际执行边界（2026-10-14 执行；原侦察边界已被取代）
+
+> **原计划**（下方存档供对照）是「AI 域整体删除」。执行时发现 AI 底座被**朗读链反向依赖**，
+> 整域删除会连锁拖入整个 W2；且 `AiReasoningModeButton`/`AiThinkingCard` 被配音与知识库共用，
+> 「保留契约」也解不开。最终**缩小为「界面层删除」**：AI 底座与朗读配音链整体保留到 W2。
+> 转向过程详见 `VERIFICATION.md` §7.3 与 `W1-3-SCOPE.md`。
+
+**实删（51 文件）**：`ui/book/knowledge/**`(19)、`ui/config/ai/**`(15)、`ui/ai/**`(7，保留 `chat/` 思考卡片三件套)、
+`ui/main/bookshelf/autoGroup/**`(4)、`ui/book/read/sheet` 的 4 个 AI 面板、`ReadAi{Contract,Delegate}.kt`(2)、
+`AiAutoGroupViewModelTest.kt`。
+
+**保留到 W2（避免断链）**：AI 底座（`AiProfileGateway`/`AiProfileRepository`、`data/repository/ai/**`、
+`AiModels`、`AiModelRegistry`、`AiChatGenerationUseCase`、`AiChatContract`）、朗读配音链（`help/readaloud/**`、
+`ReadAloudCastDelegate`、`AiCast*`/`AiScene*`、`ui/book/readaloud/**`、`BookVoiceCasting*`、
+`ui/ai/chat/{AiThinkingCard,AiThinkingStepsCard,AiChatMessageParts}`、3 个角色头像工具、`AiCastDialogSheet`）、
+数据层 entity/dao 与 `AppDatabase` 声明（W4）。
+
+**接入点改动（全部精确编辑，无行扫描块删除）**：`MainNavGraph`、`MainNavKey`、`MainNavigator`、`MainScreen`、
+`MyScreen`、`appModule`、`ReadBook{Contract,Screen,ViewModel,Controller}`、`ReadMenuActionDefs`、
+`TextActionSelectionMenu`、`BookInfo{Contract,Screen,ViewModel,RouteScreen,EditScreen}`、`GroupManageSheet`、
+`BookVoiceCastingScreen`、`TranslationConfigScreen`、`ConfigNavScreen`、`values/ids.xml`、`app/lint-baseline.xml`、
+`build.gradle.kts`。
+
+---
+
+#### （对照存档）原侦察边界（AI 域整体删除）
 
 可整删层：
 
@@ -112,7 +137,8 @@
 
 | # | 任务 | 认领 | 状态 | 证据 |
 |---|---|---|---|---|
-| W5-1 | 基线最终复核（每条与实际一致） | Verifier | ⬜ | 架构门输出 |
+| W5-1 | 基线最终复核（每条与实际一致）+ 清理 lint 基线中 33 条「文件存在但问题已消失」的过时条目 | Verifier | ⬜ | 架构门输出 + lint 报告 |
+| W5-6 | 清理 AI/知识库专用 strings（4 语言：`ai_*`、`book_characters`、`character_network`、`plot_events` 等） | Scribe | ⬜ | `grep -c` 归零 |
 | W5-2 | 文档同步：`README.md`、`AGENTS.md`、`docs/dev/feature-catalog.md`、`docs/index.md` | Scribe | ⬜ | diff |
 | W5-3 | `assembleAppDebug` / `assembleAppRelease` / `assembleAppNoR8` + APK 体积对比 | Verifier | ⬜ | 构建输出 |
 | W5-4 | 真机手测清单 | Verifier + 用户 | ⬜ | `VERIFICATION.md` 手测表 |

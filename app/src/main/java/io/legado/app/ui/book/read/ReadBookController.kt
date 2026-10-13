@@ -568,9 +568,7 @@ class ReadBookController(
         val requestVersion = ++textMenuRequestVersion
         activity.lifecycleScope.launch {
             val items = getActionMenuItems().filterNot {
-                selection.includesTitle && it.id in setOf(
-                    R.id.menu_mark, R.id.menu_ai_clean, R.id.menu_ai_rewrite,
-                )
+                selection.includesTitle && it.id == R.id.menu_mark
             }
             if (textMenuRequestVersion != requestVersion) return@launch
             _textMenuState.value = TextMenuState(
@@ -2044,32 +2042,6 @@ class ReadBookController(
                 return true
             }
 
-            R.id.menu_ai_clean -> {
-                composeSelectionBookmark(bodyOnly = true)?.let { selection ->
-                    viewModel.onIntent(
-                        ReadBookIntent.OpenAiTextClean(
-                            text = selection.bookText,
-                            chapterIndex = selection.chapterIndex,
-                            chapterPosition = selection.chapterPos,
-                        )
-                    )
-                } ?: activity.toastOnUi(R.string.ai_text_clean_selection_error)
-                return true
-            }
-
-            R.id.menu_ai_rewrite -> {
-                composeSelectionBookmark(bodyOnly = true)?.let { selection ->
-                    viewModel.onIntent(
-                        ReadBookIntent.OpenAiTextRewrite(
-                            text = selection.bookText,
-                            chapterIndex = selection.chapterIndex,
-                            chapterPosition = selection.chapterPos,
-                        )
-                    )
-                } ?: activity.toastOnUi(R.string.ai_text_clean_selection_error)
-                return true
-            }
-
             R.id.menu_search_content -> {
                 viewModel.onIntent(ReadBookIntent.TextActionSearchContent(selectedText))
                 return true
@@ -2141,8 +2113,6 @@ class ReadBookController(
             items.add(ActionMenuItem(R.id.menu_dict, activity.getString(R.string.dict)))
             items.add(ActionMenuItem(R.id.menu_replace, activity.getString(R.string.replace)))
             items.add(ActionMenuItem(R.id.menu_edit, activity.getString(R.string.edit)))
-            items.add(ActionMenuItem(R.id.menu_ai_clean, activity.getString(R.string.ai_text_clean)))
-            items.add(ActionMenuItem(R.id.menu_ai_rewrite, activity.getString(R.string.ai_text_rewrite)))
             items.add(ActionMenuItem(R.id.menu_search_content, activity.getString(R.string.search_content)))
             items.add(
                 ActionMenuItem(
@@ -3288,8 +3258,6 @@ data class ActionMenuItem(
                 R.id.menu_dict -> "menu_dict"
                 R.id.menu_replace -> "menu_replace"
                 R.id.menu_edit -> "menu_edit"
-                R.id.menu_ai_clean -> "menu_ai_clean"
-                R.id.menu_ai_rewrite -> "menu_ai_rewrite"
                 R.id.menu_search_content -> "menu_search_content"
                 R.id.menu_insert_bgm_before -> "menu_insert_bgm_before"
                 R.id.menu_insert_bgm_after -> "menu_insert_bgm_after"
