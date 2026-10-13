@@ -45,10 +45,6 @@ class ReadBookDomainSplitBoundaryTest {
         val runtimeFiles = listOf(
             "model/ReadBook.kt",
             "ui/book/read/ReadBookController.kt",
-            "ui/book/readaloud/player/ReadAloudPlayerCoordinator.kt",
-            "service/BaseReadAloudService.kt",
-            "service/TTSReadAloudService.kt",
-            "service/HttpReadAloudService.kt",
         )
         runtimeFiles.forEach { path ->
             val source = mainSourceFile("io/legado/app/$path").readText()
@@ -304,14 +300,6 @@ class ReadBookDomainSplitBoundaryTest {
 
     private companion object {
         val DOMAINS = listOf(
-            // 多角色分配域：确认/创建/取消与收尾全在 delegate，VM 只剩三个意图分支转发。
-            // 标记读写与角色表访问全收口 CastAssignmentStore（架构护栏）。
-            DomainSplit(
-                name = "多角色分配",
-                delegateFile = "io/legado/app/ui/book/read/ReadAloudCastDelegate.kt",
-                stateFields = emptySet(),
-                stateTypes = listOf("CastAssignmentStore", "CastResult"),
-            ),
             DomainSplit(
                 name = "高亮规则",
                 delegateFile = "io/legado/app/ui/book/read/ReadHighlightRuleDelegate.kt",
@@ -388,18 +376,6 @@ class ReadBookDomainSplitBoundaryTest {
                     "ReminderType.DayNightReminder",
                     "importCurrentStyle",
                     "saveBackgroundImage",
-                ),
-            ),
-            // 朗读域无自持状态：20 来个朗读字段被四个 composable 直读，搬出去要改四处入参；
-            // 靠 stateTypes 守「设置写入与合成管线重启逻辑不回流 VM」
-            DomainSplit(
-                name = "朗读",
-                delegateFile = "io/legado/app/ui/book/read/ReadAloudDelegate.kt",
-                stateFields = emptySet(),
-                stateTypes = listOf(
-                    "readAloudSettingsRepository.update",
-                    "VoiceCatalogEntry",
-                    "refreshReadAloudClass",
                 ),
             ),
             // 按钮配置域无自持状态：按钮列表仍在 menuConfig 里，靠 stateTypes 守

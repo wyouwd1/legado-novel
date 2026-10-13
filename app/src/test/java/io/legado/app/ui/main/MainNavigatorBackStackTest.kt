@@ -124,4 +124,14 @@ class MainNavigatorBackStackTest {
 
         assertEquals(listOf(MainRouteHome, bookInfo, reader), backStack)
     }
+
+    @Test
+    fun `reader route still opens when another book is on top`() {
+        val backStack = mutableListOf<NavKey>(MainRouteHome, MainRouteReadBook(bookUrl = "A"))
+
+        MainNavigator.navigateToRoute(backStack, MainRouteReadBook(bookUrl = "B"))
+
+        // 换书不是叠一层：阅读页单例语义把栈收到书架 + 新书，返回直接回书架。
+        assertEquals(listOf(MainRouteHome, MainRouteReadBook(bookUrl = "B")), backStack)
+    }
 }

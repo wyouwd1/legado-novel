@@ -105,7 +105,7 @@
 
 | # | 步骤 | 认领 | 状态 | 出口 |
 |---|---|---|---|---|
-| W2-S0 | 改测试硬约束（`MainNavigatorReadAloudTest.kt:77`、`ReadBookDomainSplitBoundaryTest.kt:49-50,321`）+ 基线下调 | Surgeon-readaloud | ⬜ | 测试可编译 |
+| W2-S0 | 改测试硬约束（`MainNavigatorReadAloudTest.kt:77`、`ReadBookDomainSplitBoundaryTest.kt:49-50,321`）+ 基线下调 | Surgeon-readaloud（主控执行） | 🟢 | 实际约束点比侦察多 3 处：①删 `MainNavigatorReadAloudTest.kt`（唯一通用测试并入 `MainNavigatorBackStackTest`，消掉读 `BaseReadAloudService.kt` 源码的断言）；②`runtimeFiles` 去 4 个朗读文件；③DOMAINS 去【多角色分配】【朗读】两条。验证：测试编译 0 错 + 59 测试通过。**基线下调与 `hostOwnedState` 两条字段条目（`_readAloudProgress`/`closeReadBookKeepReadAloud`）必须等产线文件/字段删除**（架构门为双向棘轮，先删键会失败） |
 | W2-S1 | 摘引用：`ui/book/read/**` → `model/{ReadBook,CacheBookModel,ReadAloud*}.kt` → `ui/main/**` → `di/appModule.kt` | Integrator（串行） | ⬜ | 编译通过 |
 | W2-S2 | 剥共享核心：`feature/reader/**` 分页/绘制链路 + `CastMarkers` 收敛为纯文本标记 | Surgeon-reader | ⬜ | 编译 + 阅读行为不变 |
 | W2-S3 | 删叶节点：`help/{TTS,MediaHelp,exoplayer,readaloud}/**`、`ui/book/{readaloud,audio}/**`、4 个 service、`model/ReadAloud*`、`domain/model/readaloud/**`、`feature/readaloud/**`、dao/entity/repository/gateway | Surgeon-readaloud | ⬜ | 编译通过 |
