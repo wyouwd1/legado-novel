@@ -160,8 +160,6 @@ platform implementations (Android/JVM/iOS/...)
 .\gradlew.bat assembleAppRelease
 .\gradlew.bat assembleAppNoR8
 
-# Web 前端
-pnpm --dir modules/web build
 ```
 
 KMP 任务名在模块实际创建后才存在；不要假装运行尚未定义的 `commonTest`、目标编译或 API
