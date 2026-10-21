@@ -357,3 +357,13 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 | strings | 4 语言删除 931 个已裁撤域键（zh-HK/TW 各 443）；删除 `book_type_audio/image` |
 | PreferKey | 删除 Translation 段与 `aiRewritePresets` |
 | 验证 | `processAppDebugResources`、`compileAppDebugKotlin` 通过 |
+
+### 7.8 W2b/W2c · 阅读核心 cast/BGM 与朗读高亮残留（2026-10-21）
+
+| 项 | 结果 |
+|---|---|
+| W2b 提交 | `90d57490d`；18 文件，+77 / -1,282 |
+| 删除 | `ReaderCastOptions/Profile`、`RoleCast/BgmScene` 测量与页面类型、`CastCapsuleGeometry/Style`、Legacy 胶囊预算、`castRenderHash` |
+| CastMarkers | 收敛为纯文本注入/剥离/偏移工具；新增 `CastMarkersTextTest` 5 例 |
+| W2c | 删除 `ReaderPage.Text.readAloud`、`readAloudParagraphIndex` 与 Canvas `isReadAloud` 分支；保留文字强调色 `readAloud: Color` |
+| 验证 | `compileAppDebugKotlin`/`compileAppDebugUnitTestKotlin` 通过；`feature.reader.*` 测试通过；全量 `testAppDebugUnitTest` **1,210 / 0**；架构门通过；`assembleAppDebug` 通过 |

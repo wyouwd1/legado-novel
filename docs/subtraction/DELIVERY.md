@@ -30,10 +30,9 @@
 
 ## 4. 明确未完成 / 风险
 
-1. **W2b/W2c**：`ReaderElement.RoleCast/BgmScene`、`ReaderCastOptions`、`castRenderHash`、`CastMarkers` 等阅读核心死代码仍在（生产链路不可达，已侦察：`team/W2B-CORE-PLAN.md`）。不删除不影响行为，但不满足“代码零残留”的最终形态。
-2. **W5 剩余**：lint 全量复跑仍受 `lintAnalyzeAppDebug` 超时限制；`assembleAppNoR8` 在打包阶段因 Gradle daemon 内存崩溃（`mergeDexAppNoR8` 后 daemon disappeared），未取得 NoR8 APK。
-3. **未做真机手测**：阅读、换源、缓存、书源调试、备份恢复、升级安装均未在真机验证；Room 131→132 迁移仅经 schema/KSP 验证，未做设备升级安装。
-4. **兼容性**：旧 Nav3 保存栈中的朗读/音频 route 已删除，升级后首次恢复可能回主页；`BookSource.homepageModules` 字段保留读取但不展示；旧 `httpTTS.json`/RSS/首页模块备份文件忽略而不报错。
+1. **W5 剩余**：lint 全量复跑仍受 `lintAnalyzeAppDebug` 超时限制；`assembleAppNoR8` 在打包阶段因 Gradle daemon 内存崩溃（`mergeDexAppNoR8` 后 daemon disappeared），未取得 NoR8 APK。
+2. **未做真机手测**：阅读、换源、缓存、书源调试、备份恢复、升级安装均未在真机验证；Room 131→132 迁移仅经 schema/KSP 验证，未做设备升级安装。
+3. **兼容性**：旧 Nav3 保存栈中的朗读/音频 route 已删除，升级后首次恢复可能回主页；`BookSource.homepageModules` 字段保留读取但不展示；旧 `httpTTS.json`/RSS/首页模块备份文件忽略而不报错。
 
 ## 5. 复现命令
 
