@@ -17,6 +17,7 @@ import io.legado.app.model.cache.CacheDownloadRequest
 import io.legado.app.model.cache.CacheDownloadSource
 import io.legado.app.model.cache.CacheDownloadStateStore
 import io.legado.app.model.cache.ChapterSelection
+import io.legado.app.model.cache.sanitizedForCache
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -286,6 +287,8 @@ class CacheBookModel(
     }
 
     fun addRequest(request: CacheDownloadRequest) {
+        // 先在展开 Range 之前过滤非法选择：`(start..end).toSet()` 对 Int.MAX_VALUE 会直接 OOM。
+        val selection = request.selection.sanitizedForCache() ?: return
         val enqueueExplicit = request.source != CacheDownloadSource.ReadPreload
         // 先入 FIFO，再暴露可调度章节。若反过来，冷启动多书并行准入时会出现：
         // 已在 taskMap 且 waiting>0、尚未 ensure → processJob 当成非 FIFO 预下载并行。
@@ -295,14 +298,14 @@ class CacheBookModel(
         }
         synchronized(this) {
             isStopped = false
-            val selected = selectionIndices(request.selection)
+            val selected = selectionIndices(selection)
             // An explicit request resumes only its selected chapters. Reader preloads must not
             // override a user's pause for this book or the global download queue.
             if (isPaused && request.source != CacheDownloadSource.ReadPreload) {
                 releaseBookPauseKeepingOnly(selected)
                 isPaused = false
             }
-            when (val selection = request.selection) {
+            when (selection) {
                 is ChapterSelection.Range -> {
                     canceledDownloadSet.removeAll { it in selection.start..selection.end }
                     pausedChapterSet.removeAll { it in selection.start..selection.end }
@@ -316,9 +319,9 @@ class CacheBookModel(
                     pausedChapterSet.remove(selection.index)
                 }
             }
-            queue.enqueue(request)
+            queue.enqueue(request.copy(selection = selection))
             // 单章/少量章节提到队首，避免排在失败重试之后；大 Range 保持懒游标
-            when (val selection = request.selection) {
+            when (selection) {
                 is ChapterSelection.Single -> queue.prioritize(selection.index)
                 is ChapterSelection.Indices -> {
                     if (selection.values.size <= 16) {

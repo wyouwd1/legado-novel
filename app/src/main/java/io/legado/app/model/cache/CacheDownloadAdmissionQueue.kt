@@ -1,8 +1,11 @@
 package io.legado.app.model.cache
 
 class CacheDownloadAdmissionQueue(
-    private val maxActiveBooks: Int
+    maxActiveBooks: Int
 ) {
+
+    /** 0/负数会让 pollReady 永远无法准入任何书；按至少 1 本处理，保持下载服务可推进。 */
+    private val maxActiveBooks = maxActiveBooks.coerceAtLeast(1)
 
     private val requests = ArrayDeque<CacheDownloadRequest>()
 

@@ -18,12 +18,13 @@ class CacheDownloadStateStore {
         runningIndices: Set<Int>,
         pausedIndices: Set<Int> = emptySet(),
     ) {
+        val safeWaitingCount = waitingCount.coerceAtLeast(0)
         updateBook(bookUrl) { current ->
             current.copy(
-                waitingCount = waitingCount,
+                waitingCount = safeWaitingCount,
                 runningIndices = runningIndices,
                 pausedIndices = pausedIndices,
-                failureMessage = if (waitingCount > 0 || runningIndices.isNotEmpty() || pausedIndices.isNotEmpty()) {
+                failureMessage = if (safeWaitingCount > 0 || runningIndices.isNotEmpty() || pausedIndices.isNotEmpty()) {
                     null
                 } else {
                     current.failureMessage
@@ -33,12 +34,14 @@ class CacheDownloadStateStore {
     }
 
     fun markSuccess(bookUrl: String, chapterIndex: Int) {
-        updateBook(bookUrl) { current ->
+        updateExistingBook(bookUrl) { current ->
+            val firstSuccess = chapterIndex !in current.succeededIndices
             current.copy(
                 runningIndices = current.runningIndices - chapterIndex,
                 pausedIndices = current.pausedIndices - chapterIndex,
                 failedIndices = current.failedIndices - chapterIndex,
-                successCount = current.successCount + 1,
+                successCount = if (firstSuccess) current.successCount + 1 else current.successCount,
+                succeededIndices = current.succeededIndices + chapterIndex,
                 failureMessage = null,
                 chapterProgress = current.chapterProgress - chapterIndex,
             )
@@ -46,7 +49,7 @@ class CacheDownloadStateStore {
     }
 
     fun markFailed(bookUrl: String, chapterIndex: Int) {
-        updateBook(bookUrl) { current ->
+        updateExistingBook(bookUrl) { current ->
             current.copy(
                 runningIndices = current.runningIndices - chapterIndex,
                 pausedIndices = current.pausedIndices - chapterIndex,
@@ -61,13 +64,13 @@ class CacheDownloadStateStore {
         chapterIndex: Int,
         progress: CacheChapterProgress,
     ) {
-        updateBook(bookUrl) { current ->
+        updateExistingBook(bookUrl) { current ->
             current.copy(chapterProgress = current.chapterProgress + (chapterIndex to progress))
         }
     }
 
     fun clearChapterProgress(bookUrl: String, chapterIndex: Int) {
-        updateBook(bookUrl) { current ->
+        updateExistingBook(bookUrl) { current ->
             current.copy(chapterProgress = current.chapterProgress - chapterIndex)
         }
     }
@@ -85,7 +88,7 @@ class CacheDownloadStateStore {
     }
 
     fun clearFailure(bookUrl: String, chapterIndex: Int) {
-        updateBook(bookUrl) { current ->
+        updateExistingBook(bookUrl) { current ->
             current.copy(failedIndices = current.failedIndices - chapterIndex)
         }
     }
@@ -109,6 +112,7 @@ class CacheDownloadStateStore {
                         runningIndices = emptySet(),
                         successCount = 0,
                         chapterProgress = emptyMap(),
+                        succeededIndices = emptySet(),
                     )
                 }
                 .filterValues { bookState ->
@@ -134,6 +138,20 @@ class CacheDownloadStateStore {
         }
     }
 
+    /**
+     * 运行期回调（成功/失败/进度）只更新已被队列跟踪的书。
+     * removeBook 或 clearRuntimeState 之后的迟到回调不得把书重新塞回状态表。
+     */
+    private fun updateExistingBook(
+        bookUrl: String,
+        transform: (CacheBookDownloadState) -> CacheBookDownloadState,
+    ) {
+        _stateFlow.update { state ->
+            val current = state.books[bookUrl] ?: return@update state
+            state.copy(books = state.books + (bookUrl to transform(current))).recalculate()
+        }
+    }
+
     private fun CacheDownloadState.recalculate(): CacheDownloadState {
         var totalWaiting = 0
         var totalRunning = 0
@@ -151,7 +169,7 @@ class CacheDownloadStateStore {
         }
 
         return copy(
-            isRunning = totalWaiting > totalPaused || totalRunning > 0,
+            isRunning = totalWaiting > 0 || totalRunning > 0,
             totalWaiting = totalWaiting,
             totalRunning = totalRunning,
             totalPaused = totalPaused,

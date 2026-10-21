@@ -12,6 +12,28 @@ sealed interface ChapterSelection {
     data class Single(val index: Int) : ChapterSelection
 }
 
+/**
+ * 章节下标是目录中的 0-based 下标。超过该值的 Range 属于明显的调用方错误：
+ * 队列继续处理会在游标/计数时越过 Int.MAX_VALUE 回绕；模型层先展开 `(start..end).toSet()`
+ * 则可能在入队前直接 OOM。队列和模型共用这一个上限。
+ */
+internal const val MAX_CACHE_CHAPTER_INDEX = 1_000_000
+
+internal fun isSupportedCacheIndex(index: Int): Boolean = index in 0..MAX_CACHE_CHAPTER_INDEX
+
+/** 过滤非法章节选择；全部非法时返回 null，调用方应直接忽略该请求。 */
+internal fun ChapterSelection.sanitizedForCache(): ChapterSelection? = when (this) {
+    is ChapterSelection.Range ->
+        if (start in 0..MAX_CACHE_CHAPTER_INDEX && end in start..MAX_CACHE_CHAPTER_INDEX) this else null
+
+    is ChapterSelection.Indices -> {
+        val valid = values.filterTo(linkedSetOf(), ::isSupportedCacheIndex)
+        if (valid.isEmpty()) null else ChapterSelection.Indices(valid)
+    }
+
+    is ChapterSelection.Single -> if (isSupportedCacheIndex(index)) this else null
+}
+
 enum class CacheDownloadSource {
     Manual,
     Batch,
@@ -46,6 +68,8 @@ data class CacheBookDownloadState(
     val successCount: Int = 0,
     val failureMessage: String? = null,
     val chapterProgress: Map<Int, CacheChapterProgress> = emptyMap(),
+    /** 本次运行内已成功过的章节；重复完成回调不得重复累加 successCount。 */
+    val succeededIndices: Set<Int> = emptySet(),
 )
 
 enum class CacheChapterProgressPhase {

@@ -115,27 +115,31 @@ class CacheDownloadQueue {
     private val emittedIndices = IntRangeSet()
     private val removedIndices = IntRangeSet()
 
+    @Synchronized
     fun enqueue(request: CacheDownloadRequest) {
+        val selection = request.selection.sanitizedForCache() ?: return
         if (request.source != CacheDownloadSource.ReadPreload) {
             synchronized(explicitIndices) {
-                when (val selection = request.selection) {
+                when (selection) {
                     is ChapterSelection.Range -> explicitIndices.addRange(selection.start, selection.end)
                     is ChapterSelection.Indices -> selection.values.forEach(explicitIndices::add)
                     is ChapterSelection.Single -> explicitIndices.add(selection.index)
                 }
             }
         }
-        enqueue(request.selection)
+        enqueue(selection)
     }
 
+    @Synchronized
     fun enqueue(selection: ChapterSelection) {
-        when (selection) {
-            is ChapterSelection.Range -> addRange(selection.start, selection.end)
-            is ChapterSelection.Indices -> addIndices(selection.values)
-            is ChapterSelection.Single -> addIndex(selection.index)
+        when (val sanitized = selection.sanitizedForCache() ?: return) {
+            is ChapterSelection.Range -> addRange(sanitized.start, sanitized.end)
+            is ChapterSelection.Indices -> addIndices(sanitized.values)
+            is ChapterSelection.Single -> addIndex(sanitized.index)
         }
     }
 
+    @Synchronized
     fun next(bookUrl: String, runningIndices: Set<Int>): CacheDownloadCandidate? {
         while (indices.isNotEmpty()) {
             // 再次请求正在执行的章节必须等完成后复核，不能被调度器吞掉。
@@ -169,6 +173,7 @@ class CacheDownloadQueue {
         return null
     }
 
+    @Synchronized
     fun hasLaunchableChapter(runningIndices: Set<Int>): Boolean =
         indices.any { it !in runningIndices && !emittedIndices.contains(it) } ||
             ranges.any { cursor ->
@@ -177,12 +182,15 @@ class CacheDownloadQueue {
                 }
             }
 
+    @Synchronized
     fun removeChapter(index: Int): Boolean {
+        if (!isSupportedCacheIndex(index)) return false
         val removed = indices.remove(index) || isWaiting(index)
         removedIndices.add(index)
         return removed
     }
 
+    @Synchronized
     fun clear() {
         synchronized(explicitIndices) { explicitIndices.clear() }
         ranges.clear()
@@ -191,10 +199,12 @@ class CacheDownloadQueue {
         removedIndices.clear()
     }
 
+    @Synchronized
     fun snapshot(): CacheDownloadQueueSnapshot {
         return CacheDownloadQueueSnapshot(waitingCount = waitingCount())
     }
 
+    @Synchronized
     fun waitingCount(): Int {
         val indexSet = indices.filterNot { emittedIndices.contains(it) }.toHashSet()
         val rangeCount = if (ranges.size <= 1) {
@@ -236,6 +246,7 @@ class CacheDownloadQueue {
         return indexSet.size + rangeCount
     }
 
+    @Synchronized
     fun isWaiting(index: Int): Boolean {
         if (emittedIndices.contains(index)) return false
         // 显式 indices 优先：即使 range 上打了 remove 孔，仍视为等待
@@ -247,6 +258,7 @@ class CacheDownloadQueue {
     /**
      * 当前仍等待下载的章节（indices 在前，其次为 range 剩余），不消费队列。
      */
+    @Synchronized
     fun waitingIndices(): List<Int> {
         val result = linkedSetOf<Int>()
         indices.forEach { index ->
@@ -273,7 +285,9 @@ class CacheDownloadQueue {
     /**
      * 将章节提到队首（indices 优先于 range），供「点某一章优先下载」使用。
      */
+    @Synchronized
     fun prioritize(index: Int) {
+        if (!isSupportedCacheIndex(index) || !isWaiting(index)) return
         // 从 range 挖孔，避免与 indices 双重计数；显式 indices 不受 removed 影响
         if (isInRange(index)) {
             removedIndices.add(index)
