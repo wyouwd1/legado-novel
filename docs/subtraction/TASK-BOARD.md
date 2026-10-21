@@ -168,12 +168,12 @@ W2a 删除已落盘（**225 文件 `git rm` 已暂存**）+ 11 个接入点已�
 
 | # | 任务 | 认领 | 状态 | 证据 |
 |---|---|---|---|---|
-| W5-1 | 基线最终复核（每条与实际一致）+ 清理 lint 基线中 33 条「文件存在但问题已消失」的过时条目 | Verifier | ⬜ | 架构门输出 + lint 报告 |
+| W5-1 | 基线最终复核（每条与实际一致）+ 清理 lint 基线中 33 条「文件存在但问题已消失」的过时条目 | Verifier | 🟡 | 架构门通过；lint 全量仍卡 `lintAnalyzeAppDebug`，未清理基线 |
 | W5-6 | 清理 AI/知识库专用 strings（4 语言：`ai_*`、`book_characters`、`character_network`、`plot_events` 等） | Scribe | 🟢 | `7fb79c9d1`；4 语言删除 931 键 |
-| W5-2 | 文档同步：`README.md`、`AGENTS.md`、`docs/dev/feature-catalog.md`、`docs/index.md` | Scribe | 🟡 | 减法文档已同步；全仓 feature catalog 待 W2b 后一次更新 |
+| W5-2 | 文档同步：`README.md`、`AGENTS.md`、`docs/dev/feature-catalog.md`、`docs/index.md` | Scribe | 🟢 | 减法文档、AGENTS、feature-catalog 已同步；移除 RSS/TTS/朗读/漫画/AI 域 |
 | W5-3 | `assembleAppDebug` / `assembleAppRelease` / `assembleAppNoR8` + APK 体积对比 | Verifier | 🟡 | debug 60/59/66M；NoR8 打包阶段 Gradle daemon 内存崩溃 |
 | W5-4 | 真机手测清单 | Verifier + 用户 | ⬜ | `VERIFICATION.md` 手测表 |
-| W5-5 | 交付说明：改动范围、取舍、验证、未验证风险 | Orchestrator | ⬜ | 交付文档 |
+| W5-5 | 交付说明：改动范围、取舍、验证、未验证风险 | Orchestrator | 🟢 | `DELIVERY.md`；W1–W4 + W2b/W2c + W5 字符串 |
 
 ---
 
