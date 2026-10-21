@@ -52,7 +52,6 @@ internal val ReadBookTopBarOnlyActionIds = listOf(
     "download",
     "refresh",
     "change_source",
-    "audio_download",
     "source_custom_button",
     "toc_rule",
     "charset",
@@ -128,11 +127,6 @@ internal fun topBarActionButtonInfos(context: Context): List<ReadMenuButtonInfo>
         context.getString(R.string.change_origin),
     ),
     ReadMenuButtonInfo(
-        "audio_download",
-        Icons.Default.Download,
-        context.getString(R.string.read_aloud_audio_download_entry),
-    ),
-    ReadMenuButtonInfo(
         "source_custom_button",
         Icons.Default.Extension,
         context.getString(R.string.custom_button),
@@ -161,11 +155,6 @@ internal fun readMenuButtonInfos(context: Context): List<ReadMenuButtonInfo> = l
         "catalog",
         Icons.AutoMirrored.Filled.List,
         context.getString(R.string.chapter_list),
-    ),
-    ReadMenuButtonInfo(
-        "read_aloud",
-        Icons.Default.RecordVoiceOver,
-        context.getString(R.string.read_aloud),
     ),
     ReadMenuButtonInfo("setting", Icons.Default.Settings, context.getString(R.string.setting)),
     ReadMenuButtonInfo("addBookmark", Icons.Default.Bookmark, context.getString(R.string.bookmark)),
@@ -220,26 +209,6 @@ internal fun readMenuButtonInfos(context: Context): List<ReadMenuButtonInfo> = l
         context.getString(R.string.ai_text_rewrite),
     ),
     ReadMenuButtonInfo(
-        "multi_role_read",
-        Icons.Default.Groups,
-        context.getString(R.string.use_multi_speaker),
-    ),
-    ReadMenuButtonInfo(
-        "multi_role_cast",
-        Icons.Default.Face,
-        context.getString(R.string.multi_role_cast),
-    ),
-    ReadMenuButtonInfo(
-        "cast_table",
-        Icons.Default.TableRows,
-        context.getString(R.string.book_voice_casting),
-    ),
-    ReadMenuButtonInfo(
-        "ai_cast",
-        Icons.Default.SmartToy,
-        context.getString(R.string.ai_cast_roles),
-    ),
-    ReadMenuButtonInfo(
         "more_actions",
         Icons.Default.MoreVert,
         context.getString(R.string.more_actions),
@@ -288,9 +257,6 @@ internal fun buildTopBarActionDefs(
             longPressMenu = ReadMenuLongPressMenu.ChangeSource,
         ) {
             onIntent(ReadBookIntent.MenuChangeSource)
-        },
-        def("audio_download") {
-            onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.AudioDownload))
         },
         def(
             "source_custom_button",
@@ -351,20 +317,6 @@ internal fun buildReadMenuActionDefs(
         def("catalog") {
             onIntent(ReadBookIntent.OpenChapterList)
         },
-        def(
-            "read_aloud",
-            isActive = state.isReadAloudRunning,
-            onLongClick = {
-                onIntent(ReadBookIntent.OpenReadMenuRoute(ReadBookMenuRoute.ReadAloud))
-            },
-        ) {
-            if (state.isReadAloudRunning) {
-                onIntent(ReadBookIntent.ReadAloudAction)
-            } else {
-                onIntent(ReadBookIntent.ToggleReadAloud)
-                onIntent(ReadBookIntent.HideMenu)
-            }
-        },
         def("setting") {
             onIntent(ReadBookIntent.OpenReadMenuRoute(ReadBookMenuRoute.ReadStyle))
         },
@@ -406,18 +358,6 @@ internal fun buildReadMenuActionDefs(
         },
         def("refresh_current") {
             onIntent(ReadBookIntent.RefreshCurrentChapter)
-        },
-        def("multi_role_read", isActive = state.useMultiSpeaker) {
-            onIntent(ReadBookIntent.SetUseMultiSpeaker(!state.useMultiSpeaker))
-        },
-        def("multi_role_cast", isActive = state.multiRoleCast) {
-            onIntent(ReadBookIntent.SetMultiRoleCast(!state.multiRoleCast))
-        },
-        def("cast_table") {
-            onIntent(ReadBookIntent.OpenBookVoiceCasting)
-        },
-        def("ai_cast") {
-            onIntent(ReadBookIntent.OpenAiCastDialog)
         },
         def("more_actions") {
             onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.MoreActions))

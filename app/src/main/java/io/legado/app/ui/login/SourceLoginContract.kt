@@ -11,9 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class SourceLoginType {
     BookSource,
-    HttpTts,
     ReadingBook,
-    AudioBook,
 }
 
 enum class SourceLoginMode { Form, Web }

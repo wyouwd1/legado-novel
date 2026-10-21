@@ -184,7 +184,7 @@ internal fun MenuTitleBar(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 MenuTitleGlassButton(
-                    onClick = { onIntent(ReadBookIntent.CloseReadBook()) },
+                    onClick = { onIntent(ReadBookIntent.CloseReadBook) },
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back),
                     state = state,
@@ -827,11 +827,8 @@ private fun RowScope.TitleBarActionButtons(
         state.isLocalBook,
         state.isLocalTxt,
         state.bookSource,
-        state.isReadAloudRunning,
         state.isAutoPage,
         state.translationMode,
-        state.useMultiSpeaker,
-        state.multiRoleCast,
         eyeProtectionActive,
     ) {
         loadTitleBarActions(

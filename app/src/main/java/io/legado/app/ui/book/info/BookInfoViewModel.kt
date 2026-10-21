@@ -66,7 +66,6 @@ import io.legado.app.help.book.updateTo
 import io.legado.app.help.config.LocalConfig
 import io.legado.app.help.coroutine.Coroutine
 import io.legado.app.lib.webdav.ObjectNotFoundException
-import io.legado.app.model.AudioPlay
 import io.legado.app.model.BookCover
 import io.legado.app.model.ReadBook
 import io.legado.app.model.SourceCallBack
@@ -874,8 +873,6 @@ class BookInfoViewModel(
             book.save()
             if (ReadBook.isCurrentBook(book)) {
                 ReadBook.replaceCurrentBook(book)
-            } else if (AudioPlay.book?.isSameNameAuthor(book) == true) {
-                AudioPlay.book = book
             }
             book
         }.onSuccess {
@@ -941,8 +938,6 @@ class BookInfoViewModel(
     private fun applyBookOnShelf(book: Book) {
         if (ReadBook.isCurrentBook(book)) {
             ReadBook.replaceCurrentBook(book)
-        } else if (AudioPlay.book?.isSameNameAuthor(book) == true) {
-            AudioPlay.book = book
         }
         currentBook = book
         inBookshelf = true

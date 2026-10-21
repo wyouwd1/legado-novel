@@ -33,9 +33,6 @@ class SharedReceiverActivity : AppCompatActivity() {
                     dispose(it)
                 }
             }
-            intent.getStringExtra("action") == "readAloud" -> {
-                MediaButtonReceiver.readAloud(appCtx, false)
-            }
         }
     }
 

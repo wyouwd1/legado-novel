@@ -61,6 +61,5 @@ fun SourceLoginRoute(
 
 private fun SourceLoginType.toBookType(): Int = when (this) {
     SourceLoginType.ReadingBook -> BookType.text
-    SourceLoginType.AudioBook -> BookType.audio
     else -> 0
 }

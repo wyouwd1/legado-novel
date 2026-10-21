@@ -11,9 +11,7 @@ import io.legado.app.domain.gateway.DirectLinkSettingsGateway
 import io.legado.app.domain.gateway.DownloadCacheSettingsGateway
 import io.legado.app.domain.gateway.OtherConfigSystemGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
-import io.legado.app.domain.gateway.ReadAloudSettingsGateway
 import io.legado.app.domain.model.settings.OtherSettings
-import io.legado.app.domain.model.settings.ReadAloudSettings
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +23,6 @@ import kotlinx.coroutines.launch
 
 class OtherConfigViewModel(
     private val appLocaleGateway: AppLocaleGateway,
-    private val readAloudSettingsGateway: ReadAloudSettingsGateway,
     private val otherSettingsGateway: OtherSettingsGateway,
     private val downloadCacheSettingsGateway: DownloadCacheSettingsGateway,
     private val directLinkSettingsGateway: DirectLinkSettingsGateway,
@@ -38,12 +35,7 @@ class OtherConfigViewModel(
     private var nextMessageId = 0L
 
     private val _uiState = MutableStateFlow(
-        otherSettingsGateway.currentSettings.toUiState(initialState).copy(
-            mediaButtonOnExit = readAloudSettingsGateway.currentSettings.mediaButtonOnExit,
-            readAloudByMediaButton =
-                readAloudSettingsGateway.currentSettings.readAloudByMediaButton,
-            ignoreAudioFocus = readAloudSettingsGateway.currentSettings.ignoreAudioFocus,
-        )
+        otherSettingsGateway.currentSettings.toUiState(initialState)
     )
     val uiState = _uiState.asStateFlow()
 
@@ -60,17 +52,6 @@ class OtherConfigViewModel(
         viewModelScope.launch {
             otherSettingsGateway.settings.collect { settings ->
                 _uiState.update { settings.toUiState(it) }
-            }
-        }
-        viewModelScope.launch {
-            readAloudSettingsGateway.settings.collect { preferences ->
-                _uiState.update {
-                    it.copy(
-                        mediaButtonOnExit = preferences.mediaButtonOnExit,
-                        readAloudByMediaButton = preferences.readAloudByMediaButton,
-                        ignoreAudioFocus = preferences.ignoreAudioFocus,
-                    )
-                }
             }
         }
         loadDirectLinkConfiguration()
@@ -95,12 +76,6 @@ class OtherConfigViewModel(
                 updateOtherSetting { it.copy(antiAlias = intent.value) }
             is OtherConfigIntent.ReplaceEnableDefaultChanged ->
                 updateOtherSetting { it.copy(replaceEnableDefault = intent.value) }
-            is OtherConfigIntent.MediaButtonOnExitChanged ->
-                updateReadAloudSetting { it.copy(mediaButtonOnExit = intent.value) }
-            is OtherConfigIntent.ReadAloudByMediaButtonChanged ->
-                updateReadAloudSetting { it.copy(readAloudByMediaButton = intent.value) }
-            is OtherConfigIntent.IgnoreAudioFocusChanged ->
-                updateReadAloudSetting { it.copy(ignoreAudioFocus = intent.value) }
             is OtherConfigIntent.AutoClearExpiredChanged ->
                 updateOtherSetting { it.copy(autoClearExpired = intent.value) }
             is OtherConfigIntent.ShowAddToShelfAlertChanged ->
@@ -181,15 +156,6 @@ class OtherConfigViewModel(
                 .onFailure { error ->
                     showMessage(error.message ?: error.javaClass.simpleName)
                 }
-        }
-    }
-
-    private fun updateReadAloudSetting(
-        transform: (ReadAloudSettings) -> ReadAloudSettings,
-    ) {
-        viewModelScope.launch {
-            runCatching { readAloudSettingsGateway.update(transform) }
-                .onFailure { showMessage(it.localizedMessage ?: "设置失败") }
         }
     }
 

@@ -5,6 +5,7 @@ import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.feature.reader.core.cast.CastCapsuleGeometry
+import io.legado.app.feature.reader.core.cast.CastCapsuleStyle
 import io.legado.app.feature.reader.core.cast.CastMarkers
 import io.legado.app.feature.reader.core.source.ReaderChapterInlineSource
 import io.legado.app.feature.reader.core.layout.ReaderCastOptions
@@ -167,11 +168,11 @@ object LegacyReaderChapterPaginator {
         val titleStyle = paginationStyle.titleStyle
         // 多角色分配：胶囊几何随字号缩放；锚点跟踪器章级共享（与注入侧同规则）
         val castTracker = if (castOptions.enabled) CastMarkers.CastQuoteTracker() else null
-        // 头像位移会改胶囊宽度，量出来必须和画出来用的是同一份样式
-        val roleCapsuleStyle = io.legado.app.help.readaloud.cast.CastCapsuleStyleStore
-            .current(io.legado.app.help.readaloud.cast.CastCapsuleStyleStore.ROLE)
-        val placeholderCapsuleStyle = io.legado.app.help.readaloud.cast.CastCapsuleStyleStore
-            .current(io.legado.app.help.readaloud.cast.CastCapsuleStyleStore.PLACEHOLDER)
+        // 头像位移会改胶囊宽度，量出来必须和画出来用的是同一份样式。
+        // 胶囊样式配置（CastCapsuleStyleStore）随朗读/配音域移除（D4b），
+        // 改用默认样式：castOptions.enabled 恒为 false，该分支不再参与测量。
+        val roleCapsuleStyle = CastCapsuleStyle.Default
+        val placeholderCapsuleStyle = CastCapsuleStyle.Default
         val castLabelPaint = if (castOptions.enabled) android.graphics.Paint(bodyPaint).apply {
             textSize = bodyPaint.textSize * CastCapsuleGeometry.textScale
         } else null

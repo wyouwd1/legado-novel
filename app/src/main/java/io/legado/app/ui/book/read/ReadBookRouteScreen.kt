@@ -84,8 +84,6 @@ import io.legado.app.model.ReadBook
 import io.legado.app.model.SourceCallBack
 import io.legado.app.model.translation.TranslationChapterStatus
 import io.legado.app.ui.book.read.page.entities.PageDirection
-import io.legado.app.ui.book.read.sheet.CastSheetVisuals
-import io.legado.app.ui.book.read.sheet.LocalCastSheetVisuals
 import io.legado.app.ui.book.read.sheet.ReaderBookSheetRoute
 import io.legado.app.ui.book.read.sheet.ReaderBookSourceActions
 import io.legado.app.ui.book.read.sheet.TextSelectMenuConfigSheet
@@ -158,10 +156,6 @@ fun ReadBookRouteScreen(
     onOpenBookInfo: (name: String, author: String, bookUrl: String) -> Unit,
     onOpenToc: (bookUrl: String, initialPage: Int) -> Unit,
     onOpenReplaceRule: (bookUrl: String?, editor: ReplaceEditRoute?) -> Unit,
-    onOpenVoiceCasting: (bookUrl: String) -> Unit = {},
-    onOpenReadAloudSubPage: (ReadAloudSubPage) -> Unit = {},
-    onOpenTtsEnginesAndVoices: () -> Unit = {},
-    onOpenTtsCache: () -> Unit = {},
     onNavigateBack: () -> Boolean = { true },
 ) {
     // 归因定界：与末尾 compose.screen.end 成对。若首帧 `Compose:recompose` 里出现
@@ -224,7 +218,7 @@ fun ReadBookRouteScreen(
 
     val requestClose: () -> Unit = {
         if (!isDismissed) {
-            viewModel.onIntent(ReadBookIntent.CloseReadBook())
+            viewModel.onIntent(ReadBookIntent.CloseReadBook)
         }
     }
 
@@ -246,13 +240,6 @@ fun ReadBookRouteScreen(
         }
     }
 
-    LaunchedEffect(viewModel, controller, lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.readAloudProgress.collect { chapterStart ->
-                chapterStart?.let(controller::updateReadAloudProgress)
-            }
-        }
-    }
 
     // ── ActivityResult Launchers ──────────────────────────────────────
 
@@ -425,14 +412,6 @@ fun ReadBookRouteScreen(
                             is ReadBookEffect.OpenSearch -> {
                                 onOpenSearch(effect.word, effect.bookUrl, effect.autoFocus)
                             }
-                            is ReadBookEffect.OpenBookVoiceCasting -> {
-                                onOpenVoiceCasting(effect.bookUrl)
-                            }
-                            is ReadBookEffect.OpenReadAloudSubPage -> {
-                                onOpenReadAloudSubPage(effect.page)
-                            }
-                            ReadBookEffect.OpenTtsEnginesAndVoices -> onOpenTtsEnginesAndVoices()
-                            ReadBookEffect.OpenTtsCache -> onOpenTtsCache()
                             is ReadBookEffect.MenuSettingReplace -> {
                                 onOpenReplaceRule(ReadBook.book?.bookUrl, null)
                             }
@@ -489,12 +468,6 @@ fun ReadBookRouteScreen(
                             is ReadBookEffect.OpenTitleBarCustomIconPicker -> {
                                 pendingTitleBarCustomIconId = effect.id
                                 titleBarCustomIconPicker.launch("image/*")
-                            }
-                            is ReadBookEffect.OpenSystemTtsSettings -> {
-                                IntentHelp.openTTSSetting()
-                            }
-                            is ReadBookEffect.TtsCacheCleared -> {
-                                context.toastOnUi(effect.message)
                             }
                             is ReadBookEffect.OpenHighlightRuleImportPicker -> {
                                 importHighlightRulePicker.launch(
@@ -794,8 +767,7 @@ fun ReadBookRouteScreen(
                 noAnimationScrollPage = readPreferences.noAnimScrollPage,
                 externalPageTurns = controller.composePageTurns,
                 externalSelectionCancels = controller.composeSelectionCancels,
-                    externalSelections = controller.composeSelections,
-                    onVisibleBodyTextPositionProvider = controller::setComposeVisibleBodyTextPositionProvider,
+                externalSelections = controller.composeSelections,
                 )
                 ReaderPerfTrace.marker("compose.canvas.end")
             }
@@ -877,28 +849,19 @@ fun ReadBookRouteScreen(
                 TranslationThinkingCapsule()
             }
             if (featureOverlaysInitialized) {
-                // 正文内新做的悬浮窗（分配角色 / 分配表 / AI 分配 / 背景音乐 / 听书下载）用底栏
-                // 同一份模糊与玻璃数据源；消费方是 CastSheetCard 里的 LocalCastSheetVisuals。
-                CompositionLocalProvider(
-                    LocalCastSheetVisuals provides CastSheetVisuals(
-                        backdrop = menuBackdrop,
-                        hazeState = menuHazeState.takeIf { useMenuHazeSource },
-                    ),
-                ) {
-                    ReadBookOverlayRoute(
-                        viewModel = viewModel,
-                        state = state,
-                        preferences = readPreferences,
-                        onOpenTextSelectMenuConfig = {
-                            viewModel.onIntent(ReadBookIntent.DismissSheet)
-                            showSelectMenuConfigSheet = true
-                        },
-                        onPickBookmarkBadgeImage = { bookmarkBadgeImagePicker.launch("image/*") },
-                        onResetBookmarkBadge = {
-                            viewModel.onIntent(ReadBookIntent.ClearBookmarkBadgeImage)
-                        },
-                    )
-                }
+                ReadBookOverlayRoute(
+                    viewModel = viewModel,
+                    state = state,
+                    preferences = readPreferences,
+                    onOpenTextSelectMenuConfig = {
+                        viewModel.onIntent(ReadBookIntent.DismissSheet)
+                        showSelectMenuConfigSheet = true
+                    },
+                    onPickBookmarkBadgeImage = { bookmarkBadgeImagePicker.launch("image/*") },
+                    onResetBookmarkBadge = {
+                        viewModel.onIntent(ReadBookIntent.ClearBookmarkBadgeImage)
+                    },
+                )
             }
             val bookNavigationSheet = state.activeSheet as? ReadBookSheet.BookNavigation
             ReaderPerfTrace.marker("compose.sheet.begin")

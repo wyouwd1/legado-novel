@@ -40,7 +40,6 @@ import io.legado.app.feature.reader.core.navigation.ReaderChapterPaginationSnaps
 import io.legado.app.feature.reader.core.navigation.ReaderPageContext
 import io.legado.app.feature.reader.core.navigation.ReaderPageNavigator
 import io.legado.app.feature.reader.core.navigation.ReaderPartialPagePolicy
-import io.legado.app.feature.reader.core.readaloud.ReaderVisibleTextPosition
 import io.legado.app.feature.reader.core.selection.ReaderSearchMatcher
 import io.legado.app.feature.reader.core.selection.ReaderSearchRequest
 import io.legado.app.feature.reader.core.selection.ReaderSelection
@@ -57,15 +56,12 @@ import io.legado.app.feature.reader.legacy.failureReasonFor
 import io.legado.app.feature.reader.legacy.paginateLegacyReaderChapterSafely
 import io.legado.app.feature.reader.platform.ReaderAndroidPaginationStyle
 import io.legado.app.feature.reader.platform.ReaderPerfTrace
-import io.legado.app.help.TTS
 import io.legado.app.help.book.isOnLineTxt
 import io.legado.app.help.config.ReadBookConfig
-import io.legado.app.help.readaloud.cast.BgmSceneStore
 import io.legado.app.help.storage.Backup
 import io.legado.app.lib.dialogs.SelectItem
 import io.legado.app.model.CacheBook
 import io.legado.app.model.ImageProvider
-import io.legado.app.model.ReadAloud
 import io.legado.app.model.ReadBook
 import io.legado.app.model.ReadSessionState
 import io.legado.app.model.analyzeRule.AnalyzeRule
@@ -75,7 +71,6 @@ import io.legado.app.model.analyzeRule.AnalyzeUrl.Companion.paramPattern
 import io.legado.app.model.reader.ReaderChapterInput
 import io.legado.app.receiver.NetworkChangedListener
 import io.legado.app.receiver.TimeBatteryReceiver
-import io.legado.app.service.BaseReadAloudService
 import io.legado.app.ui.association.OpenUrlConfirmActivity
 import io.legado.app.ui.book.read.page.entities.PageDirection
 import io.legado.app.ui.login.SourceLoginJsExtensions
@@ -135,7 +130,6 @@ class ReadBookController(
     ReadBook.ReaderRenderCallback {
 
     private val readSettingsGateway get() = org.koin.core.context.GlobalContext.get().get<io.legado.app.domain.gateway.ReadSettingsGateway>()
-    private val aloudSettingsGateway get() = org.koin.core.context.GlobalContext.get().get<io.legado.app.domain.gateway.ReadAloudSettingsGateway>()
 
     internal val layoutController = ReaderLayoutCoordinator(
         updateLayoutSize = { _, _ -> },
@@ -320,11 +314,9 @@ class ReadBookController(
     var onStartContentLoadFinish: (() -> Unit)? = null
 
     // Phase 4: callbacks for Activity-dependent effects
-    var onToggleReadAloud: (() -> Unit)? = null
     var onToggleAutoPage: (() -> Unit)? = null
     var onStopAutoPage: (() -> Unit)? = null
 
-    private var tts: TTS? = null
     private val timeBatteryReceiver = TimeBatteryReceiver()
     private var timeBatteryReceiverRegistered = false
     private val networkChangedListener by lazy { NetworkChangedListener(activity) }
@@ -367,8 +359,6 @@ class ReadBookController(
     private var composeSelection: ReaderSelection? = null
     private var searchSelection: ReaderSelection? = null
     private var pendingSearchNavigation: ReadBookEffect.NavigateToSearchResult? = null
-    private var readAloudPosition: Pair<Int, Int>? = null
-    private var composeVisibleBodyTextPositionProvider: (() -> ReaderVisibleTextPosition?)? = null
     private var composeImageClickAt = 0L
     private var composeImageDoubleClick = false
     private var directReaderLayoutKey: String? = null
@@ -464,29 +454,6 @@ class ReadBookController(
     // justInitData moved to ViewModel (set on InitData intent)
 
     val isAutoPage: Boolean get() = viewModel.uiState.value.isAutoPage
-
-    private fun speak(text: String) {
-        if (tts == null) {
-            tts = TTS()
-        }
-        tts?.speak(text)
-    }
-
-    fun clearTts() {
-        ReadBook.unregisterRender(this)
-        readerChapterPaginationJobs.values.forEach { it.job.cancel() }
-        readerChapterPaginationJobs.clear()
-        readerImageLoads.values.forEach { it.cancel() }
-        readerImageLoads.clear()
-        readerImageCache.evictAll()
-        tts?.clearTts()
-        tts = null
-        dismissTextActionMenu()
-        popupAction.dismiss()
-        networkChangedListener.unRegister()
-        unregisterTimeBatteryReceiver()
-        restoreActivityWindowState()
-    }
 
     // Phase 5: Key handling / page turn
     var bottomDialogCount: Int = 0
@@ -592,18 +559,9 @@ class ReadBookController(
             }
             else -> false
         }
-        is ReaderElement.RoleCast -> {
-            // 多角色分配：点击胶囊打开分配弹层（确认/取消后重排当前章）
-            viewModel.onIntent(
-                ReadBookIntent.ShowSheet(ReadBookSheet.RoleCast(element.quoteOrdinal)),
-            )
-            true
-        }
+        is ReaderElement.RoleCast -> false
 
-        is ReaderElement.BgmScene -> {
-            viewModel.onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.BgmScene(element.paragraphIndex)))
-            true
-        }
+        is ReaderElement.BgmScene -> false
         is ReaderElement.Image -> handleComposeImageClick(element)
         is ReaderElement.Review -> { activity.toastOnUi("Button Pressed!"); true }
         is ReaderElement.Action -> { activity.toastOnUi("Button Pressed!"); true }
@@ -621,7 +579,6 @@ class ReadBookController(
     fun showComposeActionMenu() {
         val state = viewModel.uiState.value
         when {
-            BaseReadAloudService.isRun -> viewModel.onIntent(ReadBookIntent.ReadAloudAction)
             isAutoPage -> viewModel.onIntent(ReadBookIntent.OpenReadMenuRoute(ReadBookMenuRoute.AutoRead))
             state.isShowingSearchResult -> viewModel.onIntent(ReadBookIntent.ShowSearchMenu)
             else -> viewModel.onIntent(ReadBookIntent.ShowMenu)
@@ -636,10 +593,8 @@ class ReadBookController(
             ReaderTapAction.PREVIOUS_PAGE -> Unit
             ReaderTapAction.NEXT_CHAPTER -> viewModel.onIntent(ReadBookIntent.NextChapter)
             ReaderTapAction.PREVIOUS_CHAPTER -> viewModel.onIntent(ReadBookIntent.PrevChapter)
-            ReaderTapAction.READ_ALOUD_PREVIOUS_PARAGRAPH ->
-                viewModel.onIntent(ReadBookIntent.ReadAloudPrevParagraph)
-            ReaderTapAction.READ_ALOUD_NEXT_PARAGRAPH ->
-                viewModel.onIntent(ReadBookIntent.ReadAloudNextParagraph)
+            ReaderTapAction.READ_ALOUD_PREVIOUS_PARAGRAPH,
+            ReaderTapAction.READ_ALOUD_NEXT_PARAGRAPH -> Unit
             ReaderTapAction.ADD_BOOKMARK -> viewModel.onIntent(ReadBookIntent.AddBookmark)
             ReaderTapAction.OPEN_CONTENT_EDIT -> viewModel.onIntent(ReadBookIntent.OpenContentEdit)
             ReaderTapAction.TOGGLE_REPLACE -> viewModel.onIntent(ReadBookIntent.MenuEnableReplace)
@@ -658,11 +613,7 @@ class ReadBookController(
                     activity.longToastOnUi(activity.getString(R.string.sync_book_progress_success))
                 },
             )
-            ReaderTapAction.TOGGLE_READ_ALOUD_PAUSE -> if (BaseReadAloudService.isPlay()) {
-                ReadAloud.pause(activity)
-            } else {
-                ReadAloud.resume(activity)
-            }
+            ReaderTapAction.TOGGLE_READ_ALOUD_PAUSE -> Unit
         }
     }
 
@@ -850,10 +801,6 @@ class ReadBookController(
         val nextPage = preview(window.next)
         val nextPlusPage = preview(window.nextPlus)
         val selection = searchSelection
-        val aloudPosition = readAloudPosition
-        val aloudParagraphIndex = aloudPosition?.let { (chapterIndex, chapterPosition) ->
-            ReaderPageNavigator.bodyParagraphAt(directReaderPages, chapterIndex, chapterPosition)
-        }
         fun highlight(page: io.legado.app.feature.reader.core.model.ReaderPage?, pageIndex: Int) = page?.let { source ->
             val chapterPageCount = directReaderChapterPageCounts[source.id.chapterIndex] ?: 0
             val contentPadding = layoutController.viewport.value?.contentPadding ?: ReaderPadding()
@@ -873,18 +820,15 @@ class ReadBookController(
                     xor viewModel.pageBatteryPercent.toLong(),
             )
             val pageHasSearchSelection = selection?.chapterIndex == source.id.chapterIndex
-            val pageHasAloudParagraph = aloudPosition?.first == source.id.chapterIndex &&
-                aloudParagraphIndex != null
             decorated.copy(
-                // Search/read-aloud state must not clone every glyph in the visible window:
-                // scroll draw data is keyed by the immutable layout element list.  The Canvas
-                // resolves these compact dynamic ranges while drawing.
+                // Search state must not clone every glyph in the visible window: scroll draw
+                // data is keyed by the immutable layout element list. The Canvas resolves these
+                // compact dynamic ranges while drawing.
                 searchStart = selection?.anchor?.takeIf { pageHasSearchSelection },
                 searchEndInclusive = selection?.focus?.takeIf { pageHasSearchSelection },
                 searchIsTitle = selection?.anchorIsTitle == true,
-                readAloudParagraphIndex = aloudParagraphIndex.takeIf { pageHasAloudParagraph },
-                revision = decorated.revision xor (selection?.hashCode()?.toLong() ?: 0L) xor
-                        (aloudPosition?.hashCode()?.toLong() ?: 0L),
+                readAloudParagraphIndex = null,
+                revision = decorated.revision xor (selection?.hashCode()?.toLong() ?: 0L),
             )
         }
         val nextPlus = if (streamingChapter != null && nextPlusPage == null) {
@@ -1112,9 +1056,6 @@ class ReadBookController(
         // 旧 View 每次翻页的其余副作用（阅读时长 / 预下载 / 进度落库）必须在，否则崩溃回到
         // 上次切章位置、静读时长不计、邻章预取推迟。
         ReadBook.onComposeManualPageCommitted()
-        if (BaseReadAloudService.isRun && ReadBook.onComposeManualPageTurn()) {
-            readAloudPosition = page.id.chapterIndex to chapterPosition
-        }
     }
 
     fun seekComposeChapterPage(chapterPageIndex: Int): Boolean {
@@ -1564,10 +1505,6 @@ class ReadBookController(
                         contentPaddingBottomPx = padding.bottom,
                         paginationStyle = style,
                         highlightRules = highlightRules,
-                        castOptions = io.legado.app.help.readaloud.cast.CastRenderOptions.load(
-                            candidate.book.bookUrl,
-                            chapterIndex,
-                        ),
                         onPage = { page ->
                             // 归因用：只标记本章第一页。三个 marker 把"第一页成形 → 主线程接管
                             // → 发布到窗口"切开，用于分析端到端可读页时间的构成。
@@ -2008,16 +1945,6 @@ class ReadBookController(
 
     fun onMenuItemSelected(itemId: Int): Boolean {
         when (itemId) {
-            R.id.menu_aloud -> {
-                viewModel.onIntent(
-                    ReadBookIntent.TextActionAloud(
-                        selectedText,
-                        composeSelection?.bodyStart,
-                    )
-                )
-                return true
-            }
-
             R.id.menu_bookmark -> {
                 composeSelectionBookmark()?.let {
                     viewModel.onIntent(ReadBookIntent.TextActionBookmark(it))
@@ -2051,45 +1978,8 @@ class ReadBookController(
                 viewModel.onIntent(ReadBookIntent.TextActionDict(selectedText))
                 return true
             }
-
-            R.id.menu_insert_bgm_before -> return openBgmSceneAtSelection(before = true)
-
-            R.id.menu_insert_bgm_after -> return openBgmSceneAtSelection(before = false)
         }
         return false
-    }
-
-    /**
-     * 手动分配背景音乐场景：以选区所在的段落为锚，打开与点击 ♪ 胶囊**同一个**场景弹层
-     * （[ReadBookSheet.BgmScene]）——挑池、写库、重载本章都由那条路做，这里只负责定位。
-     *
-     * 「前」= 胶囊插在这一段上面，场景从这一段起生效；「后」= 插到下一段上面，
-     * 也就是这一场景到下一段才切换。起点含义与朗读侧一致：
-     * 见 [io.legado.app.help.readaloud.playback.ReadAloudBgmPlayer] 的 `ordinalAt` 匹配。
-     *
-     * 段序号来自 [io.legado.app.help.readaloud.cast.BgmSceneStore.positionsToOrdinals]，
-     * 与胶囊渲染、AI 分配同一套计数（空白段不编号、标题不算段）。
-     */
-    private fun openBgmSceneAtSelection(before: Boolean): Boolean {
-        val selection = composeSelection
-        // 选区含标题时 bodyStart 会被压成 0，落不到正确的段上，直接判不可用
-        val bodyStart = selection?.bodyStart?.takeIf { !selection.includesTitle }
-        val positions = ReadBook.readerChapterInputWindow.current?.source
-            ?.let { BgmSceneStore.positionsToOrdinals(it.semanticContent) }
-            .orEmpty()
-        var ordinal = -1
-        if (bodyStart != null) {
-            positions.forEach { (position, value) ->
-                if (position <= bodyStart) ordinal = value
-            }
-        }
-        val target = ordinal + if (before) 0 else 1
-        if (target !in 0..(positions.lastOrNull()?.second ?: -1)) {
-            activity.toastOnUi(R.string.bgm_scene_insert_error)
-            return false
-        }
-        viewModel.onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.BgmScene(target)))
-        return true
     }
 
     fun onMenuActionFinally() {
@@ -2107,25 +1997,12 @@ class ReadBookController(
             items.add(ActionMenuItem(R.id.menu_copy, activity.getString(android.R.string.copy)))
             items.add(ActionMenuItem(R.id.menu_share_str, activity.getString(R.string.share)))
             items.add(ActionMenuItem(R.id.menu_browser, activity.getString(R.string.browser)))
-            items.add(ActionMenuItem(R.id.menu_aloud, activity.getString(R.string.read_aloud)))
             items.add(ActionMenuItem(R.id.menu_bookmark, activity.getString(R.string.bookmark)))
             items.add(ActionMenuItem(R.id.menu_mark, activity.getString(R.string.menu_mark)))
             items.add(ActionMenuItem(R.id.menu_dict, activity.getString(R.string.dict)))
             items.add(ActionMenuItem(R.id.menu_replace, activity.getString(R.string.replace)))
             items.add(ActionMenuItem(R.id.menu_edit, activity.getString(R.string.edit)))
             items.add(ActionMenuItem(R.id.menu_search_content, activity.getString(R.string.search_content)))
-            items.add(
-                ActionMenuItem(
-                    R.id.menu_insert_bgm_before,
-                    activity.getString(R.string.insert_bgm_before),
-                )
-            )
-            items.add(
-                ActionMenuItem(
-                    R.id.menu_insert_bgm_after,
-                    activity.getString(R.string.insert_bgm_after),
-                )
-            )
 
             val thirdPartyItems = mutableListOf<ActionMenuItem>()
             runCatching {
@@ -2285,7 +2162,6 @@ class ReadBookController(
     override fun contentLoadFinish() {
         viewModel.markInitFinished()
         handler.post {
-            viewModel.readAloudProgress.value?.let(::updateReadAloudProgress)
             onStartContentLoadFinish?.invoke()
         }
     }
@@ -2428,11 +2304,6 @@ class ReadBookController(
 
             is ReadBookEffect.UpTextSelectAble -> Unit
 
-            is ReadBookEffect.UpAloudState -> {
-                readAloudPosition = null
-                directReaderPageIndex?.let(::publishDirectReaderWindow)
-            }
-
             is ReadBookEffect.RefreshBookContent -> {
                 ReadBook.clearTextChapter()
                 ReadBook.book?.let { viewModel.refreshContentDur(it) }
@@ -2453,15 +2324,8 @@ class ReadBookController(
             }
 
             // ── Phase 4: Activity-dependent effects ──
-            is ReadBookEffect.ToggleReadAloud -> onToggleReadAloud?.invoke() ?: toggleReadAloud()
             is ReadBookEffect.ToggleAutoPage -> onToggleAutoPage?.invoke() ?: toggleAutoPage()
             is ReadBookEffect.StopAutoPage -> onStopAutoPage?.invoke() ?: stopAutoPage()
-            is ReadBookEffect.TextActionAloudPosition -> {
-                ReadBook.updateReadingPosition(effect.chapterPosition)
-                ReadBook.readAloud(chapterPosition = effect.chapterPosition)
-            }
-
-            is ReadBookEffect.TextActionSpeak -> speak(effect.text)
             is ReadBookEffect.NavigateToSearchResult -> {
                 pendingSearchNavigation = effect
                 val result = effect.result
@@ -2538,14 +2402,8 @@ class ReadBookController(
             is ReadBookEffect.OpenReadStyleExport,
             is ReadBookEffect.OpenMenuCustomIconPicker,
             is ReadBookEffect.OpenTitleBarCustomIconPicker,
-            is ReadBookEffect.OpenSystemTtsSettings,
-            ReadBookEffect.OpenTtsEnginesAndVoices,
-            ReadBookEffect.OpenTtsCache,
-            is ReadBookEffect.OpenBookVoiceCasting,
-            is ReadBookEffect.OpenReadAloudSubPage,
             is ReadBookEffect.OpenHighlightRuleImportPicker,
             is ReadBookEffect.OpenHighlightRuleExportPicker,
-            is ReadBookEffect.TtsCacheCleared,
             is ReadBookEffect.ExportJson,
             // DB query + bookmark effects — handled by ViewModel, ignored here
             is ReadBookEffect.MenuChangeSource,
@@ -2559,59 +2417,9 @@ class ReadBookController(
         }
     }
 
-    fun updateReadAloudProgress(chapterStart: Int) {
-        if (!BaseReadAloudService.isPlay()) return
-        // 只更新朗读高亮锚点。可见页的移动由朗读服务驱动（moveToReadAloudPage →
-        // moveToNextPage → upContent）与用户导航负责；这里若再按朗读位置 locate
-        // 回迁可见页，进入阅读器时会把页面先拉回朗读所在的上一段（跨页段落的
-        // locate 落在段落起始页），随后 curPageChanged 的跟随重启又跳回当前页。
-        val anchor = BaseReadAloudService.currentChapterIndex to chapterStart
-        if (readAloudPosition == anchor) return
-        readAloudPosition = anchor
-        // 高亮在窗口发布时才计算绘制（directReaderWindow），锚点变化后必须重发布
-        directReaderPageIndex?.let(::publishDirectReaderWindow)
-    }
-
-    fun setComposeVisibleBodyTextPositionProvider(
-        provider: (() -> ReaderVisibleTextPosition?)?,
-    ) {
-        composeVisibleBodyTextPositionProvider = provider
-    }
-
-    private fun readAloudFromComposeVisibleStart(): Boolean {
-        val position = composeVisibleBodyTextPositionProvider?.invoke() ?: return false
-        // The Canvas window is normally kept on the logical current page. A crossing may
-        // briefly expose a neighbor before its chapter becomes the active ReadBook chapter;
-        // let the existing chapter-transition path handle that case rather than speaking
-        // with mismatched chapter coordinates.
-        if (position.chapterIndex != ReadBook.durChapterIndex) return false
-        ReadBook.updateReadingPosition(position.chapterPosition)
-        ReadBook.readAloud(chapterPosition = position.chapterPosition)
-        return true
-    }
-
     // ── Key handling ──
 
-    private fun toggleReadAloud() {
-        viewModel.onIntent(ReadBookIntent.StopAutoPage)
-        when {
-            !BaseReadAloudService.isRun -> {
-                ReadAloud.upReadAloudClass()
-                if (!readAloudFromComposeVisibleStart()) ReadBook.readAloud()
-            }
-
-            BaseReadAloudService.pause -> {
-                val restartFromVisibleStart = pageChanged && readAloudFromComposeVisibleStart()
-                pageChanged = false
-                if (!restartFromVisibleStart) ReadAloud.resume(activity)
-            }
-
-            else -> ReadAloud.pause(activity)
-        }
-    }
-
     private fun toggleAutoPage() {
-        ReadAloud.stop(activity)
         if (isAutoPage) {
             stopAutoPage()
         } else {
@@ -2719,9 +2527,6 @@ class ReadBookController(
 
     private fun volumeKeyPage(direction: PageDirection, longPress: Boolean): Boolean {
         if (!readSettingsGateway.currentSettings.volumeKeyPage) {
-            return false
-        }
-        if (!readSettingsGateway.currentSettings.volumeKeyPageOnPlay && BaseReadAloudService.isPlay()) {
             return false
         }
         handleKeyPage(direction, longPress)
@@ -3252,15 +3057,12 @@ data class ActionMenuItem(
                 R.id.menu_copy -> "menu_copy"
                 R.id.menu_share_str -> "menu_share_str"
                 R.id.menu_browser -> "menu_browser"
-                R.id.menu_aloud -> "menu_aloud"
                 R.id.menu_bookmark -> "menu_bookmark"
                 R.id.menu_mark -> "menu_mark"
                 R.id.menu_dict -> "menu_dict"
                 R.id.menu_replace -> "menu_replace"
                 R.id.menu_edit -> "menu_edit"
                 R.id.menu_search_content -> "menu_search_content"
-                R.id.menu_insert_bgm_before -> "menu_insert_bgm_before"
-                R.id.menu_insert_bgm_after -> "menu_insert_bgm_after"
                 else -> id.toString()
             }
         }

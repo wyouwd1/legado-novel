@@ -204,7 +204,6 @@
             android:enableOnBackInvokedCallback="true"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
-        <!-- 音频播放界面（nav3 路由，见 MainRouteAudioPlay） -->
         <!-- 授权界面 -->
         <activity
             android:name="io.legado.app.lib.permission.PermissionActivity"
@@ -421,15 +420,6 @@
             </intent-filter>
         </service>
         <service
-            android:name=".service.TTSReadAloudService"
-            android:foregroundServiceType="mediaPlayback" />
-        <service
-            android:name=".service.HttpReadAloudService"
-            android:foregroundServiceType="mediaPlayback" />
-        <service
-            android:name=".service.AudioPlayService"
-            android:foregroundServiceType="mediaPlayback" />
-        <service
             android:name=".service.DownloadService"
             android:foregroundServiceType="dataSync" />
 
@@ -442,14 +432,6 @@
                 android:name="autoStoreLocales"
                 android:value="true" />
         </service>
-
-        <receiver
-            android:name=".receiver.MediaButtonReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
 
         <provider
             android:name=".api.ReaderProvider"

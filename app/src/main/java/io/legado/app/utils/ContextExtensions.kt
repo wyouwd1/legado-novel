@@ -39,7 +39,6 @@ import io.legado.app.R
 import io.legado.app.constant.AppConst
 import io.legado.app.data.entities.Book
 import io.legado.app.help.IntentHelp
-import io.legado.app.help.book.isAudio
 import io.legado.app.help.book.isImage
 import io.legado.app.help.config.AppConfigStore
 import io.legado.app.help.config.SettingsWriter
@@ -69,14 +68,8 @@ fun Context.startActivityForBook(
     book: Book,
     configIntent: Intent.() -> Unit = {},
 ) {
-    val intent = when {
-        book.isAudio -> MainActivity.createAudioPlayIntent(this, book.bookUrl)
-        else -> MainActivity.createReadBookIntent(this, book.bookUrl)
-    }
+    val intent = MainActivity.createReadBookIntent(this, book.bookUrl)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (book.isAudio) {
-        intent.putExtra("bookUrl", book.bookUrl)
-    }
     intent.apply(configIntent)
     startActivity(intent)
 }
@@ -85,14 +78,8 @@ fun Context.startActivityForBook(
     book: BookShelfItem,
     configIntent: Intent.() -> Unit = {},
 ) {
-    val intent = when {
-        book.isAudio -> MainActivity.createAudioPlayIntent(this, book.bookUrl)
-        else -> MainActivity.createReadBookIntent(this, book.bookUrl)
-    }
+    val intent = MainActivity.createReadBookIntent(this, book.bookUrl)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (book.isAudio) {
-        intent.putExtra("bookUrl", book.bookUrl)
-    }
     intent.apply(configIntent)
     startActivity(intent)
 }

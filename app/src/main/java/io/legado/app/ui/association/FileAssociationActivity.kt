@@ -110,7 +110,6 @@ class FileAssociationActivity : BaseComposeActivity(transparent = true) {
                     finish()
                 }
                 "replaceRule" -> showDialogFragment(ImportReplaceRuleDialog(it.second, true))
-                "httpTts" -> showDialogFragment(ImportHttpTtsDialog(it.second, true))
                 "theme" -> showDialogFragment(ImportThemeDialog(it.second, true))
                 "txtRule" -> showDialogFragment(ImportTxtTocRuleDialog(it.second, true))
                 "dictRule" -> showDialogFragment(ImportDictRuleDialog(it.second, true))

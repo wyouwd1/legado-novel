@@ -28,10 +28,7 @@ import io.legado.app.help.book.isEpub
 import io.legado.app.help.book.isLocal
 import io.legado.app.help.book.isMobi
 import io.legado.app.help.bookmark.BookmarkExporter
-import io.legado.app.help.readaloud.cast.CastAssignmentStore
-import io.legado.app.help.readaloud.playback.ReadAloudAudioStore
 import io.legado.app.model.CacheBook
-import io.legado.app.model.ReadAloud
 import io.legado.app.model.ReadBook
 import io.legado.app.model.cache.CacheBookDownloadState
 import io.legado.app.model.localBook.EpubFile
@@ -87,8 +84,6 @@ data class TocItemUi(
     val isSelected: Boolean,
     val downloadState: DownloadState,
     val wordCount: String?,
-    val hasCastAssignment: Boolean,
-    val hasAudioDownload: Boolean
 ) : SelectableItem<Int>
 
 @Immutable
@@ -159,8 +154,6 @@ sealed interface TocIntent {
     data object ClearSelection : TocIntent
     data object SelectFromLast : TocIntent
     data object AddBookmarksForSelected : TocIntent
-    data object DeleteAssignmentsForSelected : TocIntent
-    data object DeleteAudioDownloadsForSelected : TocIntent
     data object ToggleUseReplace : TocIntent
     data object ToggleShowWordCount : TocIntent
     data object ReverseToc : TocIntent
@@ -178,8 +171,6 @@ data class TocDomainItem(
     val chapter: BookChapter,
     val displayTitle: String,
     val downloadState: DownloadState,
-    val hasCastAssignment: Boolean = false,
-    val hasAudioDownload: Boolean = false
 )
 
 private data class DownloadContext(
@@ -467,23 +458,6 @@ class TocViewModel(
     private var titleCacheJob: Job? = null
     private var lastTitleCacheKey: TitleCacheKey? = null
 
-    /** 目录行右侧那两枚状态图标的数据源：本章分配过角色 / 本章下载过听书音频。 */
-    private data class TocStatusFlags(
-        val assigned: Set<Int> = emptySet(),
-        val downloaded: Set<Int> = emptySet(),
-    )
-
-    private val statusFlagsFlow: Flow<TocStatusFlags> = bookUrlFlow
-        .filterNotNull()
-        .flatMapLatest { url ->
-            combine(
-                CastAssignmentStore.flowAssignedChapters(url),
-                ReadAloudAudioStore.flowDownloadedChapters(url),
-            ) { assigned, downloaded ->
-                TocStatusFlags(assigned.toSet(), downloaded)
-            }
-        }
-        .flowOn(Dispatchers.IO)
 
     override val rawDataFlow: Flow<List<TocDomainItem>> = combine(
         bookState.filterNotNull().map { it.bookUrl }.distinctUntilChanged()
@@ -491,8 +465,7 @@ class TocViewModel(
         downloadContextFlow,
         uiConfigFlow,
         titleReplaceState,
-        statusFlagsFlow
-    ) { originalChapters, downloadCtx, config, titleState, statusFlags ->
+    ) { originalChapters, downloadCtx, config, titleState ->
         val book = bookState.value ?: return@combine emptyList()
 
         val processedChapters = if (config.isReverse) {
@@ -526,8 +499,6 @@ class TocViewModel(
                     chapter = chapter,
                     displayTitle = titleState.titles[chapter.index] ?: baseTitle,
                     downloadState = DownloadState.LOCAL,
-                    hasCastAssignment = chapter.index in statusFlags.assigned,
-                    hasAudioDownload = chapter.index in statusFlags.downloaded,
                 )
             }
         }
@@ -552,8 +523,6 @@ class TocViewModel(
                 chapter,
                 titleState.titles[chapter.index] ?: baseTitle,
                 downloadState,
-                statusFlags.assigned.contains(chapter.index),
-                statusFlags.downloaded.contains(chapter.index),
             )
         }
 
@@ -624,8 +593,6 @@ class TocViewModel(
             isSelected = false,
             downloadState = downloadState,
             wordCount = wordCountText,
-            hasCastAssignment = hasCastAssignment,
-            hasAudioDownload = hasAudioDownload,
         )
     }
 
@@ -664,8 +631,6 @@ class TocViewModel(
             TocIntent.ClearSelection -> clearSelection()
             TocIntent.SelectFromLast -> selectFromLast()
             TocIntent.AddBookmarksForSelected -> addBookmarksForSelected()
-            TocIntent.DeleteAssignmentsForSelected -> deleteAssignmentsForSelected()
-            TocIntent.DeleteAudioDownloadsForSelected -> deleteAudioDownloadsForSelected()
             TocIntent.ToggleUseReplace -> toggleUseReplace()
             TocIntent.ToggleShowWordCount -> toggleShowWordCount()
             TocIntent.ReverseToc -> reverseToc()
@@ -884,45 +849,6 @@ class TocViewModel(
         }
     }
 
-    /** 删除所选章节的角色分配（目录长按菜单「删除分配」）。 */
-    fun deleteAssignmentsForSelected() = deleteSelectedChapters(
-        { book, index -> CastAssignmentStore.deleteChapter(book.bookUrl, index) },
-        R.string.cast_assignment_deleted_chapters,
-    )
-
-    /** 删除所选章节的听书音频（目录长按菜单「删除听书」）。 */
-    fun deleteAudioDownloadsForSelected() = deleteSelectedChapters(
-        { book, index -> ReadAloudAudioStore.delete(book.bookUrl, index) },
-        R.string.read_aloud_audio_download_deleted_chapters,
-    )
-
-    /**
-     * 对所选章节逐章执行 [action]，完成后提示删了几章、清掉选择。
-     *
-     * 正在朗读这本书时让朗读侧重排队列，否则用户听完这句还在用刚删掉的分配。
-     */
-    private fun deleteSelectedChapters(
-        action: suspend (Book, Int) -> Unit,
-        doneMessageRes: Int,
-    ) = viewModelScope.launch(Dispatchers.IO) {
-        val book = bookState.value ?: return@launch
-        val indices = uiState.value.items
-            .asSequence()
-            .filter { it.id in uiState.value.selectedIds }
-            .filterNot { it.isVolume }
-            .map { it.id }
-            .toList()
-        if (indices.isEmpty()) {
-            showMessage(R.string.select_chapters)
-            return@launch
-        }
-        indices.forEach { index -> action(book, index) }
-        if (ReadBook.book?.bookUrl == book.bookUrl) {
-            ReadAloud.refreshCastQueue(context)
-        }
-        showMessage(context.getString(doneMessageRes, indices.size))
-        withContext(Dispatchers.Main) { clearSelection() }
-    }
 
     fun downloadSelected() {
         val book = bookState.value ?: return

@@ -3,7 +3,6 @@ package io.legado.app.model
 import android.app.Application
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.Book
-import io.legado.app.service.BaseReadAloudService
 import io.legado.app.support.InMemoryAppDatabaseFixture
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -29,7 +28,6 @@ class ReadBookProgressUploadTest {
     fun setUp() {
         RuntimeEnvironment.getApplication().injectAsAppCtx()
         databaseFixture = InMemoryAppDatabaseFixture(RuntimeEnvironment.getApplication())
-        BaseReadAloudService.requestStop()
         uploadingBook = Book(
             bookUrl = "https://example.test/upload-progress",
             name = "Upload progress",

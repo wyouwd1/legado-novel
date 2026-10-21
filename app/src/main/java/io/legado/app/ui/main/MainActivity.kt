@@ -56,12 +56,8 @@ import io.legado.app.base.BaseComposeActivity
 import io.legado.app.constant.AppConst.appInfo
 import io.legado.app.constant.EventBus
 import io.legado.app.core.ui.player.playerUnderlaySemantics
-import io.legado.app.data.repository.ReadAloudSettingsRepository
 import io.legado.app.domain.gateway.BackupSettingsGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
-import io.legado.app.domain.gateway.PlaybackCapsuleGateway
-import io.legado.app.domain.model.PlaybackCapsuleSource
-import io.legado.app.domain.model.PlaybackCapsuleState
 import io.legado.app.help.LocalNetworkAccess
 import io.legado.app.help.book.BookHelp
 import io.legado.app.help.config.LocalConfig
@@ -70,22 +66,12 @@ import io.legado.app.help.http.LocalNetworkBlockedNotifier
 import io.legado.app.help.storage.Backup
 import io.legado.app.help.update.AppUpdateGitHub
 import io.legado.app.lib.dialogs.alert
-import io.legado.app.model.AudioPlay
 import io.legado.app.service.WebService
 import io.legado.app.ui.about.MarkdownSheet
 import io.legado.app.ui.about.UpdateDialog
-import io.legado.app.ui.book.audio.AudioPlayViewModel
-import io.legado.app.ui.book.read.ReadAloudControlsRequestBus
 import io.legado.app.ui.book.read.ReadBookInputHandler
 import io.legado.app.ui.book.read.ReadBookRouteHost
 import io.legado.app.ui.book.read.page.entities.PageDirection
-import io.legado.app.ui.book.readaloud.ReadAloudPlayerMorphHost
-import io.legado.app.ui.book.readaloud.ReadAloudPlayerOverlayBus
-import io.legado.app.ui.book.readaloud.ReadAloudShellHost
-import io.legado.app.ui.book.readaloud.morph.CapsuleAnchorKind
-import io.legado.app.ui.book.readaloud.morph.LocalReadAloudMorph
-import io.legado.app.ui.book.readaloud.morph.rememberReadAloudMorphState
-import io.legado.app.ui.book.readaloud.player.ReadAloudPlayerViewModel
 import io.legado.app.ui.main.bookshelf.BookshelfCoverPreloader
 import io.legado.app.ui.theme.LocalAppUiConfiguration
 import io.legado.app.ui.welcome.WelcomeActivity
@@ -114,15 +100,13 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * 主界面
  */
-open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
+open class MainActivity : BaseComposeActivity() {
 
     private data class RouteEvent(
         val route: NavKey,
         val resetToHome: Boolean,
     )
 
-    /** 当前激活的有声书播放器 ViewModel（由有声书路由在生命周期内设置/清理） */
-    internal var activeAudioPlayViewModel: AudioPlayViewModel? = null
 
     /** 全局 Compose 文本弹层状态，供遗留命令式路径展示 Markdown/文本内容 */
     private val textSheetFlow = MutableStateFlow<TextSheetData?>(null)
@@ -134,16 +118,12 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
     companion object {
         private const val KEY_RESTORE_READ_ROUTE = "restoreReadRoute"
         private const val KEY_RESTORE_READ_BOOK_URL = "restoreReadBookUrl"
-        private const val KEY_RESTORE_READ_ALOUD = "restoreReadAloud"
         private const val KEY_RESTORE_READ_IN_BOOKSHELF = "restoreReadInBookshelf"
         private const val KEY_RESTORE_READ_CHAPTER_CHANGED = "restoreReadChapterChanged"
         private val startupUpdateCheckGate = ProcessStartupUpdateCheckGate()
 
         @Volatile
         var hasActiveReadBookRoute: Boolean = false
-
-        @Volatile
-        var hasActiveAudioPlayRoute: Boolean = false
 
         @Volatile
         var hasActiveSourceLoginRoute: Boolean = false
@@ -198,28 +178,13 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         fun createReadBookIntent(
             context: Context,
             bookUrl: String? = null,
-            readAloud: Boolean = false,
             inBookshelf: Boolean = true,
             chapterChanged: Boolean = false,
         ): Intent = MainIntent.createReadBookIntent(
             context = context,
             bookUrl = bookUrl,
-            readAloud = readAloud,
             inBookshelf = inBookshelf,
             chapterChanged = chapterChanged,
-        )
-
-        fun createReadBookMediaControlIntent(context: Context): Intent =
-            MainIntent.createReadBookMediaControlIntent(context)
-
-        fun createAudioPlayIntent(
-            context: Context,
-            bookUrl: String? = null,
-            inBookshelf: Boolean = true,
-        ): Intent = MainIntent.createAudioPlayIntent(
-            context = context,
-            bookUrl = bookUrl,
-            inBookshelf = inBookshelf,
         )
 
         fun createSearchIntent(
@@ -288,7 +253,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
     private val bookshelfCoverPreloader by inject<BookshelfCoverPreloader>()
     private val otherSettingsGateway by inject<OtherSettingsGateway>()
     private val backupSettingsGateway by inject<BackupSettingsGateway>()
-    private val readAloudSettingsRepository by inject<ReadAloudSettingsRepository>()
     internal val navRouteTracker by inject<MainNavRouteTracker>()
     private val routeEvents = MutableSharedFlow<RouteEvent>(extraBufferCapacity = 1)
     /**
@@ -401,10 +365,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (intent.getBooleanExtra(MainIntent.EXTRA_OPEN_READ_ALOUD_PLAYER, false)) {
-            ReadAloudPlayerOverlayBus.request()
-            return
-        }
         if (intent.getBooleanExtra(MainIntent.EXTRA_WEB_SERVICE_LOCAL_NETWORK, false)) {
             startWebServiceWithLocalNetworkPermission()
             return
@@ -446,7 +406,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
             val resolved = MainNavigator.resolveStartRoute(intent)
             val hasExplicitStartRoute = intent?.hasExplicitStartRoute() == true
             when {
-                resolved is MainRouteAudioPlay -> arrayOf(MainRouteHome)
                 MainIntent.shouldOpenRouteWithHomeParent(intent) -> {
                     if (resolved == MainRouteHome) {
                         arrayOf(MainRouteHome)
@@ -473,105 +432,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         val backStack = rememberNavBackStack(*startRoutes)
         SideEffect { navRouteTracker.onBackStackChanged(backStack) }
 
-        // 悬浮胶囊是全局叠层：数据来自全局朗读会话与设置，不依赖阅读器是否在栈上。
-        val pageShellPlayerViewModel: ReadAloudPlayerViewModel =
-            org.koin.compose.koinInject()
-        val pageShellPlayerState by pageShellPlayerViewModel.uiState.collectAsStateWithLifecycle()
-        val pageShellAloudSettings by pageShellPlayerViewModel.readAloudSettings
-            .collectAsStateWithLifecycle()
-        val pageShellShowCapsule = pageShellAloudSettings.showReadAloudCapsule
-        val pageShellCapsuleScope = rememberCoroutineScope()
-
-        // 两种播放页共享同窗口形变容器，导航栈保留原页面作为动画背景。
-        val initialAudioRoute =
-            remember { MainNavigator.resolveStartRoute(intent) as? MainRouteAudioPlay }
-        var initialAudioHandled by rememberSaveable { mutableStateOf(false) }
-        var readAloudPlayerVisible by rememberSaveable {
-            mutableStateOf(
-                initialAudioRoute == null &&
-                        intent.getBooleanExtra(MainIntent.EXTRA_OPEN_READ_ALOUD_PLAYER, false)
-            )
-        }
-        var audioPlayerVisible by rememberSaveable { mutableStateOf(initialAudioRoute != null) }
-        var audioPlayerBookUrl by rememberSaveable { mutableStateOf(initialAudioRoute?.bookUrl.orEmpty()) }
-        var audioPlayerInBookshelf by rememberSaveable {
-            mutableStateOf(
-                initialAudioRoute?.inBookshelf ?: true
-            )
-        }
-        var playerSource by rememberSaveable {
-            mutableStateOf(if (initialAudioRoute != null) PlaybackCapsuleSource.AudioBook else PlaybackCapsuleSource.ReadAloud)
-        }
-        val readAloudMorph = rememberReadAloudMorphState()
-        val playbackGateway: PlaybackCapsuleGateway = org.koin.compose.koinInject()
-        val playbackCapsuleState by playbackGateway.state.collectAsStateWithLifecycle()
-        val playerOpenMutex = remember { Mutex() }
-        val morphPresent by remember { derivedStateOf { readAloudMorph.progress.value > 0f } }
-
-        suspend fun openPlayer(request: PlaybackCapsuleState) = playerOpenMutex.withLock {
-            val source = request.source ?: PlaybackCapsuleSource.ReadAloud
-            val switchingPlayer = playerSource != source ||
-                    (source == PlaybackCapsuleSource.AudioBook && audioPlayerBookUrl != request.bookUrl)
-            if (switchingPlayer && readAloudMorph.progress.value > 0f) {
-                // 先交回起点，防止两个宿主同时驱动同一进度，或飞行中途换封面。
-                readAloudPlayerVisible = false
-                audioPlayerVisible = false
-                // 当前宿主响应 visible=false 完成收起，避免两个协程争用 Animatable。
-                snapshotFlow { readAloudMorph.progress.value }.first { it <= 0f }
-            }
-            playerSource = source
-            if (source == PlaybackCapsuleSource.AudioBook) {
-                audioPlayerBookUrl = request.bookUrl
-                audioPlayerInBookshelf = request.inBookshelf
-                audioPlayerVisible = true
-                readAloudPlayerVisible = false
-            } else {
-                readAloudPlayerVisible = true
-                audioPlayerVisible = false
-            }
-        }
-        LaunchedEffect(Unit) {
-            if (!initialAudioHandled) {
-                initialAudioHandled = true
-                initialAudioRoute?.let { route ->
-                    openPlayer(
-                        PlaybackCapsuleState(
-                            source = PlaybackCapsuleSource.AudioBook,
-                            bookUrl = route.bookUrl.orEmpty(),
-                            inBookshelf = route.inBookshelf,
-                        )
-                    )
-                }
-            }
-            ReadAloudPlayerOverlayBus.events.collect { openPlayer(it) }
-        }
-        val playerVisible = readAloudPlayerVisible || audioPlayerVisible
-        val matchingCapsule = !playerVisible || capsuleMatchesPlayer(
-            playbackCapsuleState, playerSource, audioPlayerBookUrl,
-        )
-        SideEffect {
-            readAloudMorph.reportCapsuleCoverLinked(
-                playbackCapsuleState.source == null || matchingCapsule,
-            )
-            if (!pageShellShowCapsule) readAloudMorph.clearStartAnchors()
-        }
-        // 只用于首帧锚点布局，不把尚未启动的朗读伪装成正在播放。
-        val capsuleAnchorPreview = if (playerVisible && pageShellShowCapsule) {
-            PlaybackCapsuleState(source = playerSource)
-        } else null
-        // 两种胶囊互斥：主页悬浮底栏用圆形胶囊，其余页面用全局可拖拽胶囊。
-        val currentRoute = backStack.lastOrNull()
-        val onMainRoute = currentRoute is MainRouteHome
-        val useFloatingBottomBar = LocalAppUiConfiguration.current.appShell.useFloatingBottomBar
-        val useHomeCapsule = shouldUseHomePlaybackCapsule(
-            onMainRoute, configuration.appShell.showBottomView, useFloatingBottomBar, useRail,
-        )
-        SideEffect {
-            readAloudMorph.expectCapsuleAnchors(
-                if (!pageShellShowCapsule) null
-                else if (useHomeCapsule) CapsuleAnchorKind.HomeBar else CapsuleAnchorKind.Global,
-            )
-        }
 
         SideEffect {
             shouldApplyDefaultToRead = false
@@ -579,23 +439,12 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
 
         LaunchedEffect(backStack) {
             routeEvents.collect { event ->
-                val audioRoute = event.route as? MainRouteAudioPlay
-                if (audioRoute != null) {
-                    openPlayer(
-                        PlaybackCapsuleState(
-                            source = PlaybackCapsuleSource.AudioBook,
-                            bookUrl = audioRoute.bookUrl.orEmpty(),
-                            inBookshelf = audioRoute.inBookshelf,
-                        )
-                    )
-                } else {
                     MainNavigator.navigateToRoute(
                         backStack = backStack,
                         route = event.route,
                         tracker = navRouteTracker,
                         resetToHome = event.resetToHome,
                     )
-                }
             }
         }
 
@@ -615,7 +464,7 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
                     Box(
                         Modifier
                             .fillMaxSize()
-                            .playerUnderlaySemantics(playerVisible || morphPresent)
+                            .playerUnderlaySemantics(false)
                     ) {
                         NavDisplay(
                             backStack = backStack,
@@ -707,23 +556,11 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
                                 useRail = useRail,
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 onNavigateToRoute = { route ->
-                                    if (route is MainRouteAudioPlay) {
-                                        pageShellCapsuleScope.launch {
-                                            openPlayer(
-                                                PlaybackCapsuleState(
-                                                    source = PlaybackCapsuleSource.AudioBook,
-                                                    bookUrl = route.bookUrl.orEmpty(),
-                                                    inBookshelf = route.inBookshelf,
-                                                )
-                                            )
-                                        }
-                                    } else {
-                                        MainNavigator.navigateToRoute(
-                                            backStack,
-                                            route,
-                                            navRouteTracker
-                                        )
-                                    }
+                                    MainNavigator.navigateToRoute(
+                                        backStack,
+                                        route,
+                                        navRouteTracker
+                                    )
                                 },
                                 onNavigateBack = {
                                     MainNavigator.navigateBack(
@@ -732,108 +569,14 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
                                         navRouteTracker
                                     )
                                 },
-                                readAloudMorph = readAloudMorph.takeIf { useHomeCapsule },
-                                homePlaybackCapsuleEnabled = useHomeCapsule,
-                                capsuleAnchorPreview = capsuleAnchorPreview,
                             )
                         )
-                    }
-                    // 全局胶囊与导航容器并列，始终画在阅读等 Nav3 叠层之上。
-                    // 主页开启悬浮底栏时仍使用主页自己的圆形胶囊。
-                    CompositionLocalProvider(
-                        // 收起完成后不再用残留进度给可点击胶囊加透明层。
-                        LocalReadAloudMorph provides readAloudMorph.takeIf {
-                            !useHomeCapsule && (playerVisible || readAloudMorph.progress.isRunning)
-                        }
-                    ) {
-                        ReadAloudShellHost(
-                            showCapsule = pageShellShowCapsule,
-                            hidden = useHomeCapsule,
-                            anchorPreview = capsuleAnchorPreview,
-                            onCapsulePositionChanged = { x, y ->
-                                pageShellCapsuleScope.launch {
-                                    readAloudSettingsRepository.putCapsulePosition(x, y)
-                                }
-                            },
-                            onOpenPlayer = { ReadAloudPlayerOverlayBus.request(it) },
-                        )
-                    }
-                    // 听书播放页：同窗口 morph 面板，从胶囊位置长出来。
-                    if (playerSource == PlaybackCapsuleSource.ReadAloud) ReadAloudPlayerMorphHost(
-                        playerViewModel = pageShellPlayerViewModel,
-                        playerState = pageShellPlayerState,
-                        morph = readAloudMorph,
-                        visible = readAloudPlayerVisible,
-                        awaitCapsuleAnchor = pageShellShowCapsule,
-                        predictiveBackEnabled = configuration.appShell.predictiveBackEnabled,
-                        onDismiss = { readAloudPlayerVisible = false },
-                        onSwitchToClassic = { bookUrl ->
-                            // 栈顶是阅读界面：让它直接落在经典朗读控制页；
-                            // 否则没有可用的阅读界面，打开一个新的。
-                            if (isReaderOnTop(backStack)) {
-                                ReadAloudControlsRequestBus.request()
-                            } else {
-                                MainNavigator.navigateToRoute(
-                                    backStack,
-                                    MainRouteReadBook(bookUrl = bookUrl.ifBlank { null }),
-                                    navRouteTracker,
-                                )
-                            }
-                        },
-                        onOpenTtsEnginesAndVoices = { bookUrl ->
-                            MainNavigator.navigateToRoute(
-                                backStack,
-                                MainRouteCloudTtsEngines(bookUrl.takeIf(String::isNotBlank)),
-                                navRouteTracker,
-                            )
-                        },
-                        onOpenTtsCache = {
-                            MainNavigator.navigateToRoute(
-                                backStack,
-                                MainRouteTtsCache,
-                                navRouteTracker,
-                            )
-                        },
-                        onOpenBookVoiceCasting = { bookUrl ->
-                            if (bookUrl.isNotBlank()) {
-                                MainNavigator.navigateToRoute(
-                                    backStack,
-                                    MainRouteBookVoiceCasting(bookUrl),
-                                    navRouteTracker,
-                                )
-                            }
-                        },
-                        onOpenReadAloudSubPage = { page ->
-                            MainNavigator.navigateToRoute(
-                                backStack,
-                                page.toMainRoute(),
-                                navRouteTracker,
-                            )
-                        },
-                    )
-                    if (playerSource == PlaybackCapsuleSource.AudioBook &&
-                        (audioPlayerVisible || morphPresent)
-                    ) {
-                        key(audioPlayerBookUrl, audioPlayerInBookshelf) {
-                            AudioPlayerMorphOverlay(
-                                bookUrl = audioPlayerBookUrl,
-                                inBookshelf = audioPlayerInBookshelf,
-                                morph = readAloudMorph,
-                                visible = audioPlayerVisible,
-                                awaitCapsuleAnchor = pageShellShowCapsule,
-                                predictiveBackEnabled = configuration.appShell.predictiveBackEnabled,
-                                onDismiss = { audioPlayerVisible = false },
-                            )
-                        }
                     }
                 }
                 // 关闭预见性返回时由宿主在导航层之前接管返回：手势不跟手预览，
                 // 松手后走普通出栈，popTransitionSpec 的返回动画照常播放。
                 BackHandler(
-                    enabled = shouldHandleActivityBack(
-                        predictiveBackEnabled = configuration.appShell.predictiveBackEnabled,
-                        playerPresent = playerVisible || morphPresent,
-                    )
+                    enabled = !configuration.appShell.predictiveBackEnabled,
                 ) {
                     MainNavigator.navigateBack(this@MainActivity, backStack)
                 }
@@ -943,7 +686,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         if (readRoute != null) {
             outState.putBoolean(KEY_RESTORE_READ_ROUTE, true)
             outState.putString(KEY_RESTORE_READ_BOOK_URL, readRoute.bookUrl)
-            outState.putBoolean(KEY_RESTORE_READ_ALOUD, readRoute.readAloud)
             outState.putBoolean(KEY_RESTORE_READ_IN_BOOKSHELF, readRoute.inBookshelf)
             outState.putBoolean(KEY_RESTORE_READ_CHAPTER_CHANGED, readRoute.chapterChanged)
         }
@@ -953,7 +695,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         if (!getBoolean(KEY_RESTORE_READ_ROUTE, false)) return null
         return MainRouteReadBook(
             bookUrl = getString(KEY_RESTORE_READ_BOOK_URL),
-            readAloud = getBoolean(KEY_RESTORE_READ_ALOUD, false),
             inBookshelf = getBoolean(KEY_RESTORE_READ_IN_BOOKSHELF, true),
             chapterChanged = getBoolean(KEY_RESTORE_READ_CHAPTER_CHANGED, false),
         )
@@ -1026,20 +767,6 @@ open class MainActivity : BaseComposeActivity(), AudioPlay.CallBack {
         if (!BuildConfig.DEBUG) {
             Backup.autoBack(this)
         }
-    }
-
-    // ===== AudioPlay.CallBack（有声书播放器路由注册，转发加载状态给当前播放器）=====
-
-    override fun upLoading(loading: Boolean) {
-        activeAudioPlayViewModel?.onLoadingChanged(loading)
-    }
-
-    override fun upLyric(lyric: String?) {
-        activeAudioPlayViewModel?.onLyricChanged()
-    }
-
-    override fun upLyricP(position: Int) {
-        // 歌词暂不在界面展示
     }
 
 }

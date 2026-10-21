@@ -1,7 +1,6 @@
 package io.legado.app.ui.main
 
 import androidx.navigation3.runtime.NavKey
-import io.legado.app.ui.book.read.ReadAloudSubPage
 import io.legado.app.ui.login.SourceLoginType
 import io.legado.app.ui.replace.ReplaceEditRoute
 import kotlinx.serialization.Serializable
@@ -23,10 +22,6 @@ data class MainRouteReplaceEdit(val editor: ReplaceEditRoute) : MainRoute
 
 @Serializable
 data object MainRouteHome : MainRoute
-
-/** 只兼容旧版本保存的导航栈，新入口使用 Activity 播放浮层。 */
-@Serializable
-data object MainRouteReadAloudPlayer : MainRoute
 
 @Serializable
 data class MainRouteSourceLogin(
@@ -118,16 +113,8 @@ data object MainRouteBookCacheManage : MainRoute
 @Serializable
 data class MainRouteReadBook(
     val bookUrl: String? = null,
-    val readAloud: Boolean = false,
     val inBookshelf: Boolean = true,
     val chapterChanged: Boolean = false,
-    val sharedCoverKey: String? = null,
-) : MainRoute
-
-@Serializable
-data class MainRouteAudioPlay(
-    val bookUrl: String? = null,
-    val inBookshelf: Boolean = true,
     val sharedCoverKey: String? = null,
 ) : MainRoute
 
@@ -147,17 +134,6 @@ data class MainRouteBookInfo(
     val sharedCoverKey: String? = null,
     val openRequestId: Long = 0L,
 ) : MainRoute
-
-@Serializable
-data class MainRouteBookVoiceCasting(
-    val bookUrl: String,
-) : MainRoute
-
-@Serializable
-data class MainRouteCloudTtsEngines(val bookUrl: String? = null) : MainRoute
-
-@Serializable
-data object MainRouteTtsCache : MainRoute
 
 @Serializable
 data object MainRouteRuleSub : MainRoute
@@ -180,43 +156,8 @@ data class MainRouteSearchContent(
 @Serializable
 data object MainRouteHighlightTagRule : MainRoute
 
-/** 朗读设置 hub（设置 → 朗读设置）：变声器 / 引擎 / 识别 / 正则角色。 */
-@Serializable
-data object MainRouteMultiRoleRule : MainRoute
-
-/** 角色声音池：池与池内音色管理。 */
-@Serializable
-data object MainRouteVoicePool : MainRoute
-
-/** 背景音乐池：导入的配乐文件管理，朗读时可作背景音。 */
-@Serializable
-data object MainRouteBgmPool : MainRoute
-
-/** 多角色识别：标记包裹符号与声音池分隔符号配置。 */
-@Serializable
-data object MainRouteMultiRoleRecognition : MainRoute
-
-/** 变声器：音高/混响预设管理，角色配音时可选。 */
-@Serializable
-data object MainRouteVoiceEffect : MainRoute
-
-/** 朗读胶囊设置：三类胶囊的圆角、背景与头像形状位置。 */
-@Serializable
-data object MainRouteCastCapsuleStyle : MainRoute
-
-/** 正则角色管理：命中正文文字换音色 / 不念改放音效。 */
-@Serializable
-data object MainRouteRegexCastRule : MainRoute
-
 @Serializable
 data object MainRouteAbout : MainRoute
-
-/** 朗读设置卡片里的子页跳转：把 [ReadAloudSubPage] 映射到对应整屏路由。 */
-fun ReadAloudSubPage.toMainRoute(): MainRoute = when (this) {
-    ReadAloudSubPage.VoicePool -> MainRouteVoicePool
-    ReadAloudSubPage.BgmPool -> MainRouteBgmPool
-    ReadAloudSubPage.CapsuleStyle -> MainRouteCastCapsuleStyle
-}
 
 object MainRouteConst {
     const val ROUTE_MAIN = "main"
@@ -246,7 +187,6 @@ object MainRouteConst {
     const val ROUTE_CACHE = "cache"
     const val ROUTE_BOOK_CACHE_MANAGE = "book/cache/manage"
     const val ROUTE_READ_BOOK = "book/read"
-    const val ROUTE_AUDIO_PLAY = "book/read/audio"
     const val ROUTE_SEARCH = "search"
     const val ROUTE_SEARCH_CONTENT = "book/searchContent"
     const val ROUTE_BOOK_INFO = "book/info"
@@ -262,5 +202,4 @@ object MainRouteConst {
     const val ROUTE_READ_RECORD = "read_record"
     const val ROUTE_READ_RECORD_OVERVIEW = "read_record_overview"
     const val ROUTE_ABOUT = "about"
-    const val ROUTE_TTS_CACHE = "tts_cache"
 }

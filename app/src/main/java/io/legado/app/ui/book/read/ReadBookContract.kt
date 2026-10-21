@@ -13,12 +13,8 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.Bookmark
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.ReplaceRule
-import io.legado.app.data.repository.ReadAloudSettingsRepository
 import io.legado.app.domain.model.AiReasoningLevel
 import io.legado.app.domain.model.TextProcessStyle
-import io.legado.app.domain.model.readaloud.SpeechRoleType
-import io.legado.app.domain.model.settings.ReadAloudContentSplitMode
-import io.legado.app.domain.model.settings.ReadAloudTimerMode
 import io.legado.app.domain.model.settings.ReadStyleItem
 import io.legado.app.domain.usecase.BookmarkTargetVerdict
 import io.legado.app.model.translation.TranslationChapterStatus
@@ -61,7 +57,6 @@ data class ReadBookMenuState(
 sealed interface ReadBookMenuRoute {
     data object Main : ReadBookMenuRoute
     data object ReadStyle : ReadBookMenuRoute
-    data object ReadAloud : ReadBookMenuRoute
     data object AutoRead : ReadBookMenuRoute
     data object TypographyConfig : ReadBookMenuRoute
     data object InformationConfig : ReadBookMenuRoute
@@ -243,18 +238,6 @@ data class ReadBookUiState(
     val searchContentQuery: String = "",
     val searchResultList: ImmutableList<SearchResult> = persistentListOf(),
     val searchResultIndex: Int = 0,
-    // Read aloud / auto page
-    val isReadAloudRunning: Boolean = false,
-    val isReadAloudPaused: Boolean = false,
-    /** 朗读位置是否跟随当前显示页；手动翻页/跳章后为 false（显示"回到朗读位置"悬浮条）。 */
-    val readAloudFollow: Boolean = true,
-    /** 朗读位置脱离当前页时的悬浮提示开关；关闭时手动翻页朗读跟随新页面。 */
-    val readAloudDetachReminderEnabled: Boolean = false,
-    val readAloudEngineName: String = "",
-    val readAloudCharacterName: String = "",
-    val readAloudRoleType: SpeechRoleType = SpeechRoleType.Narrator,
-    val readAloudChapterPosition: Int = 0,
-    val readAloudChapterLength: Int = 0,
     val isAutoPage: Boolean = false,
     // Replace rules
     val replaceRuleEnabled: Boolean = false,
@@ -283,54 +266,6 @@ data class ReadBookUiState(
     val isReadingProgressSyncConfigured: Boolean = false,
     // Content edit
     // 正文编辑域状态见 ContentEditUiState —— 由 ReadContentEditDelegate 独立持有
-    val preDownloadNum: Int = 10,
-    val preSynthesisConcurrency: Int = 3,
-    val audioCacheCleanTime: Int = 10,
-    // Read aloud config
-    val readAloudIgnoreAudioFocus: Boolean = false,
-    val readAloudPauseOnPhoneCall: Boolean = false,
-    val readAloudWakeLock: Boolean = false,
-    val readAloudKeepOnExit: Boolean = false,
-    val showReadAloudCapsule: Boolean = true,
-    val capsuleAutoCollapse: Boolean = true,
-    val readAloudCapsuleOffsetX: Float = 0f,
-    val readAloudCapsuleOffsetY: Float = 0f,
-    val readAloudMediaButtonPerNext: Boolean = false,
-    val readAloudByPage: Boolean = false,
-    /** 内容划分方式（[ReadAloudContentSplitMode.storageValue]）。 */
-    val readAloudContentSplitMode: String = ReadAloudContentSplitMode.Default.storageValue,
-    /** 「按符号」划分方式选中的标点，空集合表示使用默认句末标点。 */
-    val readAloudContentSplitSymbols: ImmutableSet<String> = persistentSetOf(),
-    val readAloudSystemMediaCompat: Boolean = true,
-    val readAloudAndroidMediaControl: Boolean = false,
-    val readAloudStreamAudio: Boolean = false,
-    val readAloudTtsFollowSys: Boolean = false,
-    val readAloudTtsSpeechRate: Int = 10,
-    val readAloudTtsTimer: Int = 0,
-    /** 分钟定时到点后读完本章再停；只对分钟模式有意义。 */
-    val readAloudFinishCurrentChapterAfterTimer: Boolean = false,
-    /** 定时模式：分钟 / 章节（[ReadAloudTimerMode.storageValue]）。 */
-    val readAloudTimerMode: String = ReadAloudTimerMode.Minute.storageValue,
-    /** 章节定时剩余章数；0 表示未开启。 */
-    val readAloudTimerChapters: Int = 0,
-    val speechAnalysisMode: String = "rule",
-    val speechAnalysisReasoningLevel: String = AiReasoningLevel.OFF.storageValue,
-    val useMultiSpeaker: Boolean = true,
-    /** 多角色分配开关（胶囊渲染 + 点击分配），与多角色朗读独立。 */
-    val multiRoleCast: Boolean = false,
-    /** 背景音乐分配开关（正文段首配乐胶囊 + 朗读时的独立配乐轨）。 */
-    val bgmAssign: Boolean = false,
-    /** 背景音乐总音量（0f–1f），与曲目自身音量、段内音量相乘。 */
-    val bgmVolume: Float = 1f,
-    val defaultReadAloudInterface: String = ReadAloudSettingsRepository.DEFAULT_INTERFACE_CLASSIC,
-    val readAloudParagraphInterval: Int = 0,
-    /**
-     * 朗读设置卡片当前停在哪个 tab（0 常规 / 1 引擎与音色 / 2 角色与配乐）。
-     *
-     * 存在这里而不是卡片里：卡片是窗口级浮层，压进整屏页（引擎与音色 / 角色与配乐里
-     * 那几个跳转项）时它会被拆掉，`rememberPagerState` 的初值回到 0，回来就落在常规 tab。
-     */
-    val readAloudConfigTab: Int = 0,
     // Style config (reactive state for ReadBookConfig)
     val styleConfig: ReadBookStyleConfig = ReadBookStyleConfig(),
     val sheetConfig: ReadSheetConfigUiState = ReadSheetConfigUiState(),
@@ -342,9 +277,6 @@ data class ReadBookUiState(
     val menuVisible: Boolean
         get() = menuState.visible
 
-    /** 朗读设置卡片是否打开；经典控制面板与听书播放界面共用同一份设置内容。 */
-    val isReadAloudConfigOpen: Boolean
-        get() = activeSheet is ReadBookSheet.ReadAloudConfig
 }
 
 /** 护眼模式设置，来源是 ThemeSettings，与外观设置共用同一份值。 */
@@ -490,23 +422,6 @@ data class ReadBookInitRequest(
     val chapterPos: Int = -1,
 )
 
-/**
- * 朗读设置卡片里可跳转的整屏子页。
- *
- * 这些都是全局设置、不需要书籍上下文，所以共用一条跳转通道（[ReadBookIntent.OpenReadAloudSubPage]）：
- * 阅读界面走 `ReadBookEffect`，听书播放页走 `ReadAloudPlayerConfigHostAction`，两边映射到同一批路由。
- */
-enum class ReadAloudSubPage {
-    /** 角色声音池。 */
-    VoicePool,
-
-    /** 背景音乐池。 */
-    BgmPool,
-
-    /** 朗读胶囊外观。 */
-    CapsuleStyle,
-}
-
 sealed interface ReadBookIntent {
     // Initialization
     data class InitData(val request: ReadBookInitRequest) : ReadBookIntent
@@ -544,9 +459,6 @@ sealed interface ReadBookIntent {
     data class NavigateToSearchResult(val result: SearchResult, val index: Int) : ReadBookIntent
     data object RestoreLastBookProgress : ReadBookIntent
     data object KeepCurrentBookProgress : ReadBookIntent
-
-    // Read aloud
-    data object ToggleReadAloud : ReadBookIntent
 
     // Auto page
     data object ToggleAutoPage : ReadBookIntent
@@ -762,10 +674,6 @@ sealed interface ReadBookIntent {
 
     // Default font picker (needs Activity for AlertDialog)
     // Text action menu (moved from Activity)
-    data class TextActionAloud(
-        val text: String,
-        val chapterPosition: Int? = null,
-    ) : ReadBookIntent
     data class TextActionBookmark(val bookmark: Bookmark) : ReadBookIntent
     data class OpenMarking(val selection: Bookmark) : ReadBookIntent
 
@@ -797,196 +705,9 @@ sealed interface ReadBookIntent {
     data class SetOrientation(val value: String) : ReadBookIntent
     data class TextSelectAbleChanged(val enabled: Boolean) : ReadBookIntent
 
-    // Media / TTS
-    data class MediaButtonPressed(val play: Boolean) : ReadBookIntent
-    data class TtsProgress(val chapterStart: Int) : ReadBookIntent
-
-    // Dialog callback bridge
-    data object ReadAloudAction : ReadBookIntent
     data object ConfirmAddCurrentBookToBookshelf : ReadBookIntent
     data object ExitWithoutAddingCurrentBookToBookshelf : ReadBookIntent
 
-    // Read aloud config (needs Activity for DialogFragment)
-    data object ShowReadAloudConfig : ReadBookIntent
-    data object OpenPreDownloadNumPicker : ReadBookIntent
-    data object OpenPreSynthesisConcurrencyPicker : ReadBookIntent
-    data object OpenParagraphIntervalPicker : ReadBookIntent
-    data object OpenCacheCleanTimePicker : ReadBookIntent
-    data class ApplyPreDownloadNum(val value: Int) : ReadBookIntent
-    data class ApplyPreSynthesisConcurrency(val value: Int) : ReadBookIntent
-    data class ApplyAudioCacheCleanTime(val value: Int) : ReadBookIntent
-    data class ApplyParagraphInterval(val value: Int) : ReadBookIntent
-    data class SetReadAloudIgnoreAudioFocus(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudPauseOnPhoneCall(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudWakeLock(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudKeepOnExit(val value: Boolean) : ReadBookIntent
-    data class SetShowReadAloudCapsule(val value: Boolean) : ReadBookIntent
-    data class SetCapsuleAutoCollapse(val value: Boolean) : ReadBookIntent
-    data object ResetReadAloudCapsulePosition : ReadBookIntent
-    data class SetReadAloudCapsulePosition(val x: Float, val y: Float) : ReadBookIntent
-    data class SetReadAloudMediaButtonPerNext(val value: Boolean) : ReadBookIntent
-
-    /**
-     * 内容划分方式与配套标点集合，取值是
-     * [io.legado.app.domain.model.readaloud.ReadAloudContentSplitSetting.encode] 的编码。
-     */
-    data class SetReadAloudContentSplitMode(val value: String) : ReadBookIntent
-    data class SetReadAloudSystemMediaCompat(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudAndroidMediaControl(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudStreamAudio(val value: Boolean) : ReadBookIntent
-    data object ReadAloudPrevParagraph : ReadBookIntent
-    data object ReadAloudTogglePause : ReadBookIntent
-    data object ReadAloudStop : ReadBookIntent
-    data object ReadAloudNextParagraph : ReadBookIntent
-    data object ReadAloudPrevChapter : ReadBookIntent
-    data object ReadAloudNextChapter : ReadBookIntent
-    /** 页面脱离朗读位置后，跳回朗读所在位置并恢复跟随。 */
-    data object BackToSpeakingPosition : ReadBookIntent
-    /** 页面脱离朗读位置后，从当前显示页重新开始朗读。 */
-    data object ReadAloudFromHere : ReadBookIntent
-    data class SetReadAloudTtsTimer(val value: Int) : ReadBookIntent
-
-    /** [value] 是 [ReadAloudTimerMode.storageValue]。 */
-    data class SetReadAloudTimerMode(val value: String) : ReadBookIntent
-    data class SetReadAloudTimerChapters(val value: Int) : ReadBookIntent
-
-    /** 分钟定时到点后是否读完本章再停。 */
-    data class SetFinishCurrentChapterAfterTimer(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudTtsFollowSys(val value: Boolean) : ReadBookIntent
-    data class SetReadAloudTtsSpeechRate(val value: Int) : ReadBookIntent
-    data class SetSpeechAnalysisMode(val value: String) : ReadBookIntent
-    data class SetSpeechAnalysisReasoningLevel(val value: String) : ReadBookIntent
-    data class SetUseMultiSpeaker(val value: Boolean) : ReadBookIntent
-
-    data class SetMultiRoleCast(val value: Boolean) : ReadBookIntent
-
-    /** 背景音乐分配开关：正文段首渲染配乐胶囊，朗读时按场景换 BGM。 */
-    data class SetBgmAssign(val value: Boolean) : ReadBookIntent
-
-    /** 背景音乐总音量（0f–1f）：与曲目音量、段内音量相乘，朗读设置里那根滑杆。 */
-    data class SetBgmVolume(val value: Float) : ReadBookIntent
-
-    /** 确认 = 分配 + 更新已有角色状态（永不创建；无匹配时 toast 提示改点创建）。selectedCharacterId 为下拉刚选中的角色 id，可空。 */
-    data class ConfirmRoleCast(
-        val ordinal: Int,
-        val selectedCharacterId: String,
-        val characterName: String,
-        val voicePoolLabel: String,
-        val voiceId: String,
-        /** 变声器预设名，空 = 不变声（只有手动分配悬浮窗会传，AI 不自动配）。 */
-        val voiceEffect: String = "",
-    ) : ReadBookIntent
-
-    /** 创建 = 新增配音角色（身份 = 名字+声音池，同名可多版本并存）并分配给这句话。 */
-    data class CreateRoleCast(
-        val ordinal: Int,
-        val characterName: String,
-        val voicePoolLabel: String,
-        val voiceId: String,
-        /** 变声器预设名，空 = 不变声（只有手动分配悬浮窗会传，AI 不自动配）。 */
-        val voiceEffect: String = "",
-    ) : ReadBookIntent
-
-        /** AI 分配角色（当前章起 N 章批量识别+分配）。 */
-    data object OpenAiCastDialog : ReadBookIntent
-
-    /**
-     * AI 识别背景音乐场景（同一个悬浮窗，但只跑配乐清那一趟）。
-     *
-     * 从朗读设置的背景音乐区进来：背景音乐分配就是它的开关，
-     * 不需要先开多角色朗读。
-     */
-    data object OpenAiSceneDialog : ReadBookIntent
-
-    /**
-     * 启动 AI 分配。
-     *
-     * 范围三种给法，优先级从下到上：[onlyChapters]（重试，只跑这些章）>
-     * [endChapter]（悬浮窗「指定范围」的显式终点）> [startChapter] + [count]（旧的「当前章 + N」）。
-     * 章号一律是**0 基**目录下标（悬浮窗显示时 ±1 换算，见 AiCastDialogSheet）。
-     */
-    data class StartAiCast(
-        val startChapter: Int,
-        val count: Int,
-        val reassign: Boolean,
-        val presetId: String = "",
-        val temporaryInstruction: String = "",
-        /** 推理强度：AUTO 表示软件完全不干预，跟随模型与服务商的设置。思考过程一律回显（默认收起），不再有显示开关。 */
-        val reasoningLevel: AiReasoningLevel = AiReasoningLevel.AUTO,
-        /** 同一趟里再跑一遍 AI 分配背景音乐场景（角色分配完成后串行执行）。 */
-        val assignScene: Boolean = false,
-        /** 跑角色那一趟。纯场景入口给 false：只配乐，不动角色分配。 */
-        val rolesPass: Boolean = true,
-        /** 范围终点（含，0 基）；-1 = 由 [count] 推出。 */
-        val endChapter: Int = -1,
-        /** 只重跑这些章（失败/跳过的章）；非空时忽略范围三兄弟。 */
-        val onlyChapters: List<Int> = emptyList(),
-    ) : ReadBookIntent
-
-    /** 取消进行中的 AI 分配。 */
-    data object CancelAiCast : ReadBookIntent
-
-    /**
-     * 删除整章分配（AI 分配悬浮窗的「删除分配」）。
-     *
-     * [alsoScenes] = 连本章的背景音乐场景一起清掉：悬浮窗勾了「同时分配背景音乐场景」
-     * 或走的是纯场景入口时，删除必须把这次分配的东西全清，否则场景会残留、
-     * 表现为「删除分配对场景分配没作用」。
-     */
-    data class DeleteChapterCastAssignments(
-        val chapterIndex: Int,
-        val alsoScenes: Boolean = false,
-    ) : ReadBookIntent
-
-    /** 取消一句话的分配（回到未分配占位胶囊）。 */
-    data class UnassignRoleCast(
-        val ordinal: Int,
-    ) : ReadBookIntent
-
-    /** 段首配乐：设定这一段起播的背景音乐池 / 指定单曲（都为空 = 取消这段的分配）/ 本段音量。 */
-    data class SetBgmScene(
-        val paragraphIndex: Int,
-        val poolName: String,
-        val trackName: String,
-        /** 本段音量（0f–1f），与配乐自身音量相乘。 */
-        val volume: Float = 1f,
-    ) : ReadBookIntent
-
-    /** 段首配乐：清除这一段的分配。 */
-    data class ClearBgmScene(
-        val paragraphIndex: Int,
-    ) : ReadBookIntent
-
-    /**
-     * 本章配乐总览里就地改一段（池/曲目/音量任一项）：写库 + 重排当前章，但**不关窗、不弹 toast**。
-     *
-     * 与 [SetBgmScene] 只差收尾那两件事：总览要连着改好几段，每改一下就关窗（或弹 toast）
-     * 就没法用了。朗读中的配乐轨靠 BgmSceneStore.version 发现改动后即时改音量。
-     */
-    data class UpdateBgmScene(
-        val paragraphIndex: Int,
-        val poolName: String,
-        val trackName: String,
-        val volume: Float,
-    ) : ReadBookIntent
-
-    /** 总览里删掉一段的配乐：重排当前章让胶囊消失，但窗口留着继续改其它段。 */
-    data class DeleteBgmScene(
-        val paragraphIndex: Int,
-    ) : ReadBookIntent
-    data class SetDefaultReadAloudInterface(val value: String) : ReadBookIntent
-    data object OpenSystemTtsSettings : ReadBookIntent
-    data object ClearTtsCache : ReadBookIntent
-    data object OpenTtsEnginesAndVoices : ReadBookIntent
-    data object OpenTtsCache : ReadBookIntent
-    data object OpenBookVoiceCasting : ReadBookIntent
-
-    /** 朗读设置里跳到某个整屏子页（角色声音池 / 背景音乐池 / 朗读胶囊外观）。 */
-    data class OpenReadAloudSubPage(val page: ReadAloudSubPage) : ReadBookIntent
-    /** 朗读设置卡片停在哪个 tab（滑页和点 tab 都走这里）。 */
-    data class SetReadAloudConfigTab(val tab: Int) : ReadBookIntent
-    data object OpenReadAloudPlayer : ReadBookIntent
-    data object OpenClassicReadAloudControls : ReadBookIntent
     data class SelectFont(val path: String) : ReadBookIntent
     data class SelectTitleFont(val path: String) : ReadBookIntent
     data class SelectTitleSystemTypeface(val index: Int) : ReadBookIntent
@@ -1009,7 +730,7 @@ sealed interface ReadBookIntent {
     data object OnResume : ReadBookIntent
     data object OnPause : ReadBookIntent
     data object OnDispose : ReadBookIntent
-    data class CloseReadBook(val keepReadAloud: Boolean = false) : ReadBookIntent
+    data object CloseReadBook : ReadBookIntent
     data object OpenBooksDirPicker : ReadBookIntent
     data class BooksDirSelected(val uri: Uri) : ReadBookIntent
 }
@@ -1018,7 +739,6 @@ sealed interface ReadBookEffect {
     // Toast
     data class ShowToast(val message: String) : ReadBookEffect
     data class LongToast(val message: String) : ReadBookEffect
-    data class TtsCacheCleared(val message: String) : ReadBookEffect
 
     // Navigation / lifecycle
     data object Finish : ReadBookEffect
@@ -1033,7 +753,6 @@ sealed interface ReadBookEffect {
     data class UpPageAnim(val upRecorder: Boolean) : ReadBookEffect
     data object UpTime : ReadBookEffect
     data class UpBattery(val level: Int) : ReadBookEffect
-    data object UpAloudState : ReadBookEffect
     data object UpSeekBar : ReadBookEffect
     data object UpMenuView : ReadBookEffect
     // PageChanged / ContentLoadFinish / LayoutPageCompleted 内联在
@@ -1050,8 +769,7 @@ sealed interface ReadBookEffect {
     data class SetBrightness(val value: Int) : ReadBookEffect
     data class ToggleBrightnessAuto(val auto: Boolean, val value: Int) : ReadBookEffect
 
-    // Read aloud / auto page
-    data object ToggleReadAloud : ReadBookEffect
+    // Auto page
     data object ToggleAutoPage : ReadBookEffect
     data object StopAutoPage : ReadBookEffect
 
@@ -1095,8 +813,6 @@ sealed interface ReadBookEffect {
     data class SyncBookProgress(val book: Book) : ReadBookEffect
 
     // Text action menu (needs Activity for View operations)
-    data class TextActionAloudPosition(val chapterPosition: Int) : ReadBookEffect
-    data class TextActionSpeak(val text: String) : ReadBookEffect
     data class TextActionReplace(val text: String, val bookName: String?, val bookSourceUrl: String?) : ReadBookEffect
 
     // Screen / selection
@@ -1120,11 +836,6 @@ sealed interface ReadBookEffect {
     data class OpenReadStyleExport(val fileName: String) : ReadBookEffect
     data class OpenMenuCustomIconPicker(val id: String) : ReadBookEffect
     data class OpenTitleBarCustomIconPicker(val id: String) : ReadBookEffect
-    data object OpenSystemTtsSettings : ReadBookEffect
-    data object OpenTtsEnginesAndVoices : ReadBookEffect
-    data object OpenTtsCache : ReadBookEffect
-    data class OpenBookVoiceCasting(val bookUrl: String) : ReadBookEffect
-    data class OpenReadAloudSubPage(val page: ReadAloudSubPage) : ReadBookEffect
     data object OpenHighlightRuleImportPicker : ReadBookEffect
     data object OpenHighlightRuleExportPicker : ReadBookEffect
 
@@ -1155,8 +866,6 @@ sealed interface ReadBookSheet {
     data object PageAnim : ReadBookSheet
     data object Download : ReadBookSheet
 
-    /** 听书音频下载（朗读音频整章落本地，之后点朗读直接播本地文件）。 */
-    data object AudioDownload : ReadBookSheet
     data object Charset : ReadBookSheet
     data object SimulatedReading : ReadBookSheet
     data object ToolButtonConfig : ReadBookSheet
@@ -1174,23 +883,6 @@ sealed interface ReadBookSheet {
     data object ChangeBookSource : ReadBookSheet
     data object ShadowSet : ReadBookSheet
 
-    /**
-     * AI 分配悬浮窗。[sceneOnly] = 从背景音乐区进来的纯场景模式：
-     * 角色状态、分配要求、临时要求、角色记忆这些只管角色的分区都不显示。
-     */
-    data class AiCastDialog(val sceneOnly: Boolean = false) : ReadBookSheet
-
-    data class RoleCast(
-        val ordinal: Int,
-    ) : ReadBookSheet
-
-    /** 背景音乐场景弹层：点击正文段首配乐胶囊打开，锚点是段序号。 */
-    data class BgmScene(
-        val paragraphIndex: Int,
-    ) : ReadBookSheet
-
-    /** 本章背景音乐总览：一屏看完/改完本章所有配乐区间。 */
-    data object BgmSceneTable : ReadBookSheet
     data object UnderlineConfig : ReadBookSheet
     data object FontSelect : ReadBookSheet
     data object TitleFontSelect : ReadBookSheet
@@ -1198,11 +890,6 @@ sealed interface ReadBookSheet {
     data object Marking : ReadBookSheet
     data object MoreConfig : ReadBookSheet
     data object BgTextConfig : ReadBookSheet
-    data object ReadAloudConfig : ReadBookSheet
-    data object PreDownloadConfig : ReadBookSheet
-    data object PreSynthesisConcurrencyConfig : ReadBookSheet
-    data object AudioCacheCleanConfig : ReadBookSheet
-    data object ParagraphIntervalConfig : ReadBookSheet
     data object ClickActionConfig : ReadBookSheet
     data object PageKeyConfig : ReadBookSheet
     data object InfoConfig : ReadBookSheet

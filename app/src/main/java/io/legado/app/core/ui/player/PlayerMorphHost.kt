@@ -62,7 +62,6 @@ import io.legado.app.ui.theme.LegadoTheme
 import io.legado.app.ui.theme.ProvideThemeOverride
 import io.legado.app.ui.theme.ThemeOverrideState
 import io.legado.app.ui.widget.components.image.cover.BookCoverImage
-import io.legado.app.ui.widget.components.player.PlayerBackground
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -320,7 +319,7 @@ fun PlayerMorphHost(
  * 视觉面：全屏尺寸 + 最终坐标下的轮廓裁剪，内容就是播放页自己的背景。
  *
  * 几何在延迟读取（`graphicsLayer`）里每帧算，不产生重组；
- * 背景用 [PlayerBackground] 而不是纯色，形变全程看到的都已经是播放页的底色，
+ * 背景自身已铺满全屏，形变全程看到的都已经是播放页的底色，
  * 落地时背景不需要再淡入一次。
  */
 @Composable
@@ -365,21 +364,6 @@ private fun MorphPanelSurface(
                     drawRect(color = lerpColor(collapsedColor, containerColor, blend))
                 },
         ) {
-            // 播放页背景（封面模糊 / 流光）按同一条交接曲线淡入：
-            // 起点是胶囊的脸，展开后才是播放页背景，收起时原路退回胶囊。
-            PlayerBackground(
-                name = appearance.bookName,
-                author = appearance.author,
-                path = appearance.coverPath,
-                sourceOrigin = appearance.sourceOrigin,
-                bgMode = appearance.bgMode,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        alpha =
-                            if (morph.panelFrame() == null) 1f else computeMorphFaceBlend(morph.progress.value)
-                    },
-            )
         }
     }
 }

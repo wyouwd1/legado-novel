@@ -219,12 +219,9 @@ internal fun MenuBottomBar(
             state.isLocalBook,
             state.isLocalTxt,
             state.bookSource,
-            state.isReadAloudRunning,
             state.isAutoPage,
             state.translationMode,
             state.useReplaceRule,
-            state.useMultiSpeaker,
-            state.multiRoleCast,
             eyeProtectionEnabled,
         ) {
             loadToolButtons(

@@ -171,7 +171,6 @@ class ReadBookDomainSplitBoundaryTest {
     private val hostOwnedState = mapOf(
         "_uiState" to "阅读页唯一的对外状态源，宿主渲染直接消费",
         "_effects" to "一次性效果与 toast 通道",
-        "_readAloudProgress" to "朗读进度流，服务层与 UI 协作",
         "_readPreferences" to "阅读偏好流，多屏共用",
         "readBookSyncJob" to "UiState 全量重建的尾随合并，属于宿主渲染节流",
         "backupJob" to "退出/切后台触发的备份任务，绑定宿主生命周期",
@@ -182,7 +181,6 @@ class ReadBookDomainSplitBoundaryTest {
         "composeProgressJob" to "Compose 进度节流任务（待下沉：进度/排版域）",
         "_seekState" to "底栏进度条与锚点胶囊的定位流，见 ReadSeekUiState",
         "justInitData" to "加载域经 Host 暴露的状态（待下沉：加载域）",
-        "closeReadBookKeepReadAloud" to "关闭阅读是否保留朗读的参数（待下沉：朗读域）",
     )
 
     /**

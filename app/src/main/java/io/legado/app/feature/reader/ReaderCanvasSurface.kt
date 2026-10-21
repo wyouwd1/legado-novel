@@ -117,8 +117,6 @@ import io.legado.app.feature.reader.core.model.contentClipRect
 import io.legado.app.feature.reader.core.model.emphasisUnderlineRunsFor
 import io.legado.app.feature.reader.core.model.textBackgroundRuns
 import io.legado.app.feature.reader.core.navigation.ReaderPageNavigator
-import io.legado.app.feature.reader.core.readaloud.ReaderVisibleTextPosition
-import io.legado.app.feature.reader.core.readaloud.ReaderVisibleTextPositionPolicy
 import io.legado.app.feature.reader.core.selection.ReaderPageChangeOrigin
 import io.legado.app.feature.reader.core.selection.ReaderSelection
 import io.legado.app.feature.reader.core.selection.ReaderSelectionDragState
@@ -233,7 +231,6 @@ fun ReaderCanvasSurface(
     externalSelectionCancels: Flow<Unit>,
     /** 宿主要求建立选区（全文搜索命中）：旧 View 的命中就是一次真选区，带手柄与菜单。 */
     externalSelections: Flow<ReaderSelection>,
-    onVisibleBodyTextPositionProvider: ((() -> ReaderVisibleTextPosition?)?) -> Unit,
 ) {
     // 所有翻页同步换窗：宿主回调直接返回新窗口，先写入 pending 供绘制与
     // 手势立即使用；宿主 StateFlow 回声（同一实例）或外部窗口变化会将其清除。
@@ -357,17 +354,6 @@ fun ReaderCanvasSurface(
     // 零重组零重绘（对照 shutiao 的 contentOffset 语义）。
     val scrollOffsetState = remember { mutableFloatStateOf(0f) }
     var scrollOffset by scrollOffsetState
-    val latestVisibleBodyTextPosition by rememberUpdatedState {
-        if (transitionMode == ReaderTransitionMode.SCROLL) {
-            ReaderVisibleTextPositionPolicy.firstVisibleBodyText(currentPageWindow(), scrollOffset)
-        } else {
-            null
-        }
-    }
-    DisposableEffect(onVisibleBodyTextPositionProvider) {
-        onVisibleBodyTextPositionProvider { latestVisibleBodyTextPosition() }
-        onDispose { onVisibleBodyTextPositionProvider(null) }
-    }
     // 滚动跨页折算标志：applyScrollResult 完成一次同步换窗后置位，由 current.id
     // 效应消费——据此区分"自己跨页"与"外部换窗"，后者才把滚动偏移归零。
     var scrollOwnCrossing by remember { mutableStateOf(false) }
@@ -2067,13 +2053,8 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScrollPageConte
             }
         } ?: drawRect(Color.Gray.copy(alpha = .18f), Offset(e.bounds.left, e.bounds.top), Size(e.bounds.width, e.bounds.height))
         is ReaderElement.Review -> if (e.count > 0) drawReview(native, e, data.paints.values.firstOrNull()?.color ?: android.graphics.Color.GRAY)
-        is ReaderElement.RoleCast -> drawRoleCast(
-            native, e,
-            castColorArgb,
-            castVariantArgb,
-            io.legado.app.help.readaloud.cast.CastAvatarCache.cached(e.avatarUri),
-        )
-        is ReaderElement.BgmScene -> drawBgmScene(native, e, castColorArgb, castVariantArgb)
+        is ReaderElement.RoleCast -> Unit
+        is ReaderElement.BgmScene -> Unit
         is ReaderElement.Action -> Unit
         is ReaderElement.Spacer -> Unit
         is ReaderElement.ParagraphMarker -> {
@@ -2793,13 +2774,8 @@ private fun ReaderPageCanvas(
                 }
             } ?: drawRect(Color.Gray.copy(alpha = .18f), Offset(e.bounds.left, e.bounds.top), Size(e.bounds.width, e.bounds.height))
             is ReaderElement.Review -> if (e.count > 0) drawReview(native, e, paints.values.firstOrNull()?.color ?: android.graphics.Color.GRAY)
-            is ReaderElement.RoleCast -> drawRoleCast(
-                native, e,
-                castColorArgb,
-                castVariantArgb,
-                io.legado.app.help.readaloud.cast.CastAvatarCache.cached(e.avatarUri),
-            )
-            is ReaderElement.BgmScene -> drawBgmScene(native, e, castColorArgb, castVariantArgb)
+            is ReaderElement.RoleCast -> Unit
+            is ReaderElement.BgmScene -> Unit
             is ReaderElement.Action -> Unit
             is ReaderElement.Spacer -> Unit
             is ReaderElement.ParagraphMarker -> {
@@ -3164,251 +3140,7 @@ private fun drawNineSliceBackground(
     }
 }
 
-/**
- * 胶囊底板：先铺底色（没设颜色就沿用正文反色派生的那层淡底），再按同一块圆角把底图裁进去。
- * 深浅模式各一套颜色和图，取哪一套在 [io.legado.app.help.readaloud.cast.CastCapsuleStyleStore.current] 里已经判好。
- */
-private fun drawCapsuleBackground(
-    native: android.graphics.Canvas,
-    b: ReaderRect,
-    h: Float,
-    style: io.legado.app.feature.reader.core.cast.CastCapsuleStyle,
-    fill: android.graphics.Paint,
-) {
-    val radius = style.cornerPx(h)
-    val custom = style.bgColor != 0
-    fill.color = if (custom) style.bgColor else (fill.color and 0x00FFFFFF) or (34 shl 24)
-    native.drawRoundRect(b.left, b.top, b.right, b.bottom, radius, radius, fill)
-    val image = style.bgImage
-    if (image.isEmpty()) return
-    val bitmap = io.legado.app.help.readaloud.cast.CastCapsuleImageCache.cached(image)
-        ?.takeIf { !it.isRecycled } ?: return
-    val rects = io.legado.app.help.readaloud.cast.CastCapsuleImageCache.coverRects(
-        bitmap, b.left, b.top, b.right, b.bottom,
-    ) ?: return
-    native.save()
-    val clip = android.graphics.Path().apply {
-        addRoundRect(
-            android.graphics.RectF(b.left, b.top, b.right, b.bottom),
-            radius, radius, android.graphics.Path.Direction.CW,
-        )
-    }
-    native.clipPath(clip)
-    fill.color = android.graphics.Color.WHITE
-    native.drawBitmap(bitmap, rects.first, rects.second, fill)
-    native.restore()
-}
-
-/**
- * 段首配乐胶囊：`♪ 声音池名`。正文文字一字未改，朗读链路也读不到它。
- * 文案与宽度与测量侧共用 [io.legado.app.feature.reader.core.cast.CastCapsuleGeometry]。
- */
-private fun drawBgmScene(
-    native: android.graphics.Canvas,
-    e: ReaderElement.BgmScene,
-    colorArgb: Int,
-    variantArgb: Int,
-) {
-    val b = e.bounds
-    val h = b.height
-    if (h <= 0f || b.width <= 0f) return
-    val style = io.legado.app.help.readaloud.cast.CastCapsuleStyleStore
-        .current(io.legado.app.help.readaloud.cast.CastCapsuleStyleStore.BGM)
-    val fill = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-        color = variantArgb
-    }
-    drawCapsuleBackground(native, b, h, style, fill)
-    val geo = io.legado.app.feature.reader.core.cast.CastCapsuleGeometry
-    val label = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-        color = labelColor(colorArgb, style)
-        textSize = h / geo.heightRatio * geo.textScale
-    }
-    val fm = label.fontMetrics
-    native.drawText(
-        geo.bgmLabel(e.poolName),
-        b.left + h * geo.padRatio,
-        (b.top + b.bottom) / 2f - (fm.ascent + fm.descent) / 2f,
-        label,
-    )
-}
-
-
-/**
- * 多角色分配胶囊：圆角底 + 头像（缺省画首字符占位圆）+ 名字 + 声音池小字 +（带变声时的）均衡器标记。
- * 未分配的那一颗只有人形图标，没有文字。
- * 几何与测量侧共用 [io.legado.app.feature.reader.core.cast.CastCapsuleGeometry]，颜色派生自正文色（主题安全）。
- * 圆角、底色、底图、头像形状与位移读 [io.legado.app.help.readaloud.cast.CastCapsuleStyleStore]。
- */
-private fun drawRoleCast(
-    native: android.graphics.Canvas,
-    e: ReaderElement.RoleCast,
-    colorArgb: Int,
-    variantArgb: Int,
-    avatar: android.graphics.Bitmap?,
-) {
-    val b = e.bounds
-    val h = b.height
-    if (h <= 0f || b.width <= 0f) return
-    val castStore = io.legado.app.help.readaloud.cast.CastCapsuleStyleStore
-    val style = castStore.current(
-        if (e.name.isEmpty()) castStore.PLACEHOLDER else castStore.ROLE,
-    )
-    val fill = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-        color = variantArgb
-    }
-    drawCapsuleBackground(native, b, h, style, fill)
-    val cy = (b.top + b.bottom) / 2f
-    val geo = io.legado.app.feature.reader.core.cast.CastCapsuleGeometry
-    val d = style.avatarDiameter(h)
-    // 两颗共用同一个落点（见 avatarLeft）：都是正方形底板、图标必须落在同一格中心，
-    // 与「显示角色名/声音池」无关。
-    val avatarLeft = b.left + style.avatarLeft(h)
-    val avatarCy = cy + style.avatarCenterOffset(h)
-    val textPx = h / geo.heightRatio * geo.textScale
-    val name = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-        color = labelColor(colorArgb, style)
-        textSize = textPx
-    }
-    val nameFm = name.fontMetrics
-    val nameBaseline = cy - (nameFm.ascent + nameFm.descent) / 2f
-    if (e.name.isEmpty()) {
-        // 未分配：胶囊里只有一个人形图标，文字一个不留（点它就是给这句分配角色）
-        drawCastPersonIcon(
-            native,
-            avatarLeft + d / 2f,
-            avatarCy,
-            d,
-            labelColor(variantArgb, style),
-        )
-        return
-    }
-    // 关掉的那一栏连宽度一起没有（测量侧读同一份开关），所以这里也只是跳过绘制
-    if (style.showAvatar) {
-        if (avatar != null && !avatar.isRecycled) {
-            val bmp = android.graphics.Paint(
-                android.graphics.Paint.ANTI_ALIAS_FLAG or android.graphics.Paint.FILTER_BITMAP_FLAG,
-            )
-            native.save()
-            val shape = android.graphics.Path().apply {
-                addRoundRect(
-                    android.graphics.RectF(avatarLeft, avatarCy - d / 2f, avatarLeft + d, avatarCy + d / 2f),
-                    style.avatarCornerPx(d), style.avatarCornerPx(d),
-                    android.graphics.Path.Direction.CW,
-                )
-            }
-            native.clipPath(shape)
-            native.drawBitmap(
-                avatar, null,
-                android.graphics.RectF(avatarLeft, avatarCy - d / 2f, avatarLeft + d, avatarCy + d / 2f),
-                bmp,
-            )
-            native.restore()
-        } else {
-            val radius = style.avatarCornerPx(d)
-            val left = avatarLeft
-            val top = avatarCy - d / 2f
-            fill.color = (variantArgb and 0x00FFFFFF) or (90 shl 24)
-            native.drawRoundRect(left, top, left + d, top + d, radius, radius, fill)
-            val initial = e.name.firstOrNull()?.toString() ?: "?"
-            name.textAlign = android.graphics.Paint.Align.CENTER
-            native.drawText(initial, left + d / 2f, avatarCy - (nameFm.ascent + nameFm.descent) / 2f, name)
-            name.textAlign = android.graphics.Paint.Align.LEFT
-        }
-    }
-    val nameWidth = if (style.showName) name.measureText(e.name) else 0f
-    if (style.showName) {
-        native.drawText(
-            e.name,
-            b.left + geo.textLeftPx(h, style),
-            nameBaseline,
-            name,
-        )
-    }
-    if (style.showPool && e.voicePoolLabel.isNotEmpty()) {
-        // 声音池：名字后的小字（无括号），与名字各自按字形垂直居中
-        val pool = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            color = labelColor(variantArgb, style)
-            textSize = textPx * geo.poolScale
-        }
-        val poolFm = pool.fontMetrics
-        val poolBaseline = cy - (poolFm.ascent + poolFm.descent) / 2f
-        native.drawText(
-            e.voicePoolLabel,
-            b.left + geo.poolLeftPx(h, style, nameWidth),
-            poolBaseline,
-            pool,
-        )
-    }
-    if (e.voiceEffectMark) {
-        // 这一句带变声器（正文胶囊那一栏设的，或角色的全局值）：右端画一撮均衡器小竖条
-        val badge = h * geo.effectRatio
-        drawCastEffectMark(
-            native,
-            b.right - h * geo.padRatio - badge / 2f,
-            cy,
-            badge,
-            labelColor(variantArgb, style),
-        )
-    }
-}
-
-/** 设了实底色（尤其是不透明的自定义底）时，字色跟着正文色走会看不见，换成对比更强的那端。 */
-private fun labelColor(baseArgb: Int, style: io.legado.app.feature.reader.core.cast.CastCapsuleStyle): Int {
-    if (style.bgColor == 0) return baseArgb
-    val alpha = (style.bgColor ushr 24) and 0xFF
-    if (alpha < 128) return baseArgb
-    val background = android.graphics.Color.red(style.bgColor) * 0.299f +
-        android.graphics.Color.green(style.bgColor) * 0.587f +
-        android.graphics.Color.blue(style.bgColor) * 0.114f
-    val current = android.graphics.Color.red(baseArgb) * 0.299f +
-        android.graphics.Color.green(baseArgb) * 0.587f +
-        android.graphics.Color.blue(baseArgb) * 0.114f
-    return if (background > current) android.graphics.Color.BLACK else android.graphics.Color.WHITE
-}
-
-
-/** 未分配占位胶囊的人形图标：一个头 + 一道肩线，不依赖任何字体。 */
-private fun drawCastPersonIcon(
-    native: android.graphics.Canvas,
-    cx: Float,
-    cy: Float,
-    d: Float,
-    colorArgb: Int,
-) {
-    if (d <= 0f) return
-    val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-        color = colorArgb
-    }
-    native.drawCircle(cx, cy - d * 0.16f, d * 0.17f, paint)
-    val body = android.graphics.Path().apply {
-        addArc(cx - d * 0.29f, cy + d * 0.06f, cx + d * 0.29f, cy + d * 0.52f, 180f, 180f)
-        close()
-    }
-    native.drawPath(body, paint)
-}
-
-/** 变声器标记：宽 [w] 的四根圆头竖条，高矮不齐（均衡器样式），字号再大也只是等比放大。 */
-private fun drawCastEffectMark(
-    native: android.graphics.Canvas,
-    cx: Float,
-    cy: Float,
-    w: Float,
-    colorArgb: Int,
-) {
-    if (w <= 0f) return
-    val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-        color = colorArgb
-        strokeCap = android.graphics.Paint.Cap.ROUND
-        strokeWidth = w * 0.16f
-    }
-    val heights = floatArrayOf(0.4f, 0.85f, 0.55f, 1f)
-    val step = w / heights.size
-    heights.forEachIndexed { index, ratio ->
-        val x = cx - w / 2f + step * (index + 0.5f)
-        val half = w * ratio / 2f
-        native.drawLine(x, cy - half, x, cy + half, paint)
-    }
-}fun drawReview(canvas: android.graphics.Canvas, review: ReaderElement.Review, colorArgb: Int) {
+fun drawReview(canvas: android.graphics.Canvas, review: ReaderElement.Review, colorArgb: Int) {
     val start = review.bounds.left
     val end = review.bounds.right
     val baseline = review.baselinePx

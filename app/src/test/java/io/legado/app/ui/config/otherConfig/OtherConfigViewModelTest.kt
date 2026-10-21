@@ -9,10 +9,8 @@ import io.legado.app.domain.gateway.DirectLinkSettingsGateway
 import io.legado.app.domain.gateway.DownloadCacheSettingsGateway
 import io.legado.app.domain.gateway.OtherConfigSystemGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
-import io.legado.app.domain.gateway.ReadAloudSettingsGateway
 import io.legado.app.domain.model.settings.DownloadCacheSettings
 import io.legado.app.domain.model.settings.OtherSettings
-import io.legado.app.domain.model.settings.ReadAloudSettings
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -46,7 +44,6 @@ class OtherConfigViewModelTest {
         val appLocaleGateway = FakeAppLocaleGateway()
         val viewModel = OtherConfigViewModel(
             appLocaleGateway = appLocaleGateway,
-            readAloudSettingsGateway = FakeReadAloudSettingsGateway(),
             otherSettingsGateway = otherSettingsGateway,
             downloadCacheSettingsGateway = FakeDownloadCacheSettingsGateway(),
             directLinkSettingsGateway = FakeDirectLinkSettingsGateway(),
@@ -135,7 +132,6 @@ class OtherConfigViewModelTest {
         systemGateway: FakeOtherConfigSystemGateway = FakeOtherConfigSystemGateway(),
     ) = OtherConfigViewModel(
         appLocaleGateway = FakeAppLocaleGateway(),
-        readAloudSettingsGateway = FakeReadAloudSettingsGateway(),
         otherSettingsGateway = otherSettingsGateway,
         downloadCacheSettingsGateway = FakeDownloadCacheSettingsGateway(),
         directLinkSettingsGateway = directLinkSettingsGateway,
@@ -170,20 +166,6 @@ class OtherConfigViewModelTest {
 
         override suspend fun update(transform: (OtherSettings) -> OtherSettings) {
             failure?.let { throw it }
-            state.value = transform(state.value)
-        }
-    }
-
-    private class FakeReadAloudSettingsGateway : ReadAloudSettingsGateway {
-        private val state = MutableStateFlow(ReadAloudSettings())
-
-        override val currentSettings: ReadAloudSettings
-            get() = state.value
-        override val settings: Flow<ReadAloudSettings> = state
-
-        override suspend fun update(
-            transform: (ReadAloudSettings) -> ReadAloudSettings,
-        ) {
             state.value = transform(state.value)
         }
     }

@@ -325,10 +325,6 @@ private fun moreActionSpecs(
         applicable = isReadMenuActionApplicable("download", state),
         onClick = { onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.Download)) }),
     MoreActionSpec(
-        "audio_download",
-        stringResource(R.string.read_aloud_audio_download_entry), Icons.Default.Download,
-        onClick = { onIntent(ReadBookIntent.ShowSheet(ReadBookSheet.AudioDownload)) }),
-    MoreActionSpec(
         "toc_rule", stringResource(R.string.txt_toc_rule), Icons.AutoMirrored.Filled.Toc,
         applicable = isReadMenuActionApplicable("toc_rule", state),
         onClick = { dispatch(ReadBookIntent.MenuTocRegex) }),

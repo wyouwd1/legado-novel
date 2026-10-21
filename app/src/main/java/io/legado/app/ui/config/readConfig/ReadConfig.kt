@@ -6,7 +6,6 @@ import io.legado.app.domain.gateway.AppShellSettingsGateway
 import io.legado.app.domain.gateway.BackupSettingsGateway
 import io.legado.app.domain.gateway.DownloadCacheSettingsGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
-import io.legado.app.domain.gateway.ReadAloudSettingsGateway
 import io.legado.app.domain.gateway.ReadSettingsGateway
 import io.legado.app.domain.gateway.ThemeSettingsGateway
 import io.legado.app.help.config.AppConfigStore
@@ -20,10 +19,9 @@ import org.koin.core.context.GlobalContext
  *
  * 新代码应注入对应 Gateway；此对象只服务尚未迁移的 View、渲染器与启动路径。
  */
-@Deprecated("使用 ReadSettingsGateway / ReadAloudSettingsGateway.currentSettings")
+@Deprecated("使用 ReadSettingsGateway.currentSettings")
 object ReadConfig {
     private val read get() = GlobalContext.get().get<ReadSettingsGateway>().currentSettings
-    private val aloud get() = GlobalContext.get().get<ReadAloudSettingsGateway>().currentSettings
     private val backup get() = GlobalContext.get().get<BackupSettingsGateway>().currentSettings
     private val cache get() = GlobalContext.get().get<DownloadCacheSettingsGateway>().currentSettings
     private val other get() = GlobalContext.get().get<OtherSettingsGateway>().currentSettings
@@ -81,34 +79,6 @@ object ReadConfig {
     val useNewTocSheet get() = read.useNewTocSheet
     val maxLengthWithNoToc get() = read.maxLengthWithNoToc
     val selectVibrator get() = read.selectVibrator
-
-    val speechRatePlay get() = if (aloud.ttsFollowSys) 5 else aloud.ttsSpeechRate
-    val ttsEngine get() = aloud.ttsEngine
-    val ttsFollowSys get() = aloud.ttsFollowSys
-    val ttsSpeechRate get() = aloud.ttsSpeechRate
-    val ttsTimer get() = aloud.ttsTimer
-    val finishCurrentChapterAfterTimer get() = aloud.finishCurrentChapterAfterTimer
-    val readAloudTimerMode get() = aloud.timerMode
-    val readAloudTimerChapters get() = aloud.timerChapters
-    val ttsParagraphInterval get() = aloud.ttsParagraphInterval
-    val ignoreAudioFocus get() = aloud.ignoreAudioFocus
-    val pauseReadAloudWhilePhoneCalls get() = aloud.pauseReadAloudWhilePhoneCalls
-    val readAloudWakeLock get() = aloud.readAloudWakeLock
-    val mediaButtonPerNext get() = aloud.mediaButtonPerNext
-    val contentSplitMode get() = aloud.contentSplitMode
-    val contentSplitSymbols get() = aloud.contentSplitSymbols
-    val androidMediaControlEnabled get() = aloud.androidMediaControlEnabled
-    val systemMediaControlCompatibilityChange get() = aloud.systemMediaControlCompatibilityChange
-    val streamReadAloudAudio get() = aloud.streamReadAloudAudio
-    val contentSelectSpeakMod get() = aloud.contentSelectSpeakMode
-    val audioPreDownloadNum get() = aloud.audioPreDownloadNum
-    val audioCacheCleanTime get() = aloud.audioCacheCleanTime * 60 * 1000L
-    val speechAnalysisMode get() = aloud.speechAnalysisMode
-    val speechAnalysisReasoningLevel get() = aloud.speechAnalysisReasoningLevel
-    val useMultiSpeaker get() = aloud.useMultiSpeaker
-    val multiRoleCast get() = aloud.multiRoleCast
-    val bgmAssign get() = aloud.bgmAssign
-    val defaultInterface get() = aloud.defaultInterface
 
     val syncBookProgress get() = backup.syncBookProgress
     val syncBookProgressPlus get() = backup.syncBookProgressPlus

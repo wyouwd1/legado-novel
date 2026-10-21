@@ -18,8 +18,6 @@ object MainIntent {
     const val EXTRA_CHARACTER_ID = "characterId"
     const val EXTRA_ENTRY_ID = "entryId"
     const val EXTRA_EVENT_ID = "eventId"
-    const val EXTRA_OPEN_READ_ALOUD_PLAYER = "openReadAloudPlayer"
-    const val EXTRA_READ_ALOUD = "readAloud"
     const val EXTRA_IN_BOOKSHELF = "inBookshelf"
     const val EXTRA_CHAPTER_CHANGED = "chapterChanged"
     const val EXTRA_EXPLORE_NAME = "exploreName"
@@ -158,44 +156,19 @@ object MainIntent {
     fun createReadBookIntent(
         context: Context,
         bookUrl: String? = null,
-        readAloud: Boolean = false,
         inBookshelf: Boolean = true,
         chapterChanged: Boolean = false,
     ): Intent {
         return createLauncherIntent(context).apply {
             putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_READ_BOOK)
             bookUrl?.let { putExtra(EXTRA_BOOK_URL, it) }
-            putExtra(EXTRA_READ_ALOUD, readAloud)
             putExtra(EXTRA_IN_BOOKSHELF, inBookshelf)
             putExtra(EXTRA_CHAPTER_CHANGED, chapterChanged)
         }
     }
 
-    fun createReadBookMediaControlIntent(context: Context): Intent =
-        createReadBookIntent(context, readAloud = true).apply {
-            // 复用 launcher Activity 并移除其上层的旧 Activity；Nav3 父栈另行重建，
-            // 让阅读页返回时始终落到主页。
-            addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP
-            )
-            putExtra(EXTRA_ROUTE_HOME_AS_PARENT, true)
-        }
-
     internal fun shouldOpenRouteWithHomeParent(intent: Intent?): Boolean =
         intent?.getBooleanExtra(EXTRA_ROUTE_HOME_AS_PARENT, false) == true
-
-    fun createAudioPlayIntent(
-        context: Context,
-        bookUrl: String? = null,
-        inBookshelf: Boolean = true,
-    ): Intent = createLauncherIntent(context).apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_AUDIO_PLAY)
-        bookUrl?.let { putExtra(EXTRA_BOOK_URL, it) }
-        putExtra(EXTRA_IN_BOOKSHELF, inBookshelf)
-    }
 
     fun createSearchIntent(
         context: Context,

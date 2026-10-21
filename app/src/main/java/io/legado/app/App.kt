@@ -125,7 +125,6 @@ class App : Application(), SingletonImageLoader.Factory {
             cacheGateway = get(),
             coverGateway = get(),
             readGateway = get(),
-            aloudGateway = get(),
             importBookGateway = get(),
             exportGateway = get(),
         )

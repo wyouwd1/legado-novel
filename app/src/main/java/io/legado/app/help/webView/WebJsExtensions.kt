@@ -13,7 +13,6 @@ import io.legado.app.data.entities.RssSource
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.help.CacheManager
 import io.legado.app.help.coroutine.Coroutine
-import io.legado.app.model.AudioPlay
 import io.legado.app.model.Debug
 import io.legado.app.model.ReadBook
 import io.legado.app.model.analyzeRule.AnalyzeRule
@@ -72,8 +71,7 @@ class WebJsExtensions(
             }
 
             BookType.audio -> {
-                book = AudioPlay.book
-                chapter = AudioPlay.durChapter
+                // 听书/有声音播放器已随朗读域移除（D4b）：保留类型位分支穷尽性
             }
         }
         Pair(book, chapter)

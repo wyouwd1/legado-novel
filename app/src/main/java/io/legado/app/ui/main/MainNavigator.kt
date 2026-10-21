@@ -68,7 +68,7 @@ object MainNavigator {
             }
         }
 
-        // 朗读通知的「回到正在读的书」不带 bookUrl（空即最后读过的那本），路由键和栈顶那份必然不相等。
+        // 回到正在读的书可能不带 bookUrl（空即最后读过的那本），路由键和栈顶那份必然不相等。
         // 栈顶已经是阅读页时再压一份，返回就要连点同样多次才出得了阅读页，所以在这里收住不压栈。
         if (route is MainRouteReadBook &&
             currentRoute is MainRouteReadBook &&
@@ -95,8 +95,6 @@ object MainNavigator {
             is MainRouteBookSourceManage,
             is MainRouteBookSourceEdit,
             is MainRouteBookSourceDebug -> backStack.add(route)
-
-            MainRouteReadAloudPlayer -> backStack.add(route)
 
             MainRouteHome -> {
                 backStack.clear()
@@ -146,26 +144,6 @@ object MainNavigator {
                 }
             }
 
-            is MainRouteAudioPlay -> {
-                // 播放器为单例语义：已在栈上（如通知栏再次进入）则替换，避免叠加多个播放界面
-                val existingAudioIndex = backStack.indexOfLast { it is MainRouteAudioPlay }
-                if (existingAudioIndex >= 0) {
-                    while (backStack.lastIndex > existingAudioIndex) {
-                        backStack.removeAt(backStack.lastIndex)
-                    }
-                    backStack[existingAudioIndex] = route
-                } else if (
-                    currentRoute == MainRouteHome ||
-                    currentRoute is MainRouteBookInfo
-                ) {
-                    backStack.add(route)
-                } else {
-                    backStack.clear()
-                    backStack.add(MainRouteHome)
-                    backStack.add(route)
-                }
-            }
-
             is MainRouteSearchContent -> {
                 backStack.add(route)
             }
@@ -203,24 +181,6 @@ object MainNavigator {
                 }
             }
 
-            is MainRouteBookVoiceCasting,
-            is MainRouteCloudTtsEngines,
-            MainRouteTtsCache -> {
-                if (
-                    currentRoute is MainRouteBookInfo ||
-                    currentRoute is MainRouteBookVoiceCasting ||
-                    currentRoute is MainRouteCloudTtsEngines ||
-                    currentRoute == MainRouteTtsCache ||
-                    currentRoute is MainRouteReadBook
-                ) {
-                    backStack.add(route)
-                } else {
-                    backStack.clear()
-                    backStack.add(MainRouteHome)
-                    backStack.add(route)
-                }
-            }
-
             is MainRouteExploreShow -> {
                 if (
                     currentRoute == MainRouteHome ||
@@ -247,7 +207,6 @@ object MainNavigator {
             }
 
             MainRouteHighlightTagRule,
-            MainRouteMultiRoleRule,
             MainRouteReadRecord -> {
                 if (currentRoute == MainRouteHome) {
                     backStack.add(route)
@@ -257,15 +216,6 @@ object MainNavigator {
                     backStack.add(route)
                 }
             }
-
-            // 朗读设置的子页（设置 hub 与阅读界面朗读设置卡片两处入口）都只压栈、不清栈：
-            // 从阅读界面进来要能直接返回阅读界面。
-            MainRouteVoicePool,
-            MainRouteBgmPool,
-            MainRouteVoiceEffect,
-            MainRouteCastCapsuleStyle,
-            MainRouteRegexCastRule,
-            MainRouteMultiRoleRecognition -> backStack.add(route)
 
             MainRouteAbout -> {
                 if (currentRoute == MainRouteHome) {
@@ -394,16 +344,11 @@ object MainNavigator {
             MainRouteConst.ROUTE_BOOK_CACHE_MANAGE -> MainRouteBookCacheManage
             MainRouteConst.ROUTE_READ_BOOK -> MainRouteReadBook(
                 bookUrl = intent?.getStringExtra(MainIntent.EXTRA_BOOK_URL),
-                readAloud = intent?.getBooleanExtra(MainIntent.EXTRA_READ_ALOUD, false) == true,
                 inBookshelf = intent?.getBooleanExtra(MainIntent.EXTRA_IN_BOOKSHELF, true) != false,
                 chapterChanged = intent?.getBooleanExtra(
                     MainIntent.EXTRA_CHAPTER_CHANGED,
                     false
                 ) == true,
-            )
-            MainRouteConst.ROUTE_AUDIO_PLAY -> MainRouteAudioPlay(
-                bookUrl = intent?.getStringExtra(MainIntent.EXTRA_BOOK_URL),
-                inBookshelf = intent?.getBooleanExtra(MainIntent.EXTRA_IN_BOOKSHELF, true) != false,
             )
             MainRouteConst.ROUTE_SEARCH -> MainRouteSearch(
                 key = intent?.getStringExtra(MainIntent.EXTRA_SEARCH_KEY),

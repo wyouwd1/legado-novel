@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Base64
 import androidx.annotation.Keep
 import androidx.media3.common.MediaItem
+import com.google.gson.reflect.TypeToken
 import com.bumptech.glide.load.model.GlideUrl
 import com.script.buildScriptBindings
 import com.script.rhino.RhinoScriptEngine
@@ -19,7 +20,6 @@ import io.legado.app.help.CacheManager
 import io.legado.app.help.ConcurrentRateLimiter
 import io.legado.app.help.JsExtensions
 import io.legado.app.help.crypto.toHexString
-import io.legado.app.help.exoplayer.ExoPlayerHelper
 import io.legado.app.help.glide.GlideHeaders
 import io.legado.app.help.http.BackstageWebView
 import io.legado.app.help.http.CookieManager
@@ -811,9 +811,21 @@ class AnalyzeUrl(
         }
 
         val customIp by lazy { ConcurrentHashMap<String, String>() }
+        /** 媒体项 headers 分隔符，与旧 ExoPlayerHelper 保持一致。 */
+        private const val MEDIA_ITEM_SPLIT_TAG = "\uD83D\uDEA7"
+
+        private val mediaItemHeaderType by lazy {
+            object : TypeToken<Map<String, String>>() {}.type
+        }
+
+        /**
+         * 书源 JS 的 `getMediaItem()`。实现原在 `help/exoplayer/ExoPlayerHelper`，
+         * 该域随朗读/音频删除（D4b），这里内联保留书源 JS API 面与 media3 依赖（见 W2-S6）。
+         */
         fun AnalyzeUrl.getMediaItem(): MediaItem {
             setCookie()
-            return ExoPlayerHelper.createMediaItem(url, headerMap)
+            val formatUrl = url + MEDIA_ITEM_SPLIT_TAG + GSON.toJson(headerMap, mediaItemHeaderType)
+            return MediaItem.Builder().setUri(formatUrl).build()
         }
 
     }

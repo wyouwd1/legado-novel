@@ -47,12 +47,9 @@ fun ReadBookFloatingActionBar(
     val anchorVisible = seek.readingAnchorAvailable &&
         !state.menuVisible && !state.isShowingSearchResult
     val reminder = state.activeReminder?.takeIf { !state.menuVisible }
-    val readAloudDetached = state.isReadAloudRunning && !state.readAloudFollow &&
-        state.readAloudDetachReminderEnabled &&
-        !state.menuVisible && !state.isShowingSearchResult
     Box(Modifier.fillMaxSize()) {
         AnimatedVisibility(
-            visible = anchorVisible || reminder != null || readAloudDetached,
+            visible = anchorVisible || reminder != null,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier
@@ -63,9 +60,6 @@ fun ReadBookFloatingActionBar(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                if (readAloudDetached) {
-                    ReadAloudDetachedCapsule(onIntent = onIntent)
-                }
                 if (anchorVisible) {
                     ReadingAnchorCapsule(onIntent = onIntent)
                 }
@@ -74,27 +68,6 @@ fun ReadBookFloatingActionBar(
                 }
             }
         }
-    }
-}
-
-/** 朗读位置脱离当前显示页时：跳回朗读位置，或从当前页重新朗读。 */
-@Composable
-private fun ReadAloudDetachedCapsule(onIntent: (ReadBookIntent) -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        MediumTonalButton(
-            onClick = { onIntent(ReadBookIntent.BackToSpeakingPosition) },
-            icon = Icons.AutoMirrored.Filled.VolumeUp,
-            text = stringResource(R.string.back_to_speaking_position),
-            contentDescription = stringResource(R.string.back_to_speaking_position),
-        )
-        MediumTonalButton(
-            onClick = { onIntent(ReadBookIntent.ReadAloudFromHere) },
-            icon = Icons.Default.PlayArrow,
-            text = stringResource(R.string.read_aloud_from_here),
-            contentDescription = stringResource(R.string.read_aloud_from_here),
-        )
     }
 }
 

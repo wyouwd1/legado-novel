@@ -13,11 +13,9 @@ import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.rule.RowUi
 import io.legado.app.data.repository.BookRepository
 import io.legado.app.data.repository.BookSourceRepository
-import io.legado.app.data.repository.HttpTtsRepository
 import io.legado.app.data.repository.SearchRepository
 import io.legado.app.domain.gateway.DownloadCacheSettingsGateway
 import io.legado.app.help.http.CookieStore
-import io.legado.app.model.AudioPlay
 import io.legado.app.model.ReadBook
 import io.legado.app.utils.GSON
 import io.legado.app.utils.fromJsonArray
@@ -37,7 +35,6 @@ class SourceLoginViewModel(
     private val application: Application,
     private val bookRepository: BookRepository,
     private val bookSourceRepository: BookSourceRepository,
-    private val httpTtsRepository: HttpTtsRepository,
     private val searchRepository: SearchRepository,
     private val downloadCacheSettingsGateway: DownloadCacheSettingsGateway,
 ) : ViewModel() {
@@ -179,20 +176,12 @@ class SourceLoginViewModel(
                 ReadBook.bookSource
             }
 
-            SourceLoginType.AudioBook -> {
-                book = AudioPlay.book
-                chapter = AudioPlay.durChapter
-                AudioPlay.bookSource
-            }
-
             SourceLoginType.BookSource -> intent.sourceKey?.let {
                 bookSourceRepository.getBookSource(
                     it
                 )
             }
 
-            SourceLoginType.HttpTts -> intent.sourceKey?.toLongOrNull()
-                ?.let { httpTtsRepository.findById(it) }
         }.also {
             if (book == null) {
                 book = intent.bookUrl?.let { url ->

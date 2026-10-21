@@ -42,26 +42,14 @@ import io.legado.app.R
 import io.legado.app.constant.BookType
 import io.legado.app.core.ui.morph.BookCoverMorphAnchors
 import io.legado.app.core.ui.morph.isAnchorVisibleInScreen
-import io.legado.app.core.ui.player.PlayerMorphAppearance
-import io.legado.app.core.ui.player.PlayerMorphHost
 import io.legado.app.domain.model.BookSearchScope
-import io.legado.app.domain.model.PlaybackCapsuleSource
-import io.legado.app.domain.model.PlaybackCapsuleState
 import io.legado.app.domain.model.settings.AppUiConfiguration
 import io.legado.app.feature.reader.platform.ReaderPerfTrace
-import io.legado.app.model.AudioPlay
 import io.legado.app.model.Download
-import io.legado.app.model.ReadAloudSessionStore
 import io.legado.app.model.SourceCallBack
-import io.legado.app.service.AudioPlayService
-import io.legado.app.service.BaseReadAloudService
 import io.legado.app.ui.about.AboutEffect
 import io.legado.app.ui.about.AboutScreen
 import io.legado.app.ui.about.AboutViewModel
-import io.legado.app.ui.book.audio.AudioPlayEffect
-import io.legado.app.ui.book.audio.AudioPlayIntent
-import io.legado.app.ui.book.audio.AudioPlayScreenContent
-import io.legado.app.ui.book.audio.AudioPlayViewModel
 import io.legado.app.ui.book.cache.manage.BookCacheManageRouteScreen
 import io.legado.app.ui.book.explore.ExploreShowIntent
 import io.legado.app.ui.book.explore.ExploreShowRouteScreen
@@ -83,23 +71,6 @@ import io.legado.app.ui.book.read.ReadBookViewModel
 import io.legado.app.ui.book.read.ReaderSessionViewModel
 import io.legado.app.ui.book.readRecord.ReadRecordOverviewRouteScreen
 import io.legado.app.ui.book.readRecord.ReadRecordRouteScreen
-import io.legado.app.ui.book.readaloud.ReadAloudPlayerOverlayBus
-import io.legado.app.ui.book.readaloud.cache.TtsCacheRouteScreen
-import io.legado.app.ui.book.readaloud.cast.BgmPoolRouteScreen
-import io.legado.app.ui.book.readaloud.cast.CastCapsuleStyleRouteScreen
-import io.legado.app.ui.book.readaloud.cast.MultiRoleRecognitionRouteScreen
-import io.legado.app.ui.book.readaloud.cast.MultiRoleRuleRouteScreen
-import io.legado.app.ui.book.readaloud.cast.RegexCastRuleRouteScreen
-import io.legado.app.ui.book.readaloud.cast.VoiceEffectRouteScreen
-import io.legado.app.ui.book.readaloud.cast.VoicePoolRouteScreen
-import io.legado.app.ui.book.readaloud.casting.BookVoiceCastingScreen
-import io.legado.app.ui.book.readaloud.casting.BookVoiceCastingViewModel
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsEffect
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsIntent
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsScreen
-import io.legado.app.ui.book.readaloud.cloudtts.CloudTtsViewModel
-import io.legado.app.ui.book.readaloud.morph.ReadAloudMorphState
-import io.legado.app.ui.book.readaloud.player.rememberPlayerThemeOverride
 import io.legado.app.ui.book.search.SearchIntent
 import io.legado.app.ui.book.search.SearchRouteScreen
 import io.legado.app.ui.book.search.SearchViewModel
@@ -279,15 +250,6 @@ fun MainActivity.mainEntryProvider(
     sharedTransitionScope: SharedTransitionScope,
     onNavigateToRoute: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
-    /**
-     * 「胶囊 ↔ 听书播放页」的形变状态。
-     *
-     * 主界面要把听书胶囊排在悬浮底栏同一行里，需要把胶囊的锚点上报给同一个进度源，
-     * 所以这里透传（其余目的地不用）。
-     */
-    readAloudMorph: ReadAloudMorphState?,
-    homePlaybackCapsuleEnabled: Boolean,
-    capsuleAnchorPreview: io.legado.app.domain.model.PlaybackCapsuleState?,
 ) = entryProvider<NavKey> {
     entry<MainRouteToc> { route ->
         TocRouteScreen(
@@ -447,9 +409,6 @@ fun MainActivity.mainEntryProvider(
             onIntent = mainViewModel::onIntent,
             effects = mainViewModel.effects,
             useRail = useRail,
-            readAloudMorph = readAloudMorph,
-            homePlaybackCapsuleEnabled = homePlaybackCapsuleEnabled,
-            capsuleAnchorPreview = capsuleAnchorPreview,
             onOpenSettings = {
                 onNavigateToRoute(MainRouteSettings)
             },
@@ -476,21 +435,12 @@ fun MainActivity.mainEntryProvider(
                 onNavigateToRoute(MainRouteBookCacheManage)
             },
             onOpenBookshelfBook = { book, sharedCoverKey ->
-                if (book.isAudio) {
-                    onNavigateToRoute(
-                        MainRouteAudioPlay(
-                            bookUrl = book.bookUrl,
-                            sharedCoverKey = sharedCoverKey
-                        )
+                onNavigateToRoute(
+                    MainRouteReadBook(
+                        bookUrl = book.bookUrl,
+                        sharedCoverKey = sharedCoverKey,
                     )
-                } else {
-                    onNavigateToRoute(
-                        MainRouteReadBook(
-                            bookUrl = book.bookUrl,
-                            sharedCoverKey = sharedCoverKey,
-                        )
-                    )
-                }
+                )
             },
             onNavigateToBackupSettings = {
                 onNavigateToRoute(MainRouteSettingsBackup)
@@ -551,8 +501,6 @@ fun MainActivity.mainEntryProvider(
             onBackClick = { onNavigateBack() },
             onNavigateToOther = { backStack.add(MainRouteSettingsOther) },
             onNavigateToRead = { backStack.add(MainRouteSettingsRead) },
-            // 朗读规则 hub：入口从「我的」移到设置，页面标题与这里统一叫「朗读设置」
-            onNavigateToReadAloud = { backStack.add(MainRouteMultiRoleRule) },
             onNavigateToCover = { backStack.add(MainRouteSettingsCover) },
             onNavigateToTheme = { backStack.add(MainRouteSettingsTheme) },
             onNavigateToBackup = { backStack.add(MainRouteSettingsBackup) },
@@ -743,26 +691,11 @@ fun MainActivity.mainEntryProvider(
             }
             val readerResumeState = remember(controller, lifecycleOwner) { booleanArrayOf(false) }
             val collectorReady = remember(readBookViewModel) { booleanArrayOf(false) }
-            // 是否跟随朗读位置：用户手动翻页/跳章后为 false，此时回阅读界面不回拉可见页。
-            val readAloudSessionStore: ReadAloudSessionStore = org.koin.compose.koinInject()
-            val readAloudFollow = remember(readBookViewModel) { booleanArrayOf(true) }
-            LaunchedEffect(readAloudSessionStore) {
-                readAloudSessionStore.state
-                    .map { it.followReadAloudPosition }
-                    .distinctUntilChanged()
-                    .collect { readAloudFollow[0] = it }
-            }
             fun resumeReader() {
                 if (readerResumeState[0]) return
                 readerResumeState[0] = true
                 controller.onResume()
                 readBookViewModel.onIntent(ReadBookIntent.OnResume)
-                // 回到阅读界面时把可见页对齐到当前朗读位置：朗读期间用户可能进听书页跳段/跳章，
-                // 服务驱动的是内部页游标，可见页需要显式回位，否则停在离开时那一页。
-                // 只在跟随状态下做（用户手动翻页脱离后不回拉），语义与「回到朗读位置」一致。
-                if (BaseReadAloudService.isRun && readAloudFollow[0]) {
-                    readBookViewModel.onIntent(ReadBookIntent.BackToSpeakingPosition)
-                }
             }
 
             fun pauseReader() {
@@ -807,18 +740,6 @@ fun MainActivity.mainEntryProvider(
                         )
                     )
                 },
-                onOpenVoiceCasting = { bookUrl ->
-                    onNavigateToRoute(MainRouteBookVoiceCasting(bookUrl))
-                },
-                onOpenReadAloudSubPage = { page ->
-                    onNavigateToRoute(page.toMainRoute())
-                },
-                onOpenTtsEnginesAndVoices = {
-                    onNavigateToRoute(MainRouteCloudTtsEngines(route.bookUrl))
-                },
-                onOpenTtsCache = {
-                    onNavigateToRoute(MainRouteTtsCache)
-                },
                 onNavigateBack = {
                     MainNavigator.navigateBack(
                         this@mainEntryProvider,
@@ -829,16 +750,11 @@ fun MainActivity.mainEntryProvider(
                 },
             )
 
-            DisposableEffect(controller, lifecycleOwner, route.readAloud) {
+            DisposableEffect(controller, lifecycleOwner) {
                 activeReadBookInputHandler = controller
                 activeReadBookRoute = route
                 MainActivity.hasActiveReadBookRoute = true
                 controller.onClose = { onNavigateBack() }
-                controller.onStartContentLoadFinish = {
-                    if (route.readAloud) {
-                        io.legado.app.model.ReadBook.readAloud()
-                    }
-                }
 
                 val lifecycleObserver = LifecycleEventObserver { _, event ->
                     when (event) {
@@ -863,7 +779,6 @@ fun MainActivity.mainEntryProvider(
                     }
                     MainActivity.hasActiveReadBookRoute = false
                     controller.onClose = null
-                    controller.clearTts()
                     this@mainEntryProvider.toggleSystemBar(configuration.appShell.showStatusBar)
                 }
             }
@@ -882,27 +797,6 @@ fun MainActivity.mainEntryProvider(
                     }
                 }
             }
-        }
-    }
-
-    entry<MainRouteReadAloudPlayer>(metadata = modalOverlayEntryMetadata()) {
-        LaunchedEffect(Unit) {
-            ReadAloudPlayerOverlayBus.request(PlaybackCapsuleState(source = PlaybackCapsuleSource.ReadAloud))
-            if (backStack.size > 1) onNavigateBack() else backStack[0] = MainRouteHome
-        }
-    }
-
-    // 兼容已保存的导航栈。新入口在 MainActivity 直接打开同窗口播放浮层。
-    entry<MainRouteAudioPlay>(metadata = modalOverlayEntryMetadata()) { route ->
-        LaunchedEffect(route) {
-            ReadAloudPlayerOverlayBus.request(
-                PlaybackCapsuleState(
-                    source = PlaybackCapsuleSource.AudioBook,
-                    bookUrl = route.bookUrl.orEmpty(),
-                    inBookshelf = route.inBookshelf,
-                )
-            )
-            if (backStack.size > 1) onNavigateBack() else backStack[0] = MainRouteHome
         }
     }
 
@@ -1082,18 +976,6 @@ fun MainActivity.mainEntryProvider(
                     )
                 )
             },
-            onOpenAudioPlay = { bookUrl, inBookshelf ->
-                onNavigateToRoute(
-                    MainRouteAudioPlay(
-                        bookUrl = bookUrl,
-                        inBookshelf = inBookshelf,
-                        sharedCoverKey = bookInfoCoverSharedElementKey(
-                            bookUrl,
-                            route.openRequestId
-                        ),
-                    )
-                )
-            },
             onNavigateToBookInfo = { name, author, bookUrl, origin, coverPath ->
                 onNavigateToRoute(MainRouteBookInfo(name, author, bookUrl, origin, coverPath))
             },
@@ -1103,65 +985,6 @@ fun MainActivity.mainEntryProvider(
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = LocalNavAnimatedContentScope.current,
             sharedCoverKey = route.sharedCoverKey ?: bookCoverSharedElementKey(route.bookUrl),
-        )
-    }
-
-    entry<MainRouteBookVoiceCasting> { route ->
-        val viewModel = koinViewModel<BookVoiceCastingViewModel>(
-            key = "BookVoiceCasting:${route.bookUrl}",
-            parameters = { parametersOf(route.bookUrl) },
-        )
-        BookVoiceCastingScreen(
-            state = viewModel.uiState.collectAsStateWithLifecycle().value,
-            onIntent = viewModel::onIntent,
-            effects = viewModel.effects,
-            onBack = { onNavigateBack() },
-            onManageCloudTts = { onNavigateToRoute(MainRouteCloudTtsEngines(route.bookUrl)) },
-        )
-    }
-
-    entry<MainRouteCloudTtsEngines> { route ->
-        val viewModel = koinViewModel<CloudTtsViewModel>()
-        LaunchedEffect(route.bookUrl) {
-            viewModel.onIntent(CloudTtsIntent.SetBookContext(route.bookUrl))
-        }
-        val context = LocalContext.current
-        val importLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.OpenDocument()
-        ) { uri -> uri?.let { viewModel.onIntent(CloudTtsIntent.ImportHttpTtsFileSelected(it)) } }
-        val exportLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.CreateDocument("application/json")
-        ) { uri -> uri?.let { viewModel.onIntent(CloudTtsIntent.ExportHttpTtsFileSelected(it)) } }
-        LaunchedEffect(viewModel) {
-            viewModel.effects.collectLatest { effect ->
-                when (effect) {
-                    CloudTtsEffect.OpenHttpTtsImportPicker -> importLauncher.launch(
-                        arrayOf("application/json", "text/plain")
-                    )
-
-                    CloudTtsEffect.OpenHttpTtsExportPicker -> exportLauncher.launch("httpTTS.json")
-                    is CloudTtsEffect.OpenHttpTtsLogin -> onNavigateToRoute(
-                        MainRouteSourceLogin(
-                            type = SourceLoginType.HttpTts,
-                            sourceKey = effect.engineId.toString(),
-                        )
-                    )
-
-                    else -> Unit
-                }
-            }
-        }
-        CloudTtsScreen(
-            state = viewModel.uiState.collectAsStateWithLifecycle().value,
-            onIntent = viewModel::onIntent,
-            effects = viewModel.effects,
-            onBack = { onNavigateBack() },
-        )
-    }
-
-    entry<MainRouteTtsCache> {
-        TtsCacheRouteScreen(
-            onBackClick = { onNavigateBack() },
         )
     }
 
@@ -1201,55 +1024,6 @@ fun MainActivity.mainEntryProvider(
         )
     }
 
-    entry<MainRouteMultiRoleRule> {
-        MultiRoleRuleRouteScreen(
-            onBackClick = { onNavigateBack() },
-            onNavigateToVoicePool = { backStack.add(MainRouteVoicePool) },
-            onNavigateToBgmPool = { backStack.add(MainRouteBgmPool) },
-            onNavigateToVoiceEffect = { backStack.add(MainRouteVoiceEffect) },
-            onNavigateToCapsuleStyle = { backStack.add(MainRouteCastCapsuleStyle) },
-            onNavigateToEngines = { backStack.add(MainRouteCloudTtsEngines()) },
-            onNavigateToRecognition = { backStack.add(MainRouteMultiRoleRecognition) },
-            onNavigateToRegexCast = { backStack.add(MainRouteRegexCastRule) },
-        )
-    }
-
-    entry<MainRouteCastCapsuleStyle> {
-        CastCapsuleStyleRouteScreen(
-            onBackClick = { onNavigateBack() },
-        )
-    }
-
-    entry<MainRouteVoicePool> {
-        VoicePoolRouteScreen(
-            onBackClick = { onNavigateBack() }
-        )
-    }
-
-    entry<MainRouteBgmPool> {
-        BgmPoolRouteScreen(
-            onBackClick = { onNavigateBack() }
-        )
-    }
-
-    entry<MainRouteVoiceEffect> {
-        VoiceEffectRouteScreen(
-            onBackClick = { onNavigateBack() },
-        )
-    }
-
-    entry<MainRouteMultiRoleRecognition> {
-        MultiRoleRecognitionRouteScreen(
-            onBackClick = { onNavigateBack() }
-        )
-    }
-
-    entry<MainRouteRegexCastRule> {
-        RegexCastRuleRouteScreen(
-            onBackClick = { onNavigateBack() },
-        )
-    }
-
     entry<MainRouteAbout> {
         val viewModel = koinViewModel<AboutViewModel>()
         val context = LocalContext.current
@@ -1270,191 +1044,6 @@ fun MainActivity.mainEntryProvider(
             state = viewModel.uiState.collectAsStateWithLifecycle().value,
             onIntent = viewModel::onIntent,
             onBack = { onNavigateBack() },
-        )
-    }
-}
-
-/** 有声书的 Android 宿主动作；播放页与听书页共用同窗口形变组件。 */
-@Composable
-internal fun MainActivity.AudioPlayerMorphOverlay(
-    bookUrl: String,
-    inBookshelf: Boolean,
-    morph: ReadAloudMorphState,
-    visible: Boolean,
-    awaitCapsuleAnchor: Boolean,
-    predictiveBackEnabled: Boolean,
-    onDismiss: () -> Unit,
-) {
-    // 浮层关闭后释放页面 VM；播放服务和会话继续保留，重新打开会重新同步书籍。
-    val playerStoreOwner = remember {
-        object : ViewModelStoreOwner {
-            override val viewModelStore = ViewModelStore()
-        }
-    }
-    DisposableEffect(playerStoreOwner) {
-        onDispose { playerStoreOwner.viewModelStore.clear() }
-    }
-    val audioPlayViewModel = koinViewModel<AudioPlayViewModel>(
-        key = "AudioPlay:${bookUrl}",
-        viewModelStoreOwner = playerStoreOwner,
-    )
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val uiState by audioPlayViewModel.uiState.collectAsStateWithLifecycle()
-    var showAudioChangeSource by remember { mutableStateOf(false) }
-    val sourceEditResult = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            audioPlayViewModel.onIntent(AudioPlayIntent.SourceEdited)
-        }
-    }
-
-    fun copyAudioPlayUrl() {
-        AudioPlay.book?.let {
-            SourceCallBack.callBackBtn(
-                this@AudioPlayerMorphOverlay,
-                SourceCallBack.CLICK_COPY_PLAY_URL,
-                AudioPlay.bookSource,
-                it,
-                AudioPlay.durChapter,
-                BookType.audio,
-                result = AudioPlayService.url,
-            ) {
-                sendToClip(AudioPlayService.url)
-            }
-        }
-    }
-
-    fun finishAudioPlay() {
-        if (AudioPlay.inBookshelf) {
-            SourceCallBack.callBackBook(
-                SourceCallBack.END_READ,
-                AudioPlay.bookSource,
-                AudioPlay.book,
-                AudioPlay.durChapter
-            )
-        }
-        onDismiss()
-    }
-
-    LaunchedEffect(bookUrl, inBookshelf, audioPlayViewModel) {
-        audioPlayViewModel.onIntent(
-            AudioPlayIntent.Init(bookUrl.orEmpty(), inBookshelf)
-        )
-    }
-    DisposableEffect(audioPlayViewModel, lifecycleOwner) {
-        MainActivity.hasActiveAudioPlayRoute = true
-        this@AudioPlayerMorphOverlay.activeAudioPlayViewModel = audioPlayViewModel
-        AudioPlay.register(this@AudioPlayerMorphOverlay)
-        onDispose {
-            AudioPlay.unregister(this@AudioPlayerMorphOverlay)
-            if (this@AudioPlayerMorphOverlay.activeAudioPlayViewModel === audioPlayViewModel) {
-                this@AudioPlayerMorphOverlay.activeAudioPlayViewModel = null
-            }
-            MainActivity.hasActiveAudioPlayRoute = false
-        }
-    }
-    LaunchedEffect(audioPlayViewModel) {
-        audioPlayViewModel.effects.collectLatest { effect ->
-            when (effect) {
-                is AudioPlayEffect.OpenChangeSource -> showAudioChangeSource = true
-
-                is AudioPlayEffect.OpenLogin -> startActivity(
-                    MainActivity.createSourceLoginIntent(
-                        this@AudioPlayerMorphOverlay,
-                        SourceLoginType.BookSource,
-                        effect.sourceUrl
-                    )
-                )
-
-                AudioPlayEffect.CopyPlayUrl -> copyAudioPlayUrl()
-                is AudioPlayEffect.OpenEditSource -> sourceEditResult.launch(
-                    MainActivity.createBookSourceEditIntent(
-                        this@AudioPlayerMorphOverlay,
-                        effect.sourceUrl
-                    )
-                )
-
-                is AudioPlayEffect.ShowToast -> toastOnUi(effect.message)
-                is AudioPlayEffect.OpenBookReader -> {
-                    startActivity(
-                        MainActivity.createReadBookIntent(
-                            this@AudioPlayerMorphOverlay,
-                            effect.bookUrl
-                        )
-                    )
-                    onDismiss()
-                }
-
-                AudioPlayEffect.Finish -> {
-                    if (!morph.hasCapsuleAnchors) {
-                        val anchor = BookCoverMorphAnchors.get(bookUrl)
-                        if (anchor != null && !anchor.bounds.isEmpty && isAnchorVisibleInScreen(
-                                anchor.bounds,
-                                morph.screenBounds
-                            )
-                        ) {
-                            morph.reportBookCoverAnchor(anchor.bounds, anchor.cornerRadiusPx)
-                        }
-                    }
-                    morph.animateTo(0f)
-                    finishAudioPlay()
-                }
-            }
-        }
-    }
-    val refreshAudioAnchor = {
-        if (!morph.hasCapsuleAnchors) {
-            val anchor = BookCoverMorphAnchors.get(bookUrl)
-            if (anchor != null && !anchor.bounds.isEmpty && isAnchorVisibleInScreen(
-                    anchor.bounds,
-                    morph.screenBounds
-                )
-            ) {
-                morph.reportBookCoverAnchor(anchor.bounds, anchor.cornerRadiusPx)
-            }
-        }
-    }
-    LaunchedEffect(bookUrl, visible) {
-        if (visible && morph.progress.value == 0f) {
-            refreshAudioAnchor()
-        }
-    }
-    PlayerMorphHost(
-        appearance = PlayerMorphAppearance(
-            uiState.bookName, uiState.author, uiState.coverPath,
-            uiState.sourceOrigin, uiState.bgMode,
-        ),
-        playerTheme = rememberPlayerThemeOverride(
-            uiState.bookName, uiState.author, uiState.coverPath, uiState.sourceOrigin,
-        ),
-        morph = morph,
-        visible = visible,
-        awaitCapsuleAnchor = awaitCapsuleAnchor,
-        predictiveBackEnabled = predictiveBackEnabled,
-        verticalDragEnabled = true,
-        onBeforeCollapse = refreshAudioAnchor,
-        backEnabled = uiState.activeSheet == null && !showAudioChangeSource,
-        onDismiss = ::finishAudioPlay,
-    ) { onCollapse ->
-        AudioPlayScreenContent(
-            state = uiState,
-            onIntent = audioPlayViewModel::onIntent,
-            onBack = onCollapse,
-        )
-    }
-    val audioBook = AudioPlay.book
-    if (showAudioChangeSource && audioBook != null) {
-        ChangeSourceSheet(
-            show = true,
-            oldBook = audioBook,
-            onDismissRequest = { showAudioChangeSource = false },
-            onReplace = { source, book, toc, _ ->
-                audioPlayViewModel.changeTo(source, book, toc)
-            },
-            onAddAsNew = { book, toc ->
-                audioPlayViewModel.addToBookshelf(book, toc)
-            },
         )
     }
 }
