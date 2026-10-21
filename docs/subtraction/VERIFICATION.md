@@ -314,3 +314,25 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 - `ReaderElement.RoleCast/BgmScene`、`castRenderHash`、`CastMarkers` 文本工具仍保留 → W2b（已侦察，见 `team/W2B-CORE-PLAN.md`）。
 - `readAloudParagraphIndex`、`readAloud: Color`（文字高亮色）保留 → W2c；不得误删。
 - 真机手测未做 → W5。
+
+### 7.5 W3 · 首页 / Web / 翻译 / 导航收敛（2026-10-21）
+
+| 子波 | 提交 | 结果 |
+|---|---|---|
+| W3a 首页 + 3 tab | `2db39755a` | 31 文件 / -7,423 行；Banner 迁 `ui/widget/components/book/BookBannerRow`；`MainDestination` 收敛为 Bookshelf/Explore/My |
+| W3b Web 归档 | `ce91fb1b0` | 11 源码 + assets/web 58 文件移出 APK；`attic/webservice/` 保留恢复路径；删除 6 个 ktor 依赖；ShortCuts 移到 `App.onCreate` |
+| W3c 翻译删除 | `97fa73e8b` | 16 文件 / -1,961 行；阅读页/导出/设置链路清零；保留字典与 AI 底座共享模型 |
+
+**W3 出口验证（提交后）**：
+
+| 命令 | 结果 |
+|---|---|
+| `:app:compileAppDebugKotlin` | **BUILD SUCCESSFUL**（逐子波各一次） |
+| `testAppDebugUnitTest` | **1255 / 0 / 0 / 0**（233 XML） |
+| `verifyConfigArchitecture` | **通过**（20 键/68、1/0、8/20；无缺失键） |
+| `assembleAppDebug` | **通过**；APK arm64 **60M**、armv7 **59M**、universal **66M**（W2a 65/64/71M） |
+| `git diff --check` | 0 |
+
+**残留/顺延**：翻译/AI/TTS 专用 strings 4 语言、`PreferKey.llm*`、`BookType.audio`/DB 旧表与 DAO → W4/W5；lint 复跑仍受 `lintAnalyzeAppDebug` 超时限制。
+
+> 注：W3b 的提交号与 W3a/W3c 以 `git log` 实际值为准；本文按交付时 HEAD 顺序记录。

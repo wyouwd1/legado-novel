@@ -149,11 +149,11 @@ W2a 删除已落盘（**225 文件 `git rm` 已暂存**）+ 11 个接入点已�
 
 | # | 任务 | 认领 | 状态 | 证据 |
 |---|---|---|---|---|
-| W3-1 | 首页自定义模块（D7）+ `BookSource.homepageModules` 用法清理 | Surgeon-homepage | ⬜ | 编译通过 |
-| W3-2 | Web 服务归档（D8）：源码迁 `attic/webservice/` + 删 `assets/web/**` + 删 APK 侧入口与 ktor 依赖 | Surgeon-web | ⬜ | 编译通过 + APK 无 assets/web |
-| W3-3 | 翻译域删除（D9） | Surgeon-misc | ⬜ | 编译通过 |
-| W3-4 | 导航收敛 3 tab（D7a） | Integrator | ⬜ | 编译 + 手测 |
-| W3-5 | 热点收口 + 基线同步 + 独立验证 | Integrator/Verifier | ⬜ | 架构门通过 |
+| W3-1 | 首页自定义模块（D7）+ `BookSource.homepageModules` 用法清理 | Surgeon-homepage | 🟢 | W3a `2db39755a`；31 文件 / -7,423 行 |
+| W3-2 | Web 服务归档（D8）：源码迁 `attic/webservice/` + 删 `assets/web/**` + 删 APK 侧入口与 ktor 依赖 | Surgeon-web | 🟢 | W3b `ce91fb1b0`；11 源码 + 58 assets 移出 APK |
+| W3-3 | 翻译域删除（D9） | Surgeon-misc | 🟢 | W3c `97fa73e8b`；16 文件 / -1,961 行 |
+| W3-4 | 导航收敛 3 tab（D7a） | Integrator | 🟢 | W3a 内完成；旧顺序/默认页自动降级 |
+| W3-5 | 热点收口 + 基线同步 + 独立验证 | Integrator/Verifier | 🟢 | 架构门通过；单测 1255/0；APK 60/59/66M |
 
 ## W4 · 数据层收口（串行）
 
