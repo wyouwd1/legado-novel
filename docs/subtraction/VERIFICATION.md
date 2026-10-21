@@ -366,4 +366,4 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 | 删除 | `ReaderCastOptions/Profile`、`RoleCast/BgmScene` 测量与页面类型、`CastCapsuleGeometry/Style`、Legacy 胶囊预算、`castRenderHash` |
 | CastMarkers | 收敛为纯文本注入/剥离/偏移工具；新增 `CastMarkersTextTest` 5 例 |
 | W2c | 删除 `ReaderPage.Text.readAloud`、`readAloudParagraphIndex` 与 Canvas `isReadAloud` 分支；保留文字强调色 `readAloud: Color` |
-| 验证 | `compileAppDebugKotlin`/`compileAppDebugUnitTestKotlin` 通过；`feature.reader.*` 测试通过；全量 `testAppDebugUnitTest` **1,210 / 0**；架构门通过；`assembleAppDebug` 通过 |
+| 验证 | `compileAppDebugKotlin`/`compileAppDebugUnitTestKotlin` 通过；`feature.reader.*` 测试通过；全量 `testAppDebugUnitTest` **1,209 / 0**；架构门通过；`assembleAppDebug` 通过 |

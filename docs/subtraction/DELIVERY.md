@@ -18,7 +18,7 @@
 ## 2. 结果（提交后验证）
 
 - `:app:compileAppDebugKotlin`：**BUILD SUCCESSFUL**
-- `testAppDebugUnitTest`：**1,222 / 0 失败 / 0 错误**（225 XML）
+- `testAppDebugUnitTest`：**1,209 / 0 失败 / 0 错误**（225 XML）
 - `verifyConfigArchitecture`：**通过**（20 键/68、1 键/0、8 键/20，无缺失键）
 - `assembleAppDebug`：**通过**；APK arm64 **60M**、armv7 **59M**、universal **66M**（W0 基线 71.7/71.2/78.2 MB）
 - `git diff --check`：0
@@ -30,7 +30,7 @@
 
 ## 4. 明确未完成 / 风险
 
-1. **W5 剩余**：lint 全量复跑仍受 `lintAnalyzeAppDebug` 超时限制；`assembleAppNoR8` 在打包阶段因 Gradle daemon 内存崩溃（`mergeDexAppNoR8` 后 daemon disappeared），未取得 NoR8 APK。
+1. **W5 剩余**：lint 全量复跑仍受 `lintAnalyzeAppDebug` 超时限制；`assembleAppNoR8` 在打包阶段因 Gradle daemon 内存崩溃（`mergeDexAppNoR8` 后 daemon disappeared），未取得 NoR8 APK；`lintVitalAnalyzeAppNoR8` 在崩溃前已通过。
 2. **未做真机手测**：阅读、换源、缓存、书源调试、备份恢复、升级安装均未在真机验证；Room 131→132 迁移仅经 schema/KSP 验证，未做设备升级安装。
 3. **兼容性**：旧 Nav3 保存栈中的朗读/音频 route 已删除，升级后首次恢复可能回主页；`BookSource.homepageModules` 字段保留读取但不展示；旧 `httpTTS.json`/RSS/首页模块备份文件忽略而不报错。
 
