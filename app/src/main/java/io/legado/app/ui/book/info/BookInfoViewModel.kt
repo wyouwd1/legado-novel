@@ -28,7 +28,6 @@ import io.legado.app.data.repository.HighlightTagRuleRepository
 import io.legado.app.data.repository.ReadRecordRepository
 import io.legado.app.data.repository.RemoteBookRepository
 import io.legado.app.data.repository.SearchRepository
-import io.legado.app.domain.gateway.BookKnowledgeGateway
 import io.legado.app.domain.gateway.CoverSettingsGateway
 import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.domain.gateway.PrivateAccessGateway
@@ -121,7 +120,6 @@ class BookInfoViewModel(
     private val searchRepository: SearchRepository,
     private val highlightTagRuleRepository: HighlightTagRuleRepository,
     private val imageLoader: ImageLoader,
-    private val bookKnowledgeGateway: BookKnowledgeGateway,
     private val themeSettingsGateway: ThemeSettingsGateway,
     private val coverSettingsGateway: CoverSettingsGateway,
     private val otherSettingsGateway: OtherSettingsGateway,

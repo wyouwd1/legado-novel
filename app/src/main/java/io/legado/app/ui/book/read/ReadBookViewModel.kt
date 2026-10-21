@@ -24,7 +24,6 @@ import io.legado.app.data.repository.ReadSettingsRepository
 import io.legado.app.data.repository.ReplaceRuleRepository
 import io.legado.app.data.repository.SettingsRepository
 import io.legado.app.data.repository.UploadRepository
-import io.legado.app.domain.gateway.AiProfileGateway
 import io.legado.app.domain.gateway.AppShellSettingsGateway
 import io.legado.app.domain.gateway.AppUiConfigurationGateway
 import io.legado.app.domain.gateway.BackupSettingsGateway
@@ -112,7 +111,6 @@ class ReadBookViewModel(
     private val verifyBookmarkTargetUseCase: VerifyBookmarkTargetUseCase,
     private val relocateMarkingTargetUseCase: RelocateMarkingTargetUseCase,
     private val bookContentProcessGateway: BookContentProcessGateway,
-    private val aiProfileGateway: AiProfileGateway,
     private val replaceRuleRepository: ReplaceRuleRepository,
     private val changeSourceSettingsGateway: ChangeSourceSettingsGateway,
     private val appShellSettingsGateway: AppShellSettingsGateway,

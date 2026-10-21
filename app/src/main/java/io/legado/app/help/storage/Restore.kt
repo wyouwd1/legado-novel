@@ -20,13 +20,8 @@ import io.legado.app.data.entities.Bookmark
 import io.legado.app.data.entities.DictRule
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.HighlightTagRule
-import io.legado.app.data.entities.HomepageCustomSet
-import io.legado.app.data.entities.HomepageModule
-import io.legado.app.data.entities.HttpTTS
 import io.legado.app.data.entities.KeyboardAssist
 import io.legado.app.data.entities.ReplaceRule
-import io.legado.app.data.entities.RssSource
-import io.legado.app.data.entities.RssStar
 import io.legado.app.data.entities.RuleSub
 import io.legado.app.data.entities.SearchKeyword
 import io.legado.app.data.entities.Server
@@ -183,22 +178,6 @@ object Restore : KoinComponent {
                 }
             }
         }
-        if (BackupConfig.dbIsNotIgnored("rssSource")) {
-            fileToListT<RssSource>(path, "rssSources.json")?.let {
-                try {
-                    appDb.rssSourceDao.insert(*it.toTypedArray())
-                } catch (_: SQLiteConstraintException) {
-                }
-            }
-        }
-        if (BackupConfig.dbIsNotIgnored("rssStar")) {
-            fileToListT<RssStar>(path, "rssStar.json")?.let {
-                try {
-                    appDb.rssStarDao.insert(*it.toTypedArray())
-                } catch (_: SQLiteConstraintException) {
-                }
-            }
-        }
         if (BackupConfig.dbIsNotIgnored("replaceRule")) {
             fileToListT<ReplaceRule>(path, "replaceRule.json")?.let {
                 try {
@@ -231,14 +210,6 @@ object Restore : KoinComponent {
                 }
             }
         }
-        if (BackupConfig.dbIsNotIgnored("httpTTS")) {
-            fileToListT<HttpTTS>(path, "httpTTS.json")?.let {
-                try {
-                    appDb.httpTTSDao.insert(*it.toTypedArray())
-                } catch (_: SQLiteConstraintException) {
-                }
-            }
-        }
         if (BackupConfig.dbIsNotIgnored("dictRule")) {
             fileToListT<DictRule>(path, "dictRule.json")?.let {
                 try {
@@ -253,16 +224,6 @@ object Restore : KoinComponent {
                     appDb.keyboardAssistsDao.insert(*it.toTypedArray())
                 } catch (_: SQLiteConstraintException) {
                 }
-            }
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageModules")) {
-            fileToListT<HomepageModule>(path, "homepageModules.json")?.let {
-                appDb.homepageModuleDao.replaceAll(it)
-            }
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageCustomSets")) {
-            fileToListT<HomepageCustomSet>(path, "homepageCustomSets.json")?.let {
-                appDb.homepageCustomSetDao.replaceAll(it)
             }
         }
         if (BackupConfig.dbIsNotIgnored("highlightRule")) {

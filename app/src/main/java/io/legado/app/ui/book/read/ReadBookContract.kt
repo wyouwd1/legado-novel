@@ -13,7 +13,6 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.Bookmark
 import io.legado.app.data.entities.HighlightRule
 import io.legado.app.data.entities.ReplaceRule
-import io.legado.app.domain.model.AiReasoningLevel
 import io.legado.app.domain.model.TextProcessStyle
 import io.legado.app.domain.model.settings.ReadStyleItem
 import io.legado.app.domain.usecase.BookmarkTargetVerdict

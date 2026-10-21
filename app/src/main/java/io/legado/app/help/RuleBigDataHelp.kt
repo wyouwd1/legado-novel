@@ -14,7 +14,6 @@ object RuleBigDataHelp {
 
     private val ruleDataDir = FileUtils.createFolderIfNotExist(appCtx.externalFiles, "ruleData")
     private val bookData = FileUtils.createFolderIfNotExist(ruleDataDir, "book")
-    private val rssData = FileUtils.createFolderIfNotExist(ruleDataDir, "rss")
 
     suspend fun clearInvalid() {
         withContext(IO) {
@@ -28,21 +27,6 @@ object RuleBigDataHelp {
                     } else {
                         val bookUrl = bookUrlFile.readText()
                         if (!appDb.bookDao.has(bookUrl)) {
-                            FileUtils.delete(it)
-                        }
-                    }
-                }
-            }
-            rssData.listFiles()?.forEach {
-                if (it.isFile) {
-                    FileUtils.delete(it)
-                } else {
-                    val originFile = it.getFile("origin.txt")
-                    if (!originFile.exists()) {
-                        FileUtils.delete(it)
-                    } else {
-                        val origin = originFile.readText()
-                        if (!appDb.rssSourceDao.has(origin)) {
                             FileUtils.delete(it)
                         }
                     }
@@ -111,36 +95,5 @@ object RuleBigDataHelp {
         return null
     }
 
-    fun putRssVariable(origin: String, link: String, key: String, value: String?) {
-        val md5Origin = MD5Utils.md5Encode(origin)
-        val md5Link = MD5Utils.md5Encode(link)
-        val md5Key = MD5Utils.md5Encode(key)
-        val filePath = FileUtils.getPath(rssData, md5Origin, md5Link, "$md5Key.txt")
-        if (value == null) {
-            FileUtils.delete(filePath)
-        } else {
-            val valueFile = FileUtils.createFileIfNotExist(filePath)
-            valueFile.writeText(value)
-            val originFile = File(FileUtils.getPath(rssData, md5Origin, "origin.txt"))
-            if (!originFile.exists()) {
-                originFile.writeText(origin)
-            }
-            val linFile = File(FileUtils.getPath(rssData, md5Origin, md5Link, "origin.txt"))
-            if (!linFile.exists()) {
-                linFile.writeText(link)
-            }
-        }
-    }
 
-    fun getRssVariable(origin: String, link: String, key: String): String? {
-        val md5Origin = MD5Utils.md5Encode(origin)
-        val md5Link = MD5Utils.md5Encode(link)
-        val md5Key = MD5Utils.md5Encode(key)
-        val filePath = FileUtils.getPath(rssData, md5Origin, md5Link, "$md5Key.txt")
-        val file = File(filePath)
-        if (file.exists()) {
-            return file.readText()
-        }
-        return null
-    }
 }

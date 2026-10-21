@@ -70,8 +70,6 @@ object Backup {
             "bookMarking.json",
             "bookGroup.json",
             "bookSource.json",
-            "rssSources.json",
-            "rssStar.json",
             "replaceRule.json",
             "readRecord.json",
             "readRecordDetail.json",
@@ -79,11 +77,8 @@ object Backup {
             "searchHistory.json",
             "sourceSub.json",
             "txtTocRule.json",
-            "httpTTS.json",
             "keyboardAssists.json",
             "dictRule.json",
-            "homepageModules.json",
-            "homepageCustomSets.json",
             "highlightRule.json",
             "highlightTagRule.json",
             "tagGroupRule.json",
@@ -161,12 +156,6 @@ object Backup {
         if (BackupConfig.dbIsNotIgnored("bookSource", true)) {
             writeListToJson(appDb.bookSourceDao.all, "bookSource.json", backupPath)
         }
-        if (BackupConfig.dbIsNotIgnored("rssSource", true)) {
-            writeListToJson(appDb.rssSourceDao.all, "rssSources.json", backupPath)
-        }
-        if (BackupConfig.dbIsNotIgnored("rssStar", true)) {
-            writeListToJson(appDb.rssStarDao.all, "rssStar.json", backupPath)
-        }
         if (BackupConfig.dbIsNotIgnored("replaceRule", true)) {
             writeListToJson(appDb.replaceRuleDao.all, "replaceRule.json", backupPath)
         }
@@ -184,24 +173,11 @@ object Backup {
         if (BackupConfig.dbIsNotIgnored("txtTocRule", true)) {
             writeListToJson(appDb.txtTocRuleDao.all, "txtTocRule.json", backupPath)
         }
-        if (BackupConfig.dbIsNotIgnored("httpTTS", true)) {
-            writeListToJson(appDb.httpTTSDao.all, "httpTTS.json", backupPath)
-        }
         if (BackupConfig.dbIsNotIgnored("keyboardAssists", true)) {
             writeListToJson(appDb.keyboardAssistsDao.all, "keyboardAssists.json", backupPath)
         }
         if (BackupConfig.dbIsNotIgnored("dictRule", true)) {
             writeListToJson(appDb.dictRuleDao.all, "dictRule.json", backupPath)
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageModules", true)) {
-            writeListToJson(appDb.homepageModuleDao.getAll(), "homepageModules.json", backupPath)
-        }
-        if (BackupConfig.dbIsNotIgnored("homepageCustomSets", true)) {
-            writeListToJson(
-                appDb.homepageCustomSetDao.getAll(),
-                "homepageCustomSets.json",
-                backupPath
-            )
         }
         if (BackupConfig.dbIsNotIgnored("highlightRule", true)) {
             writeListToJson(appDb.highlightRuleDao.getAll(), "highlightRule.json", backupPath)

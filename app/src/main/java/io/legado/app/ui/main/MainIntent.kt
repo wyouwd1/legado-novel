@@ -223,50 +223,6 @@ object MainIntent {
         }
     }
 
-    fun createBookKnowledgeListIntent(
-        context: Context,
-        bookUrl: String,
-    ): Intent {
-        return createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_BOOK_KNOWLEDGE_LIST)
-            putExtra(EXTRA_BOOK_URL, bookUrl)
-        }
-    }
-
-    fun createBookKnowledgeDetailIntent(
-        context: Context,
-        bookUrl: String,
-        entryId: String? = null,
-    ): Intent {
-        return createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_BOOK_KNOWLEDGE_DETAIL)
-            putExtra(EXTRA_BOOK_URL, bookUrl)
-            entryId?.let { putExtra(EXTRA_ENTRY_ID, it) }
-        }
-    }
-
-    fun createBookEventListIntent(
-        context: Context,
-        bookUrl: String,
-    ): Intent {
-        return createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_BOOK_EVENT_LIST)
-            putExtra(EXTRA_BOOK_URL, bookUrl)
-        }
-    }
-
-    fun createBookEventDetailIntent(
-        context: Context,
-        bookUrl: String,
-        eventId: String? = null,
-    ): Intent {
-        return createLauncherIntent(context).apply {
-            putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_BOOK_EVENT_DETAIL)
-            putExtra(EXTRA_BOOK_URL, bookUrl)
-            eventId?.let { putExtra(EXTRA_EVENT_ID, it) }
-        }
-    }
-
     fun createExploreShowIntent(
         context: Context,
         exploreName: String? = null,

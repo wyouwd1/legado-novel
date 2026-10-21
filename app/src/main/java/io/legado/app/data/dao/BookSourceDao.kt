@@ -84,13 +84,6 @@ interface BookSourceDao {
 
     @Query(
         """select * from book_sources
-        where enabled = 1 and enabledExplore = 1 and homepageModules is not null
-        order by customOrder asc"""
-    )
-    fun flowHomepageModules(): Flow<List<BookSource>>
-
-    @Query(
-        """select * from book_sources
         where enabled = 1 and enabledExplore = 1
         order by customOrder asc"""
     )

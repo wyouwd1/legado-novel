@@ -1,6 +1,7 @@
 package io.legado.app.data
 
 import androidx.room.DeleteColumn
+import androidx.room.DeleteTable
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -896,6 +897,60 @@ object DatabaseMigrations {
             )
             db.execSQL("DROP TABLE highlightRules")
             db.execSQL("ALTER TABLE highlightRules_r56 RENAME TO highlightRules")
+        }
+    }
+    /** 131 → 132：纯删除已裁撤域的 40 张旧表（RSS/AI/朗读/配音/BGM/首页模块/HTTP TTS）。 */
+    @DeleteTable.Entries(
+        DeleteTable(tableName = "rssSources"),
+        DeleteTable(tableName = "rssArticles"),
+        DeleteTable(tableName = "rssReadRecords"),
+        DeleteTable(tableName = "rssStars"),
+        DeleteTable(tableName = "httpTTS"),
+        DeleteTable(tableName = "homepage_modules"),
+        DeleteTable(tableName = "homepage_custom_sets"),
+        DeleteTable(tableName = "ai_provider_profiles"),
+        DeleteTable(tableName = "ai_model_profiles"),
+        DeleteTable(tableName = "ai_task_presets"),
+        DeleteTable(tableName = "ai_artifacts"),
+        DeleteTable(tableName = "ai_chat_conversations"),
+        DeleteTable(tableName = "ai_chat_messages"),
+        DeleteTable(tableName = "ai_memory"),
+        DeleteTable(tableName = "ai_prompt_presets"),
+        DeleteTable(tableName = "book_character_profiles"),
+        DeleteTable(tableName = "book_character_events"),
+        DeleteTable(tableName = "book_character_relations"),
+        DeleteTable(tableName = "book_knowledge_entries"),
+        DeleteTable(tableName = "book_outline_nodes"),
+        DeleteTable(tableName = "read_aloud_voices"),
+        DeleteTable(tableName = "book_voice_bindings"),
+        DeleteTable(tableName = "chapter_speech_analysis"),
+        DeleteTable(tableName = "chapter_speech_segments"),
+        DeleteTable(tableName = "chapter_role_assignments"),
+        DeleteTable(tableName = "cast_characters"),
+        DeleteTable(tableName = "book_cast_memory"),
+        DeleteTable(tableName = "voice_pools"),
+        DeleteTable(tableName = "voice_pool_members"),
+        DeleteTable(tableName = "voice_pool_groups"),
+        DeleteTable(tableName = "cloud_tts_engines"),
+        DeleteTable(tableName = "bgm_tracks"),
+        DeleteTable(tableName = "bgm_pools"),
+        DeleteTable(tableName = "bgm_pool_members"),
+        DeleteTable(tableName = "bgm_pool_groups"),
+        DeleteTable(tableName = "bgm_scene_marks"),
+        DeleteTable(tableName = "voice_effect_presets"),
+        DeleteTable(tableName = "read_aloud_audio_downloads"),
+        DeleteTable(tableName = "regex_cast_rules"),
+        DeleteTable(tableName = "regex_cast_groups")
+    )
+    @Suppress("ClassName")
+    class Migration_131_132 : AutoMigrationSpec {
+        override fun onPostMigrate(db: SupportSQLiteDatabase) {
+            // 旧音频/图片书不再属于本应用：保留数据、标为需下载的文本并移出书架。
+            val oldTypes = BookType.audio or BookType.image or BookType.video
+            db.execSQL(
+                "UPDATE books SET type = (type & ~$oldTypes) or ${BookType.text} or ${BookType.notShelf} " +
+                    "WHERE type & $oldTypes > 0"
+            )
         }
     }
 }

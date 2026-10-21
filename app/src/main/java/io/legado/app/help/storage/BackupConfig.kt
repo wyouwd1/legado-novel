@@ -76,47 +76,36 @@ object BackupConfig {
     private const val dbKeyBookmark = "bookmark"
     private const val dbKeyBookGroup = "bookGroup"
     private const val dbKeyBookSource = "bookSource"
-    private const val dbKeyRssSource = "rssSource"
-    private const val dbKeyRssStar = "rssStar"
     private const val dbKeyReplaceRule = "replaceRule"
     private const val dbKeyReadRecord = "readRecord"
     private const val dbKeySearchHistory = "searchHistory"
     private const val dbKeySourceSub = "sourceSub"
     private const val dbKeyTxtTocRule = "txtTocRule"
-    private const val dbKeyHttpTts = "httpTTS"
     private const val dbKeyKeyboardAssists = "keyboardAssists"
     private const val dbKeyDictRule = "dictRule"
-    private const val dbKeyHomepageModules = "homepageModules"
-    private const val dbKeyHomepageCustomSets = "homepageCustomSets"
     private const val dbKeyHighlightRule = "highlightRule"
     private const val dbKeyHighlightTagRule = "highlightTagRule"
     private const val dbKeyTagGroupRule = "tagGroupRule"
     private const val dbKeyServer = "server"
 
     val dbIgnoreKeys = arrayOf(
-        dbKeyBookmark, dbKeyBookGroup, dbKeyBookSource, dbKeyRssSource,
-        dbKeyRssStar, dbKeyReplaceRule, dbKeyReadRecord, dbKeySearchHistory,
-        dbKeySourceSub, dbKeyTxtTocRule, dbKeyHttpTts, dbKeyKeyboardAssists,
-        dbKeyDictRule, dbKeyHomepageModules, dbKeyHomepageCustomSets,
-        dbKeyHighlightRule, dbKeyHighlightTagRule, dbKeyTagGroupRule, dbKeyServer
+        dbKeyBookmark, dbKeyBookGroup, dbKeyBookSource, dbKeyReplaceRule,
+        dbKeyReadRecord, dbKeySearchHistory, dbKeySourceSub, dbKeyTxtTocRule,
+        dbKeyKeyboardAssists, dbKeyDictRule, dbKeyHighlightRule,
+        dbKeyHighlightTagRule, dbKeyTagGroupRule, dbKeyServer
     )
 
     val dbIgnoreTitle = arrayOf(
         appCtx.getString(R.string.bookmark),
         appCtx.getString(R.string.book_group),
         appCtx.getString(R.string.book_source),
-        appCtx.getString(R.string.rss_source),
-        appCtx.getString(R.string.rss_star),
         appCtx.getString(R.string.replace_rule),
         appCtx.getString(R.string.read_record),
         appCtx.getString(R.string.search_history),
         appCtx.getString(R.string.source_sub),
         appCtx.getString(R.string.txt_toc_rule),
-        appCtx.getString(R.string.http_tts),
         appCtx.getString(R.string.keyboard_assists),
         appCtx.getString(R.string.dict_rule),
-        appCtx.getString(R.string.homepage_modules),
-        appCtx.getString(R.string.homepage_custom_sets),
         appCtx.getString(R.string.highlight_rule_config),
         appCtx.getString(R.string.highlight_tag_config),
         appCtx.getString(R.string.tag_group_rules),

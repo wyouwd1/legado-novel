@@ -198,9 +198,7 @@ fun BookInfoEditContent(
                 Spacer(modifier = Modifier.height(4.dp))
                 BookTypeDropdown(
                     bookTypes = listOf(
-                        BookInfoEditType.TEXT to stringResource(R.string.book_type_text),
-                        BookInfoEditType.AUDIO to stringResource(R.string.book_type_audio),
-                        BookInfoEditType.IMAGE to stringResource(R.string.book_type_image)
+                        BookInfoEditType.TEXT to stringResource(R.string.book_type_text)
                     ),
                     selectedType = uiState.selectedType,
                     onTypeSelected = { viewModel.onBookTypeChange(it) }

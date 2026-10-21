@@ -364,9 +364,8 @@ class HighlightRuleRepository(
      */
     private fun cleanupUnusedBgImages() {
         val allRules = dao.getAll()
-        val usedPaths = (
-            allRules.mapNotNull { it.bgImage } + castBubblePaths()
-            ).filter { it.isNotBlank() && !it.startsWith("assets://") }.toSet()
+        val usedPaths = allRules.mapNotNull { it.bgImage }
+            .filter { it.isNotBlank() && !it.startsWith("assets://") }.toSet()
         val dir = File(context.filesDir, "bg_images")
         if (!dir.exists()) return
         dir.listFiles()?.forEach { file ->
@@ -375,12 +374,6 @@ class HighlightRuleRepository(
             }
         }
     }
-
-    private fun castBubblePaths(): List<String> = runCatching {
-        appDb.castCharacterDao.getBubbleRefs().mapNotNull { json ->
-            GSON.fromJsonObject<HighlightRule>(json).getOrNull()?.bgImage
-        }
-    }.getOrDefault(emptyList())
 
     private fun restoreRuleBgImage(backupRootPath: String?, bgImage: String?): String? {
         val path = bgImage ?: return null

@@ -29,9 +29,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 enum class BookInfoEditType {
-    TEXT,
-    AUDIO,
-    IMAGE
+    TEXT
 }
 
 data class BookInfoEditUiState(
@@ -60,11 +58,7 @@ class BookInfoEditViewModel(
         execute {
             book = bookRepository.getBook(bookUrl)
             book?.let {
-                val selectedType = when {
-                    it.isImage -> BookInfoEditType.IMAGE
-                    it.isAudio -> BookInfoEditType.AUDIO
-                    else -> BookInfoEditType.TEXT
-                }
+                val selectedType = BookInfoEditType.TEXT
                 val sourceKinds = it.kind?.splitNotBlank(",", "\n").orEmpty().distinct()
                 val customTags = it.customTag?.splitNotBlank(",", "\n").orEmpty().distinct()
                 _uiState.value = BookInfoEditUiState(
@@ -133,11 +127,7 @@ class BookInfoEditViewModel(
                 book.author = currentState.author
                 book.remark = currentState.remark
                 val local = if (book.isLocal) BookType.local else 0
-                val bookType = when (currentState.selectedType) {
-                    BookInfoEditType.IMAGE -> BookType.image or local
-                    BookInfoEditType.AUDIO -> BookType.audio or local
-                    else -> BookType.text or local
-                }
+                val bookType = BookType.text or local
                 book.removeType(BookType.local, BookType.image, BookType.audio, BookType.text)
                 book.addType(bookType)
                 book.config.fixedType = currentState.fixedType

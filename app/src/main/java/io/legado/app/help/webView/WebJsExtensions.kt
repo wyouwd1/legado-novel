@@ -9,7 +9,6 @@ import io.legado.app.data.appDb
 import io.legado.app.data.entities.BaseSource
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
-import io.legado.app.data.entities.RssSource
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.help.CacheManager
 import io.legado.app.help.coroutine.Coroutine
@@ -213,47 +212,6 @@ class WebJsExtensions(
     @JavascriptInterface
     fun longToast(msg: String?) {
         super.longToast(msg)
-    }
-
-    @JavascriptInterface
-    override fun open(name: String, url: String?, title: String?, origin: String?) {
-        when (name) {
-            "sort" -> {
-                val sortUrl = if (url.isJsonObject()) {
-                    url
-                } else {
-                    title?.let { JSONObject().put(title, url).toString() } ?: url
-                }
-                val originKey = origin?.takeIf { it.isNotBlank() }
-                val targetSourceUrl = if (originKey != null) {
-                    appDb.rssSourceDao.getByKey(originKey)?.sourceUrl
-                } else {
-                    (getSource() as? RssSource)?.sourceUrl
-                }
-                if (targetSourceUrl == null) {
-                    // origin 指定的订阅源未安装时不能回退到当前源, 否则会用当前源的规则解析跨站 HTML
-                    if (originKey != null) {
-                        val missing = if (title.isNullOrBlank()) {
-                            originKey
-                        } else {
-                            "$title($originKey)"
-                        }
-                        Debug.log(
-                            getSource()?.getKey(),
-                            "WebView open(sort): 未找到订阅源 $missing url=$url"
-                        )
-                        activityRef.get()?.toastOnUi("未找到订阅源:$missing")
-                    }
-                    return
-                }
-                Debug.log(
-                    getSource()?.getKey(),
-                    "WebView open(sort): url=$url, title=$title, origin=$origin, target=$targetSourceUrl"
-                )
-                callbackRef.get()?.onNavigateToArticles(sortUrl, targetSourceUrl)
-            }
-            else -> super.open(name, url, title, origin)
-        }
     }
 
     @JavascriptInterface

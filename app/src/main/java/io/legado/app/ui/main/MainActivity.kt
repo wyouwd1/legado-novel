@@ -208,38 +208,6 @@ open class MainActivity : BaseComposeActivity() {
             characterId: String? = null,
         ): Intent = MainIntent.createBookCharacterDetailIntent(context, bookUrl, characterId)
 
-        fun createBookCharacterNetworkIntent(
-            context: Context,
-            bookUrl: String,
-        ): Intent = MainIntent.createBookCharacterNetworkIntent(context, bookUrl)
-
-        fun createBookKnowledgeListIntent(
-            context: Context,
-            bookUrl: String,
-        ): Intent = MainIntent.createBookKnowledgeListIntent(context, bookUrl)
-
-        fun createBookCharacterListIntent(
-            context: Context,
-            bookUrl: String,
-        ): Intent = MainIntent.createBookCharacterListIntent(context, bookUrl)
-
-        fun createBookKnowledgeDetailIntent(
-            context: Context,
-            bookUrl: String,
-            entryId: String? = null,
-        ): Intent = MainIntent.createBookKnowledgeDetailIntent(context, bookUrl, entryId)
-
-        fun createBookEventListIntent(
-            context: Context,
-            bookUrl: String,
-        ): Intent = MainIntent.createBookEventListIntent(context, bookUrl)
-
-        fun createBookEventDetailIntent(
-            context: Context,
-            bookUrl: String,
-            eventId: String? = null,
-        ): Intent = MainIntent.createBookEventDetailIntent(context, bookUrl, eventId)
-
         fun createExploreShowIntent(
             context: Context,
             exploreName: String? = null,

@@ -22,10 +22,6 @@ class BookSourceRepository(private val bookSourceDao: BookSourceDao) {
         return bookSourceDao.flowGroups()
     }
 
-    fun flowHomepageModules(): Flow<List<BookSource>> {
-        return bookSourceDao.flowHomepageModules()
-    }
-
     fun flowExploreSources(): Flow<List<BookSource>> {
         return bookSourceDao.flowExploreSources()
     }
