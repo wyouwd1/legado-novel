@@ -559,9 +559,6 @@ class ReadBookController(
             }
             else -> false
         }
-        is ReaderElement.RoleCast -> false
-
-        is ReaderElement.BgmScene -> false
         is ReaderElement.Image -> handleComposeImageClick(element)
         is ReaderElement.Review -> { activity.toastOnUi("Button Pressed!"); true }
         is ReaderElement.Action -> { activity.toastOnUi("Button Pressed!"); true }
@@ -1418,7 +1415,6 @@ class ReadBookController(
         bookUrl = book.bookUrl,
         bookOrigin = book.origin,
         bookSourceHash = bookSourceHash,
-        castRenderHash = castRenderHash,
     )
 
     /**

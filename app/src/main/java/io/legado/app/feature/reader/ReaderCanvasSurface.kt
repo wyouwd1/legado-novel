@@ -2053,8 +2053,6 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScrollPageConte
             }
         } ?: drawRect(Color.Gray.copy(alpha = .18f), Offset(e.bounds.left, e.bounds.top), Size(e.bounds.width, e.bounds.height))
         is ReaderElement.Review -> if (e.count > 0) drawReview(native, e, data.paints.values.firstOrNull()?.color ?: android.graphics.Color.GRAY)
-        is ReaderElement.RoleCast -> Unit
-        is ReaderElement.BgmScene -> Unit
         is ReaderElement.Action -> Unit
         is ReaderElement.Spacer -> Unit
         is ReaderElement.ParagraphMarker -> {
@@ -2774,8 +2772,6 @@ private fun ReaderPageCanvas(
                 }
             } ?: drawRect(Color.Gray.copy(alpha = .18f), Offset(e.bounds.left, e.bounds.top), Size(e.bounds.width, e.bounds.height))
             is ReaderElement.Review -> if (e.count > 0) drawReview(native, e, paints.values.firstOrNull()?.color ?: android.graphics.Color.GRAY)
-            is ReaderElement.RoleCast -> Unit
-            is ReaderElement.BgmScene -> Unit
             is ReaderElement.Action -> Unit
             is ReaderElement.Spacer -> Unit
             is ReaderElement.ParagraphMarker -> {

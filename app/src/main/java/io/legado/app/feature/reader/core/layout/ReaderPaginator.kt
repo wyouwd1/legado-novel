@@ -12,7 +12,6 @@ import io.legado.app.feature.reader.core.model.frameBottomPx
 import io.legado.app.feature.reader.core.model.frameLeftPx
 import io.legado.app.feature.reader.core.model.frameRightPx
 import io.legado.app.feature.reader.core.model.frameTopPx
-import io.legado.app.feature.reader.core.style.ReaderCharacterStyle
 import kotlin.math.max
 
 enum class ReaderTextAlignment { START, CENTER, END, JUSTIFY }
@@ -76,8 +75,6 @@ data class ReaderPaginationConfig(
     val pageUnderline: ReaderPageUnderline? = null,
     val inlineImagesPreserveScrollLine: Boolean = true,
     val emphasisUnderlineStyle: ReaderEmphasisUnderline? = null,
-    /** 多角色分配渲染选项（默认关闭：不产生胶囊、零额外开销）。 */
-    val castOptions: ReaderCastOptions = ReaderCastOptions.Disabled,
 ) {
     init {
         require(columnCount in 1..2)
@@ -97,42 +94,6 @@ private data class ReaderLayoutRow(
 )
 
 /** A shaped paragraph. Android supplies glyph-cluster widths using the same font used by Canvas. */
-/** 角色配音档案快照（分页期用，平台层从 DB 预取，core 层不触 DB）。 */
-data class ReaderCastProfile(
-    val characterId: String,
-    val avatarUri: String,
-)
-
-/**
- * 多角色分配的分页选项：开关 + 角色档案 + 变声器状态（段级优先，其次角色全局）。
- *
- * 胶囊上的变声器标记看的是这一句**最终**用不用变声器，与朗读侧
- * `VoiceEffectStore.ofSpeech` 的取值顺序一致。
- */
-data class ReaderCastOptions(
-    val enabled: Boolean,
-    val profiles: Map<String, ReaderCastProfile>,
-    /** 段级：本章开引号锚点序号 → 变声器预设名（空值不收录）。 */
-    val chapterEffects: Map<Int, String> = emptyMap(),
-    /** 角色级（全局）：角色名 → 变声器预设名（空值不收录）。 */
-    val characterEffects: Map<String, String> = emptyMap(),
-    /**
-     * 角色自己设的气泡：角色名 → 样式（只带背景图与背景色那两栏，见 `CastCharacter.bubbleRuleJson`）。
-     *
-     * 由平台层换算好再送进来（dp→px 与位图尺寸都在那边），core 层不碰 DB 也不碰配置。
-     * 命中哪一句由分配表给定，样式在 `LegacyReaderStyleRangeMapper` 里盖到高亮规则之上。
-     */
-    val bubbles: Map<String, ReaderCharacterStyle> = emptyMap(),
-) {
-    fun hasVoiceEffect(characterName: String, quoteOrdinal: Int): Boolean =
-        chapterEffects[quoteOrdinal]?.isNotBlank() == true ||
-            (characterName.isNotBlank() && characterEffects[characterName]?.isNotBlank() == true)
-
-    companion object {
-        val Disabled = ReaderCastOptions(enabled = false, profiles = emptyMap())
-    }
-}
-
 data class ReaderMeasuredParagraph(
     val text: String,
     val clusters: List<String>,
@@ -236,40 +197,11 @@ sealed interface ReaderMeasuredInlineItem {
         val lineFinalWidthPx: Float? = null,
     ) : ReaderMeasuredInlineItem
 
-    /**
-     * 多角色分配胶囊（已测量）。raw 为标记原文（占语义坐标；未分配占位胶囊为空串）。
-     * [voiceEffectMark] = 这一句最终带变声器，胶囊右端画标记图标（宽度已含）。
-     */
-    data class RoleCast(
-        override val widthPx: Float,
-        val heightPx: Float,
-        override val chapterPosition: Int,
-        val raw: String,
-        val name: String,
-        val voicePoolLabel: String,
-        val quoteOrdinal: Int,
-        val voiceEffectMark: Boolean = false,
-    ) : ReaderMeasuredInlineItem
-
-    /** 段首背景音乐胶囊（纯视觉）：不占语义坐标。 */
-    data class BgmScene(
-        override val widthPx: Float,
-        val heightPx: Float,
-        override val chapterPosition: Int,
-        val paragraphIndex: Int,
-        val poolName: String,
-        val trackName: String,
-    ) : ReaderMeasuredInlineItem
 }
 
-/**
- * 行内项里能自己撑起行高的那几种的像素高：行内图、角色胶囊、配乐胶囊（单独成行的胶囊
- * 一个文字都没有，行高只能由它自己给）。文字不算，它走段落的基线/ descent 那套。
- */
+/** 行内项里能自己撑起行高的只有行内图；文字走段落的基线/descent。 */
 private fun ReaderMeasuredInlineItem.tallItemHeightPx(): Float = when (this) {
     is ReaderMeasuredInlineItem.Image -> heightPx
-    is ReaderMeasuredInlineItem.RoleCast -> heightPx
-    is ReaderMeasuredInlineItem.BgmScene -> heightPx
     else -> 0f
 }
 
@@ -467,8 +399,6 @@ internal class ReaderPaginationSession(
             )
 
             is ReaderElement.Action -> element.copy(bounds = element.bounds.offsetY(deltaY))
-        is ReaderElement.RoleCast -> element.copy(bounds = element.bounds.offsetY(deltaY))
-            is ReaderElement.BgmScene -> element.copy(bounds = element.bounds.offsetY(deltaY))
             is ReaderElement.Spacer -> element.copy(bounds = element.bounds.offsetY(deltaY))
             is ReaderElement.Rule -> element.copy(bounds = element.bounds.offsetY(deltaY))
             is ReaderElement.ParagraphMarker -> element.copy(bounds = element.bounds.offsetY(deltaY))
@@ -699,8 +629,6 @@ internal class ReaderPaginationSession(
                 }
 
                 is ReaderMeasuredInlineItem.Image -> clusters += "\uFFFC"
-                is ReaderMeasuredInlineItem.RoleCast -> clusters += "\uFFFC"
-                is ReaderMeasuredInlineItem.BgmScene -> clusters += ""
             }
         }
 
@@ -952,51 +880,10 @@ internal class ReaderPaginationSession(
                         )
                     }
 
-                    is ReaderMeasuredInlineItem.RoleCast -> {
-                        // 胶囊垂直居中于行盒；头像/角色 id 由平台预取的档案补全
-                        val capTop = y + (actualLineHeight - item.heightPx) / 2f
-                        val profile = config.castOptions.profiles[item.name]
-                        elements += ReaderElement.RoleCast(
-                            bounds = ReaderRect(
-                                x,
-                                capTop,
-                                x + item.widthPx,
-                                capTop + item.heightPx,
-                            ),
-                            name = item.name,
-                            voicePoolLabel = item.voicePoolLabel,
-                            avatarUri = profile?.avatarUri.orEmpty(),
-                            assigned = item.name.isNotEmpty(),
-                            voiceEffectMark = item.voiceEffectMark,
-                            quoteOrdinal = item.quoteOrdinal,
-                            characterId = profile?.characterId.orEmpty(),
-                            chapterPosition = item.chapterPosition,
-                        )
-                    }
-
-                    is ReaderMeasuredInlineItem.BgmScene -> {
-                        // 垂直居中于行盒，与角色胶囊同一套算法
-                        val capTop = y + (actualLineHeight - item.heightPx) / 2f
-                        elements += ReaderElement.BgmScene(
-                            bounds = ReaderRect(
-                                x,
-                                capTop,
-                                x + item.widthPx,
-                                capTop + item.heightPx,
-                            ),
-                            paragraphIndex = item.paragraphIndex,
-                            poolName = item.poolName,
-                            trackName = item.trackName,
-                            chapterPosition = item.chapterPosition,
-                        )
-                    }
                 }
                 pageText.append(
                     when (item) {
                         is ReaderMeasuredInlineItem.Text -> item.value
-                        is ReaderMeasuredInlineItem.RoleCast -> item.raw
-                        // 配乐胶囊零字符：正文语义坐标与不开时逐字节一致
-                        is ReaderMeasuredInlineItem.BgmScene -> ""
                         else -> "\uFFFC"
                     },
                 )
@@ -1004,15 +891,8 @@ internal class ReaderPaginationSession(
                         (matchStyle?.matchSpacingAfterPx ?: 0f) +
                         if (item is ReaderMeasuredInlineItem.Text && item.value == " ") wordSpaceExtra else 0f
                 x += if (itemIndex >= indentItems) justifyGap else 0f
-                // 胶囊是我们自己插进去的按钮，原文里没有它，所以它对背景 run 完全透明：
-                // 不把它的 null 覆盖上去，run 才会跨过胶囊连成同一个气泡。不带背景的正文
-                // 与行内图照旧打断 run。
-                if (item !is ReaderMeasuredInlineItem.RoleCast &&
-                    item !is ReaderMeasuredInlineItem.BgmScene
-                ) {
-                    previousItemBackground = itemBackground
-                    previousMatchSpacingAfterPx = matchStyle?.matchSpacingAfterPx ?: 0f
-                }
+                previousItemBackground = itemBackground
+                previousMatchSpacingAfterPx = matchStyle?.matchSpacingAfterPx ?: 0f
             }
             addPageUnderline(underlineElementStart, y + actualLineHeight)
             columnRows += ReaderLayoutRow(rowElementStart, elements.size, y, y + actualLineHeight)

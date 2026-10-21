@@ -253,39 +253,6 @@ class ReaderTextBackgroundRunTest {
         assertEquals(8f, resolved.contentInsetBottomPx, 0f)
     }
 
-    /**
-     * 胶囊对背景完全透明：分页期会把胶囊之后的字标成同一 run 的延续（见
-     * [io.legado.app.feature.reader.core.layout.ReaderPaginator] 的 previousItemBackground），
-     * 绘制期只认这个标记，几何上被胶囊撑开的间隙不再断链——一句对白只有一个包住胶囊的气泡。
-     */
-    @Test
-    fun `role capsule does not cut the bubble in half`() {
-        val page = page(
-            text(0f, 0f, 10f, 20f, style),
-            capsule(10f, 0f, 40f, 20f),
-            text(40f, 0f, 55f, 20f, style, continues = true),
-        )
-
-        assertEquals(listOf(ReaderRect(0f, 0f, 55f, 20f)), page.textBackgroundRuns().map { it.bounds })
-    }
-
-    @Test
-    fun `bgm capsule does not cut the bubble in half`() {
-        val page = page(
-            text(0f, 0f, 10f, 20f, style),
-            ReaderElement.BgmScene(
-                bounds = ReaderRect(10f, 0f, 30f, 20f),
-                paragraphIndex = 0,
-                poolName = "池",
-                trackName = "曲",
-                chapterPosition = 0,
-            ),
-            text(30f, 0f, 45f, 20f, style, continues = true),
-        )
-
-        assertEquals(1, page.textBackgroundRuns().size)
-    }
-
     /** 行内图是真内容，不是我们插进去的按钮：它照常切断一条气泡。 */
     @Test
     fun `inline image still breaks the run`() {
@@ -298,17 +265,6 @@ class ReaderTextBackgroundRunTest {
                 inline = true,
             ),
             text(40f, 0f, 55f, 20f, style, continues = true),
-        )
-
-        assertEquals(2, page.textBackgroundRuns().size)
-    }
-
-    @Test
-    fun `capsule never bridges two different rows`() {
-        val page = page(
-            text(0f, 0f, 10f, 20f, style),
-            capsule(10f, 0f, 40f, 20f),
-            text(40f, 20f, 55f, 40f, style, continues = true),
         )
 
         assertEquals(2, page.textBackgroundRuns().size)
@@ -372,19 +328,6 @@ class ReaderTextBackgroundRunTest {
             ReaderPageWindow(current = current, next = next).contentClipRect(),
         )
     }
-
-    private fun capsule(left: Float, top: Float, right: Float, bottom: Float) =
-        ReaderElement.RoleCast(
-            bounds = ReaderRect(left, top, right, bottom),
-            name = "丹妃",
-            voicePoolLabel = "女中年",
-            avatarUri = "",
-            assigned = true,
-            voiceEffectMark = false,
-            quoteOrdinal = 0,
-            characterId = "c",
-            chapterPosition = 0,
-        )
 
     private fun text(
         left: Float,
