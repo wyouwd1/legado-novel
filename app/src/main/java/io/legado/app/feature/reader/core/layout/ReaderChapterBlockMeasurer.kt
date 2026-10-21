@@ -382,8 +382,9 @@ class ReaderChapterBlockMeasurer(
                         // loader already supplies an error image; reserve stable line geometry
                         // until real dimensions are available.
                         val placeholderExtent = (lineHeight ?: baseStyle.fontSizePx).coerceAtLeast(1f)
-                        val originalSize = imageDimensionsResolver.resolve(item.source)
-                            ?: ReaderImageDimensions(placeholderExtent, placeholderExtent)
+                        val originalSize = (imageDimensionsResolver.resolve(item.source)
+                            ?: ReaderImageDimensions(placeholderExtent, placeholderExtent))
+                            .finiteOrUnit()
                         val requestedWidth = options?.requestedWidthFraction?.let { fraction ->
                             style.imageAvailableWidthPx?.times(fraction)
                         } ?: options?.requestedWidthPx
@@ -419,8 +420,11 @@ class ReaderChapterBlockMeasurer(
                             // HTML 段落例外：旧 `setTypeHtml` 的占位宽/行盒高来自 ImageSpan 本身。
                             val span = item.htmlSpanExtent
                             val cellWidthPx = span?.widthPx
+                                ?.takeIf { it.isFinite() && it > 0f }
                                 ?: inlinePlaceholderWidth(layout.placeholder, baseStyle)
-                            val cellHeightPx = span?.heightPx ?: (
+                            val cellHeightPx = span?.heightPx
+                                ?.takeIf { it.isFinite() && it > 0f }
+                                ?: (
                                     cellWidthPx * (size.heightPx.coerceAtLeast(1f) /
                                             size.widthPx.coerceAtLeast(1f))
                                     )
@@ -488,8 +492,9 @@ class ReaderChapterBlockMeasurer(
                     }
                     val placeholderExtent = (style.bodyLineHeightPx ?: style.bodyStyle.fontSizePx)
                         .coerceAtLeast(1f)
-                    val originalSize = imageDimensionsResolver.resolve(block.source)
-                        ?: ReaderImageDimensions(placeholderExtent, placeholderExtent)
+                    val originalSize = (imageDimensionsResolver.resolve(block.source)
+                        ?: ReaderImageDimensions(placeholderExtent, placeholderExtent))
+                        .finiteOrUnit()
                     val requestedWidth = options?.requestedWidthFraction?.let { fraction ->
                         style.imageAvailableWidthPx?.times(fraction)
                     } ?: options?.requestedWidthPx
@@ -512,13 +517,16 @@ class ReaderChapterBlockMeasurer(
                     addStyledParagraph(block.items, false)
                 }
                 is ReaderChapterSourceBlock.Html -> {
-                    val paragraphs = try {
+                    val resolved = try {
                         htmlSourceResolver.resolve(block.value, block.chapterPosition)
                     } catch (error: CancellationException) {
                         throw error
                     } catch (_: Exception) {
                         null
                     }
+                    // 解析器返回空列表/全空文本时等价于“没解析出任何可显示内容”：
+                    // 若该 HTML 在 semanticContent 里有正文，必须回落到语义文本，不能整块吞掉。
+                    val paragraphs = resolved?.takeIf { it.hasRenderableContent() }
                         ?: fallbackHtmlParagraphs(source, block)
                     paragraphs.forEach { paragraph ->
                         addStyledParagraph(
@@ -537,6 +545,25 @@ class ReaderChapterBlockMeasurer(
             }
         }
         return ReaderChapterMeasureResult.Success(blocks)
+    }
+}
+
+/**
+ * 图片加载器可能返回 0/负/NaN/Infinity（损坏图片、失败占位、异常 EXIF）。非有限值不能进入
+ * 行内图比例或整图缩放，否则 `Infinity * 0` 会生成 NaN 并污染整章几何；无效分量按 1px 兜底。
+ */
+private fun ReaderImageDimensions.finiteOrUnit(): ReaderImageDimensions = ReaderImageDimensions(
+    widthPx = if (widthPx.isFinite() && widthPx > 0f) widthPx else 1f,
+    heightPx = if (heightPx.isFinite() && heightPx > 0f) heightPx else 1f,
+)
+
+private fun List<ReaderHtmlParagraph>.hasRenderableContent(): Boolean = any { paragraph ->
+    paragraph.items.any { item ->
+        when (item) {
+            is ReaderChapterInlineSource.Text -> item.value.isNotEmpty()
+            is ReaderChapterInlineSource.Image -> true
+            is ReaderChapterInlineSource.BlankLine -> true
+        }
     }
 }
 
@@ -644,7 +671,8 @@ private fun ReaderChapterMeasureStyle.resolveImageLayout(
 }
 
 private fun ReaderImageDimensions.withWidth(requestedWidthPx: Float?): ReaderImageDimensions {
-    val width = requestedWidthPx?.takeIf { it > 0f && widthPx > 0f } ?: return this
+    val width = requestedWidthPx?.takeIf { it.isFinite() && it > 0f && widthPx > 0f }
+        ?: return this
     return ReaderImageDimensions(width, heightPx * width / widthPx)
 }
 

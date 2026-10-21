@@ -85,6 +85,16 @@ data class ReaderPaginationConfig(
     val contentBottomPx get() = (viewportHeightPx - paddingBottomPx).coerceAtLeast(paddingTopPx)
 }
 
+/**
+ * 图片/字形测量在异常设备或损坏图片上可能返回 NaN/Infinity/负值。这些值一旦进入几何，
+ * `NaN` 会沿着 [ReaderPaginationSession.y] 污染后续所有正文（页高、命中、选区全失效）。
+ * 非法 advance 按 0 处理；图片的非法固有尺寸按 1px 占位处理，与原来的 `coerceAtLeast(1f)` 一致。
+ */
+private fun Float.finiteNonNegative(): Float = if (isFinite()) coerceAtLeast(0f) else 0f
+
+private fun Float.finitePositiveOr(fallback: Float): Float =
+    if (isFinite() && this > 0f) this else fallback
+
 private data class ReaderLayoutRow(
     val elementStart: Int,
     val elementEnd: Int,
@@ -197,12 +207,6 @@ sealed interface ReaderMeasuredInlineItem {
         val lineFinalWidthPx: Float? = null,
     ) : ReaderMeasuredInlineItem
 
-}
-
-/** 行内项里能自己撑起行高的只有行内图；文字走段落的基线/descent。 */
-private fun ReaderMeasuredInlineItem.tallItemHeightPx(): Float = when (this) {
-    is ReaderMeasuredInlineItem.Image -> heightPx
-    else -> 0f
 }
 
 /** Platform-free page assembler. It never creates or mutates legacy TextPage/TextLine objects. */
@@ -471,17 +475,20 @@ internal class ReaderPaginationSession(
         appendSeparator: Boolean,
     ) {
         val lineHeight = paragraph.lineHeightPx ?: config.lineHeightPx
-        val letterSpacing = paragraph.letterSpacingPx ?: config.letterSpacingPx
+        val letterSpacing = (paragraph.letterSpacingPx ?: config.letterSpacingPx)
+            .let { if (it.isFinite()) it else 0f }
+        // 断行器和落笔几何必须使用同一份已清洗的字宽，否则断行结果正常、元素 bounds 仍是 NaN。
+        val clusterWidths = paragraph.clusterWidthsPx.map { it.finiteNonNegative() }
         val indentWidth = paragraph.indentWidthPx
             ?: (paragraph.style.fontSizePx + letterSpacing) * paragraph.indentCharacters
         val baselineOffset = paragraph.baselineOffsetPx ?: config.baselineOffsetPx
-        val ideographWidth = paragraph.clusterWidthsPx.firstOrNull { it > 0f }
-            ?: paragraph.style.fontSizePx
+        val ideographWidth = clusterWidths.firstOrNull { it > 0f }
+            ?: paragraph.style.fontSizePx.finitePositiveOr(1f)
         val breaker = ChineseLineBreaker(
             clusters = paragraph.clusters,
             // The shared breaker expects advances including spacing; its width limit
             // compensates for the final, undrawn trailing gap (also used by legacy ZhLayout).
-            widthsPx = paragraph.clusterWidthsPx.map { it + letterSpacing },
+            widthsPx = clusterWidths.map { it + letterSpacing },
             indentCharacters = 0,
             widthPx = config.contentWidthPx.toInt(),
             ideographWidthPx = ideographWidth + letterSpacing,
@@ -494,7 +501,7 @@ internal class ReaderPaginationSession(
             if (y + lineHeight > config.contentBottomPx && columnHasContent()) advanceColumn()
             val from = starts[lineIndex]
             val until = starts[lineIndex + 1]
-            val widths = paragraph.clusterWidthsPx.subList(from, until)
+            val widths = clusterWidths.subList(from, until)
             val naturalWidth = widths.sum() + letterSpacing * (widths.size - 1).coerceAtLeast(0)
             val indent = if (lineIndex == 0) indentWidth else 0f
             val available = (config.contentWidthPx - indent).coerceAtLeast(0f)
@@ -511,7 +518,7 @@ internal class ReaderPaginationSession(
             var characterOffset = paragraph.clusters.take(from).sumOf(String::length)
             for (clusterIndex in from until until) {
                 val value = paragraph.clusters[clusterIndex]
-                val width = max(paragraph.clusterWidthsPx[clusterIndex], 0f)
+                val width = clusterWidths[clusterIndex]
                 elements += ReaderElement.Text(
                     bounds = ReaderRect(x, y, x + width, y + lineHeight),
                     baselinePx = y + baselineOffset,
@@ -542,8 +549,9 @@ internal class ReaderPaginationSession(
 
     private fun addImage(image: ReaderMeasuredBlock.Image) {
         if (image.pageBreakBefore) advanceColumn()
-        val sourceWidth = image.intrinsicWidthPx.coerceAtLeast(1f)
-        val sourceHeight = image.intrinsicHeightPx.coerceAtLeast(1f)
+        // NaN/Infinity 不能参与 scale：Inf * 0 = NaN，会让本页和后续所有页的 y 变成 NaN。
+        val sourceWidth = image.intrinsicWidthPx.finitePositiveOr(1f)
+        val sourceHeight = image.intrinsicHeightPx.finitePositiveOr(1f)
         val availableHeight = config.contentBottomPx - config.paddingTopPx
         val singleImage = image.scaleMode == ReaderImageScaleMode.FIT_PAGE ||
                 image.pageBreakBefore && image.pageBreakAfter
@@ -601,8 +609,14 @@ internal class ReaderPaginationSession(
         appendSeparator: Boolean,
     ) {
         if (paragraph.items.isEmpty()) return
+        // 行内项也可能来自异常字体/图片量测：只把需要参与几何的 advance 收敛到安全值，
+        // 不复制 item 列表（这里是逐字热路径，整段 copy 会明显增加分页分配）。
+        val itemWidths = FloatArray(paragraph.items.size) { index ->
+            paragraph.items[index].widthPx.finiteNonNegative()
+        }
         val setupStartNs = if (metrics != null) System.nanoTime() else 0L
-        val letterSpacing = paragraph.letterSpacingPx ?: config.letterSpacingPx
+        val letterSpacing = (paragraph.letterSpacingPx ?: config.letterSpacingPx)
+            .let { if (it.isFinite()) it else 0f }
         val indentWidth = paragraph.indentWidthPx
             ?: (paragraph.baseTextSizePx + letterSpacing) * paragraph.indentCharacters
         val ideographWidth = paragraph.items.filterIsInstance<ReaderMeasuredInlineItem.Text>()
@@ -623,8 +637,8 @@ internal class ReaderPaginationSession(
             when (item) {
                 is ReaderMeasuredInlineItem.Text -> {
                     if (item.style.backgroundImage != null) hasBackgroundImages = true
-                    matchSpacingPx[index] =
-                        item.style.matchSpacingBeforePx + item.style.matchSpacingAfterPx
+                    val spacing = item.style.matchSpacingBeforePx + item.style.matchSpacingAfterPx
+                    matchSpacingPx[index] = if (spacing.isFinite()) spacing.coerceAtLeast(0f) else 0f
                     clusters += item.value
                 }
 
@@ -638,8 +652,8 @@ internal class ReaderPaginationSession(
 
         val breaker = ChineseLineBreaker(
             clusters = clusters,
-            widthsPx = paragraph.items.mapIndexed { index, item ->
-                item.widthPx + letterSpacing + matchSpacingPx[index]
+            widthsPx = paragraph.items.mapIndexed { index, _ ->
+                itemWidths[index] + letterSpacing + matchSpacingPx[index]
             },
             indentCharacters = 0,
             widthPx = (config.contentWidthPx - paragraph.restLineIndentWidthPx)
@@ -670,7 +684,7 @@ internal class ReaderPaginationSession(
             fun occupiedWidth(endExclusive: Int): Float {
                 var widthSum = 0.0
                 for (index in from until endExclusive) {
-                    widthSum += (paragraph.items[index].widthPx + matchSpacingPx[index]).toDouble()
+                    widthSum += (itemWidths[index] + matchSpacingPx[index]).toDouble()
                 }
                 return widthSum.toFloat() +
                         letterSpacing * (endExclusive - from - 1).coerceAtLeast(0)
@@ -706,7 +720,7 @@ internal class ReaderPaginationSession(
             var linePadBottomPx = 0f
             for (itemIndex in 0 until itemCount) {
                 val item = lineItems[itemIndex]
-                widthSum += item.widthPx.toDouble()
+                widthSum += itemWidths[from + itemIndex].toDouble()
                 matchSum += matchSpacingPx[from + itemIndex].toDouble()
                 if (item is ReaderMeasuredInlineItem.Text) {
                     // Inline HTML may shrink every glyph in a row (<small>, font-size, etc.).
@@ -722,7 +736,8 @@ internal class ReaderPaginationSession(
                     val bottomPad = item.style.linePadBottomPx
                     if (bottomPad > linePadBottomPx) linePadBottomPx = bottomPad
                 } else {
-                    val tallHeightPx = item.tallItemHeightPx()
+                    val tallHeightPx = (item as ReaderMeasuredInlineItem.Image)
+                        .heightPx.finiteNonNegative()
                     if (tallHeightPx > maxImageHeightPx) maxImageHeightPx = tallHeightPx
                 }
             }
@@ -815,7 +830,8 @@ internal class ReaderPaginationSession(
             var previousMatchSpacingAfterPx = 0f
             lineItems.forEachIndexed { itemIndex, item ->
                 val matchStyle = (item as? ReaderMeasuredInlineItem.Text)?.style
-                val spacingBefore = matchStyle?.matchSpacingBeforePx ?: 0f
+                val spacingBefore = (matchStyle?.matchSpacingBeforePx ?: 0f)
+                    .let { if (it.isFinite()) it.coerceAtLeast(0f) else 0f }
                 x += spacingBefore
                 val itemBackground = backgroundOf(from + itemIndex)
                 when (item) {
@@ -823,7 +839,8 @@ internal class ReaderPaginationSession(
                         val expandedWordSpace = if (item.value == " ") wordSpaceExtra else 0f
                         elements += ReaderElement.Text(
                             bounds = ReaderRect(
-                                x, y, x + item.widthPx + expandedWordSpace, y + actualLineHeight,
+                                x, y, x + itemWidths[from + itemIndex] + expandedWordSpace,
+                                y + actualLineHeight,
                             ),
                             baselinePx = y + lineBaselineOffset + item.baselineShiftPx,
                             value = item.value,
@@ -859,18 +876,20 @@ internal class ReaderPaginationSession(
                     }
 
                     is ReaderMeasuredInlineItem.Image -> {
-                        val imageTop = y + (actualLineHeight - item.heightPx) / 2f
+                        val imageHeight = item.heightPx.finiteNonNegative()
+                        val imageTop = y + (actualLineHeight - imageHeight) / 2f
                         // 旧 `setTypeHtml` 行末图用 `measureText("\uFFFC")` 当宽度（行中才用 span
-                        // advance）；断行推进仍按 item.widthPx，因此行末会像旧版一样留出空档。
+                        // advance）；断行推进仍按安全宽度，因此行末会像旧版一样留出空档。
                         val drawnWidthPx = item.lineFinalWidthPx
+                            ?.finiteNonNegative()
                             ?.takeIf { itemIndex == itemCount - 1 }
-                            ?: item.widthPx
+                            ?: itemWidths[from + itemIndex]
                         elements += ReaderElement.Image(
                             bounds = ReaderRect(
                                 x,
                                 imageTop,
                                 x + drawnWidthPx,
-                                imageTop + item.heightPx
+                                imageTop + imageHeight
                             ),
                             source = item.source,
                             action = item.action,
@@ -887,12 +906,14 @@ internal class ReaderPaginationSession(
                         else -> "\uFFFC"
                     },
                 )
-                x += item.widthPx + letterSpacing +
-                        (matchStyle?.matchSpacingAfterPx ?: 0f) +
+                x += itemWidths[from + itemIndex] + letterSpacing +
+                        (matchStyle?.matchSpacingAfterPx ?: 0f)
+                            .let { if (it.isFinite()) it.coerceAtLeast(0f) else 0f } +
                         if (item is ReaderMeasuredInlineItem.Text && item.value == " ") wordSpaceExtra else 0f
                 x += if (itemIndex >= indentItems) justifyGap else 0f
                 previousItemBackground = itemBackground
-                previousMatchSpacingAfterPx = matchStyle?.matchSpacingAfterPx ?: 0f
+                previousMatchSpacingAfterPx = (matchStyle?.matchSpacingAfterPx ?: 0f)
+                    .let { if (it.isFinite()) it.coerceAtLeast(0f) else 0f }
             }
             addPageUnderline(underlineElementStart, y + actualLineHeight)
             columnRows += ReaderLayoutRow(rowElementStart, elements.size, y, y + actualLineHeight)

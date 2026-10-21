@@ -91,7 +91,9 @@ object CastMarkers {
     fun stripKeepingOffsets(text: String, base: Int = 0): Spoken {
         val markers = syntax.markerRegex.findAll(text).map { it.range.first to it.range.last + 1 }
             .toList()
-        if (markers.isEmpty()) return Spoken(text, base + text.length) { base + it }
+        if (markers.isEmpty()) {
+            return Spoken(text, storedStart = base, storedEnd = base + text.length) { base + it }
+        }
         val sb = StringBuilder(text.length)
         var cursor = 0
         markers.forEach { (from, until) ->
@@ -101,7 +103,7 @@ object CastMarkers {
         sb.append(text, cursor, text.length)
         val spokenLength = sb.length
         val storedEnd = base + text.length
-        return Spoken(sb.toString(), storedEnd) { index ->
+        return Spoken(sb.toString(), storedStart = base, storedEnd = storedEnd) { index ->
             val spoken = index.coerceIn(0, spokenLength)
             var removed = 0
             for ((from, until) in markers) {
@@ -114,16 +116,34 @@ object CastMarkers {
     }
 
     /** 送进引擎的那一句：文本 + 把引擎回传的下标换回正文绝对下标的 [storedOf]。 */
-    class Spoken(val text: String, private val storedEnd: Int, private val map: (Int) -> Int) {
+    class Spoken(
+        val text: String,
+        private val storedStart: Int,
+        private val storedEnd: Int,
+        private val map: (Int) -> Int,
+    ) {
 
         /** 原样送给引擎（标记不删）：两份下标天然一致。 */
         companion object {
             fun passThrough(text: String, base: Int = 0) =
-                Spoken(text, base + text.length) { (base + it).coerceIn(base, base + text.length) }
+                Spoken(
+                    text = text,
+                    storedStart = base,
+                    storedEnd = base + text.length,
+                ) { (base + it).coerceIn(base, base + text.length) }
         }
 
-        /** 引擎回传的下标 → 正文（含标记）的绝对下标。 */
-        fun storedOf(spokenIndex: Int): Int = map(spokenIndex).coerceIn(0, storedEnd)
+        /**
+         * 引擎回传的下标 → 正文（含标记）的绝对下标。
+         *
+         * 引擎在异常情况下会回传 -1 或大于文本长度的下标；先按语音文本边界收敛，避免
+         * `base + Int.MAX_VALUE` 溢出后被夹成 0，也确保负数不会映射到本段之前。
+         */
+        fun storedOf(spokenIndex: Int): Int = when {
+            spokenIndex < 0 -> storedStart
+            spokenIndex >= text.length -> storedEnd
+            else -> map(spokenIndex).coerceIn(storedStart, storedEnd)
+        }
     }
 
 

@@ -29,6 +29,9 @@ object ReaderBodyOnlyFilter {
     private const val USE_HTML_END = "</usehtml>"
     private const val PAGE_BREAK = "[newpage]"
 
+    /** 标记编号碰撞时的搜索上限，防止恶意正文把扫描变成无限循环。 */
+    private const val MARKER_DISAMBIGUATION_LIMIT = 10_000
+
     /** 折叠片段的类型，[label] 直接出现在占位标记里（形如 `〔图片1〕`）。 */
     enum class Kind(val label: String) {
         Image("图片"),
@@ -37,8 +40,8 @@ object ReaderBodyOnlyFilter {
     }
 
     /**
-     * 一段被折叠的原文。[index] 从 1 开始，标记里带序号，既避免重名又让 [reassemble]
-     * 能逐个定位（用户手打不出同样的字符串）。
+     * 一段被折叠的原文。[index] 正常从 1 开始，标记里带序号，让 [reassemble] 能逐个定位。
+     * 若正文本身恰好包含同号字面量，[scan] 会整体后移编号以避开碰撞。
      */
     data class HiddenSpan(
         val index: Int,
@@ -85,7 +88,28 @@ object ReaderBodyOnlyFilter {
             if (lineEnd >= text.length) break
             lineStart = lineEnd + 1
         }
-        return spans
+        return spans.disambiguatedAgainst(text)
+    }
+
+    /**
+     * 用户正文本身可能包含 `〔图片1〕` 这类字符串。若直接用它做折叠标记，
+     * [toBodyOnly] 会生成两个同号标记，[reassemble] 会先命中用户手写的那一个，
+     * 把真实图片插到错误位置。这里只在检测到碰撞时整体后移编号，保持既有
+     * “正常正文用 1 开始”的输出不变。
+     */
+    private fun List<HiddenSpan>.disambiguatedAgainst(text: String): List<HiddenSpan> {
+        if (isEmpty() || !text.contains('〔')) return this
+        if (none { text.contains(it.marker) }) return this
+        var indexOffset = 1
+        while (indexOffset <= MARKER_DISAMBIGUATION_LIMIT) {
+            val candidate = mapIndexed { localIndex, span ->
+                span.copy(index = indexOffset + localIndex)
+            }
+            if (candidate.none { text.contains(it.marker) }) return candidate
+            indexOffset += size
+        }
+        // 病态文本包含数以万计的候选标记时保持旧输出，至少不改变内容归属的已知行为。
+        return this
     }
 
     /** 把 [spans] 换成占位标记；[spans] 必须由同一份 [text] 扫描得到。 */

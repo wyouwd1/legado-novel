@@ -13,6 +13,14 @@ class ChineseLineBreaker(
     private val starts = mutableListOf(0)
     private val clusterStarts = mutableListOf(0)
     private val widths = mutableListOf<Float>()
+    /**
+     * 字体量测在异常设备上可能返回 NaN/Infinity/负 advance。断行计算不能让这些值进入
+     * `lineWidthsPx`：`Infinity - Infinity` 会变成 NaN，负宽度会让行宽倒退。非法值按 0 宽处理，
+     * 字符仍然留在同一个行区间里，不吞字。
+     */
+    private val safeWidthsPx = widthsPx.map { width ->
+        if (width.isFinite() && width > 0f) width else 0f
+    }
     private val widthLimit = widthPx + letterSpacingPx
     private val firstWidthLimit = firstLineWidthPx + letterSpacingPx
 
@@ -31,7 +39,7 @@ class ChineseLineBreaker(
         var lineWidth = 0f
         var textLength = 0
         clusters.forEachIndexed { index, cluster ->
-            val currentWidth = widthsPx[index]
+            val currentWidth = safeWidthsPx[index]
             lineWidth += currentWidth
             var carriedWidth = 0f
             var carriedCharacters = 0
@@ -43,7 +51,7 @@ class ChineseLineBreaker(
                 fun carryFrom(candidate: Int) {
                     val start = safeBreakStart(candidate, lineStart)
                     val carriedRange = start..index
-                    carriedWidth = carriedRange.sumOf { widthsPx[it].toDouble() }.toFloat()
+                    carriedWidth = carriedRange.sumOf { safeWidthsPx[it].toDouble() }.toFloat()
                     carriedCharacters = carriedRange.sumOf { clusters[it].length }
                     carriedClusters = carriedRange.count()
                     addStart(
@@ -55,7 +63,7 @@ class ChineseLineBreaker(
                 // （BREAK_MORE_CHAR），全角标点则直接悬挂在本行右边界之外（CPS_1/2/3：
                 // `offset = 0f`，行宽允许超过 width）。下面三个判定与旧版逐条对应。
                 fun compressibleAt(at: Int): Boolean =
-                    at in widthsPx.indices && widthsPx[at] < ideographWidthPx
+                    at in safeWidthsPx.indices && safeWidthsPx[at] < ideographWidthPx
 
                 val previousClosing = index > 0 && clusters[index - 1] in closing
                 val previousOpening = index > 0 && clusters[index - 1] in opening
