@@ -3,7 +3,7 @@
 > 目标：把本仓库收敛为一台**纯小说阅读器**——阅读、书源、书架、搜索、缓存、本地导入、
 > 阅读设置/主题、替换净化、备份恢复；移除与小说阅读无关的扩展域。
 >
-> 状态：**规划阶段（未动代码）**。决策待用户逐项裁决，见 [`DECISION-MAP.md`](./DECISION-MAP.md)。
+> 状态：**W1–W3 已落地并提交**；W2b（阅读核心 cast/BGM 残留）与 W4（Room 旧表收口）待执行，W5 收口验证部分完成。决策见 [`DECISION-MAP.md`](./DECISION-MAP.md)，候选方案择优见 [`PLAN-CANDIDATES.md`](./PLAN-CANDIDATES.md)。
 >
 > 创建：2026-10-14 ｜ 分支基线：`main` @ `070ca1a9b`
 
