@@ -18,19 +18,14 @@
 | `ui/book/changecover`                    | `feature/change-cover`      | Feature                       | 图片选择与裁剪由 host/platform effect 处理                                             |
 | `ui/book/changesource`、`ui/book/source`  | `feature/book-source`       | Feature                       | source edit/manage/debug 可作为同域子包，避免交叉 impl 依赖                                |
 | `ui/book/readRecord`                     | `feature/reading-history`   | Feature                       | 新包统一全小写；不要延续 camelCase package                                               |
-| `ui/book/readaloud`                      | `feature/read-aloud`        | Feature + platform adapter    | 控制 UI 可 Feature 化，TTS/service/media 生命周期留 platform                           |
-| `ui/book/audio`                          | `feature/audio-playback`    | Feature + platform adapter    | 播放服务、媒体会话和通知留 Android platform                                               |
 | `ui/book/read`                           | `platform/android/reader`   | platform island               | 当前不作为普通 Feature 搬迁；共享状态/模型另行立项                                               |
-| `ui/book/manga`                          | `feature/manga`             | Feature + renderer capability | 图片渲染、缓存和手势需专项边界审计                                                            |
 | `ui/config/*`                            | `feature/settings`          | Feature domain                | 先保留 settings 下的 `appearance`、`reading`、`backup`、`advanced` 等 section，不为每页建模块 |
 | `ui/theme`                               | `core/designsystem`         | core candidate                | theme engine、token 与基础主题；Feature 专属样式不进入 core                                |
 | `ui/widget/components`                   | owner audit                 | core/ui candidate             | 有至少两个 Feature 调用且职责稳定的组件才进入 `core/ui` 或 `core/designsystem`                  |
 | `ui/widget` 其余 View-era 控件               | legacy/platform owner       | migration zone                | Recycler/View/Dialog 控件按实际调用方迁走，禁止整目录改名为 core                                |
-| `ui/rss/*`、`ui/main/rss`                 | `feature/rss`               | Feature domain                | 初期一个业务域，内部 `feed`、`article`、`source`、`subscription` 子包                       |
 | `ui/replace`                             | `feature/replace-rules`     | Feature                       | `edit` 是同 Feature 子流程                                                        |
 | `ui/dict`                                | `feature/dictionary`        | Feature                       | rule editor 留同域，执行引擎经 domain/platform contract                               |
 | `ui/highlightTagRule`、`ui/tagGroupRule`  | `feature/tag-rules`         | Feature domain                | 可作为小型迁移样板候选，先核对实际共享模型                                                        |
-| `ui/ai/chat`                             | `feature/ai-chat`           | Feature                       | AI provider/config 归 settings 或 data/platform，不放 Screen                      |
 | `ui/login`                               | `feature/source-login`      | Feature + host effect         | WebView/cookie/platform auth 通过 adapter                                      |
 | `ui/about`                               | `feature/about`             | Feature                       | 边界小，适合首个 package relocation 样板候选                                             |
 | `ui/welcome`                             | `feature/onboarding`        | Feature                       | 首次启动状态经 settings/domain contract                                             |
