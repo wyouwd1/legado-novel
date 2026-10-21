@@ -311,8 +311,8 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 
 **残留/顺延**：
 - `BookType.audio` / `BookSourceType.audio` 类型位与 DAO 位运算仍保留 → W2-S6/W4。
-- `ReaderElement.RoleCast/BgmScene`、`castRenderHash`、`CastMarkers` 文本工具仍保留 → W2b（已侦察，见 `team/W2B-CORE-PLAN.md`）。
-- `readAloudParagraphIndex`、`readAloud: Color`（文字高亮色）保留 → W2c；不得误删。
+- `ReaderElement.RoleCast/BgmScene`、`castRenderHash`、`CastMarkers` 文本工具 → **W2b 已完成，见 §7.8**。
+- `readAloudParagraphIndex`、`readAloud: Color`（文字高亮色）→ **W2c 已完成，见 §7.8**。
 - 真机手测未做 → W5。
 
 ### 7.5 W3 · 首页 / Web / 翻译 / 导航收敛（2026-10-21）
