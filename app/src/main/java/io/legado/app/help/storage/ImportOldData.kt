@@ -136,8 +136,13 @@ object ImportOldData {
             book.originName = jsonItem.readString("$.bookInfoBean.origin") ?: ""
             book.author = jsonItem.readString("$.bookInfoBean.author") ?: ""
             val local = if (book.origin == "loc_book") BookType.local else 0
-            val isAudio = jsonItem.readString("$.bookInfoBean.bookSourceType") == "AUDIO"
-            book.type = local or if (isAudio) BookType.audio else BookType.text
+            val oldType = when (jsonItem.readString("$.bookInfoBean.bookSourceType")?.uppercase()) {
+                "AUDIO" -> BookType.audio
+                "IMAGE" -> BookType.image
+                "VIDEO" -> BookType.video
+                else -> BookType.text
+            }
+            book.type = migrateLegacyBookType(local or oldType)
             book.tocUrl = jsonItem.readString("$.bookInfoBean.chapterUrl") ?: book.bookUrl
             book.coverUrl = jsonItem.readString("$.bookInfoBean.coverUrl")
             book.customCoverUrl = jsonItem.readString("$.customCoverPath")

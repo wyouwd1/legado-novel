@@ -12,6 +12,8 @@ import java.util.zip.*
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object ZipUtils {
 
+    private const val ZIP_HEADER_SIZE = 4
+
     fun gzipByteArray(byteArray: ByteArray): ByteArray {
         val byteOut = ByteArrayOutputStream()
         val zip = GZIPOutputStream(byteOut)
@@ -211,9 +213,7 @@ object ZipUtils {
         path: String,
         filter: ((String) -> Boolean)? = null
     ): List<File> {
-        return ZipInputStream(inputStream).use {
-            unZipToPath(it, File(path), filter)
-        }
+        return unZipToPath(inputStream, File(path), filter)
     }
 
     @Throws(SecurityException::class)
@@ -222,24 +222,62 @@ object ZipUtils {
         dir: File,
         filter: ((String) -> Boolean)? = null
     ): List<File> {
-        return ZipInputStream(inputStream).use {
-            unZipToPath(it, dir, filter)
+        // ZipInputStream 对随机文本会静默返回“无条目”；先看文件头，损坏/非 ZIP 必须显式失败。
+        val buffered = inputStream as? BufferedInputStream ?: BufferedInputStream(inputStream)
+        requireZipSignature(buffered)
+        return ZipInputStream(buffered).use {
+            unZipEntries(it, dir, filter)
+        }
+    }
+
+    private fun requireZipSignature(input: BufferedInputStream) {
+        input.mark(ZIP_HEADER_SIZE)
+        val header = ByteArray(ZIP_HEADER_SIZE)
+        val count = input.read(header)
+        input.reset()
+        val valid = count == ZIP_HEADER_SIZE &&
+                header[0] == 'P'.code.toByte() &&
+                header[1] == 'K'.code.toByte() &&
+                ((header[2] == 0x03.toByte() && header[3] == 0x04.toByte()) ||
+                        (header[2] == 0x05.toByte() && header[3] == 0x06.toByte()) ||
+                        (header[2] == 0x07.toByte() && header[3] == 0x08.toByte()))
+        if (!valid) {
+            throw ZipException("不是有效的 ZIP 文件")
         }
     }
 
     @Throws(SecurityException::class)
-    private fun unZipToPath(
+    private fun unZipEntries(
         zipInputStream: ZipInputStream,
         dir: File,
         filter: ((String) -> Boolean)? = null
     ): List<File> {
         val files = arrayListOf<File>()
+        // 先解析目标目录的规范路径，再逐条目做“目录本身或目录 + 分隔符”的严格比较。
+        // 旧的 startsWith(dir.canonicalPath) 会放过 /tmp/backup-evil 这类同前缀兄弟目录。
+        val canonicalDir = dir.canonicalFile
+        val canonicalDirPath = canonicalDir.path
+        val directoryPrefix = if (canonicalDirPath.endsWith(File.separator)) {
+            canonicalDirPath
+        } else {
+            canonicalDirPath + File.separator
+        }
         var entry: ZipEntry?
         while (zipInputStream.nextEntry.also { entry = it } != null) {
             val entryName = entry!!.name
-            val entryFile = File(dir, entryName)
-            if (!entryFile.canonicalPath.startsWith(dir.canonicalPath)) {
+            if (entryName.isNullOrBlank()) {
+                throw SecurityException("压缩文件包含空的条目名")
+            }
+            // ZIP 规范要求 '/'；反斜杠在 Windows 上是分隔符，统一归一化后再做边界判断。
+            val normalizedName = entryName.replace('\\', '/')
+            val entryFile = File(canonicalDir, normalizedName).canonicalFile
+            val entryPath = entryFile.path
+            val isDirectoryItself = entryPath == canonicalDirPath
+            if (!isDirectoryItself && !entryPath.startsWith(directoryPrefix)) {
                 throw SecurityException("压缩文件只能解压到指定路径")
+            }
+            if (isDirectoryItself && !entry.isDirectory) {
+                throw SecurityException("压缩文件条目指向目标目录本身")
             }
             if (entry.isDirectory) {
                 if (!entryFile.exists()) {

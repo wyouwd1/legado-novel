@@ -124,6 +124,104 @@ class BookRestorePlannerTest {
     }
 
     @Test
+    fun `empty backup leaves every existing book untouched`() {
+        val existing = Book(bookUrl = "https://source/book", name = "书", author = "作者")
+
+        val plan = planBookRestore(
+            restoredBooks = emptyList(),
+            existingBooks = listOf(existing),
+            ignoreLocalBook = false,
+            locationStatus = { LocalBookLocationStatus.Available },
+        )
+
+        assertTrue(plan.booksToUpsert.isEmpty())
+        assertTrue(plan.booksToDelete.isEmpty())
+    }
+
+    @Test
+    fun `book missing from backup is not deleted`() {
+        val existing = Book(bookUrl = "https://source/book", name = "书", author = "作者")
+        val restored = Book(bookUrl = "https://source/other", name = "另一本", author = "作者")
+
+        val plan = planBookRestore(
+            restoredBooks = listOf(restored),
+            existingBooks = listOf(existing),
+            ignoreLocalBook = false,
+            locationStatus = { LocalBookLocationStatus.Missing },
+        )
+
+        assertEquals(listOf(restored.bookUrl), plan.booksToInsert.map { it.bookUrl })
+        assertTrue(plan.booksToDelete.isEmpty())
+    }
+
+    @Test
+    fun `legacy audio book is restored as text and moved off the shelf`() {
+        val restored = Book(
+            bookUrl = "https://audio/book",
+            name = "听书",
+            author = "作者",
+            type = BookType.audio,
+            durChapterIndex = 7,
+            durChapterPos = 42,
+        )
+
+        val plan = planBookRestore(
+            restoredBooks = listOf(restored),
+            existingBooks = emptyList(),
+            ignoreLocalBook = false,
+            locationStatus = { LocalBookLocationStatus.Missing },
+        )
+
+        val saved = plan.booksToInsert.single()
+        assertEquals(BookType.text or BookType.notShelf, saved.type)
+        assertEquals(7, saved.durChapterIndex)
+        assertEquals(42, saved.durChapterPos)
+    }
+
+    @Test
+    fun `legacy image book keeps local flag and data while leaving the shelf`() {
+        val restored = Book(
+            bookUrl = "/books/comic.cbz",
+            origin = BookType.localTag,
+            originName = "comic.cbz",
+            name = "图册",
+            author = "作者",
+            type = BookType.image or BookType.local,
+            durChapterIndex = 3,
+        )
+
+        val plan = planBookRestore(
+            restoredBooks = listOf(restored),
+            existingBooks = emptyList(),
+            ignoreLocalBook = false,
+            locationStatus = { LocalBookLocationStatus.Missing },
+        )
+
+        val saved = plan.booksToInsert.single()
+        assertEquals(BookType.text or BookType.notShelf or BookType.local, saved.type)
+        assertEquals(3, saved.durChapterIndex)
+    }
+
+    @Test
+    fun `plain text book type is not changed by restore`() {
+        val restored = Book(
+            bookUrl = "https://text/book",
+            name = "小说",
+            author = "作者",
+            type = BookType.text,
+        )
+
+        val plan = planBookRestore(
+            restoredBooks = listOf(restored),
+            existingBooks = emptyList(),
+            ignoreLocalBook = false,
+            locationStatus = { LocalBookLocationStatus.Missing },
+        )
+
+        assertEquals(BookType.text, plan.booksToInsert.single().type)
+    }
+
+    @Test
     fun `temporarily unreadable content location is never rebound or deleted`() {
         val offline = localBook("content://cloud/books/book.txt", progress = 1)
         val available = localBook("content://local/books/book.txt", progress = 2)

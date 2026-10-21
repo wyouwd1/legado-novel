@@ -1,5 +1,6 @@
 package io.legado.app.help.storage
 
+import io.legado.app.constant.BookType
 import io.legado.app.data.entities.Book
 import io.legado.app.help.book.isLocal
 import java.io.File
@@ -62,7 +63,12 @@ internal fun planBookRestore(
             }
         }
 
-        val restoredForSave = restoredBook.copy(bookUrl = resolution.targetBookUrl)
+        val restoredForSave = restoredBook.copy(
+            bookUrl = resolution.targetBookUrl,
+            // 旧备份可能仍带 audio/image/video 位；恢复时按 131→132 的同一语义转成
+            // 可下载文本并移出书架，保留章节进度等其余字段。
+            type = migrateLegacyBookType(restoredBook.type),
+        )
         booksToDelete.remove(restoredForSave.bookUrl)
         booksToUpsert[restoredForSave.bookUrl] = restoredForSave
         activeBooks[restoredForSave.bookUrl] = restoredForSave
@@ -154,6 +160,16 @@ private fun Book.isRelocatedCopyOf(other: Book): Boolean {
             name.isNotBlank() &&
             name == other.name &&
             author == other.author
+}
+
+/** 131→132 的旧类型迁移规则；恢复旧备份与旧书导入共用，避免把已裁撤的音频/图片书带回来。 */
+internal fun migrateLegacyBookType(type: Int): Int {
+    val legacyMask = BookType.audio or BookType.image or BookType.video
+    return if (type and legacyMask != 0) {
+        (type and legacyMask.inv()) or BookType.text or BookType.notShelf
+    } else {
+        type
+    }
 }
 
 internal fun normalizeLocalBookLocation(bookUrl: String): String {

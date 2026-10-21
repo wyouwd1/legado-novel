@@ -53,6 +53,45 @@ class NormalizeConfigMapTest {
     }
 
     @Test
+    fun `null 值不会变成字符串 null`() {
+        val result = normalize(
+            mapOf(
+                PreferKey.webDavPassword to null,
+                "nullValue" to null,
+                "keep" to 1,
+            )
+        )
+        assertFalse(result.containsKey(PreferKey.webDavPassword))
+        assertFalse(result.containsKey("nullValue"))
+        assertEquals(1, result["keep"])
+    }
+
+    @Test
+    fun `webDavPassword 非字符串类型被忽略`() {
+        val result = normalize(
+            mapOf(
+                PreferKey.webDavPassword to 12345,
+                "keep" to true,
+            ),
+            hasLocalWebDavPassword = false,
+        )
+        assertFalse(result.containsKey(PreferKey.webDavPassword))
+        assertEquals(true, result["keep"])
+    }
+
+    @Test
+    fun `未知类型值被丢弃而不影响同 map 的合法值`() {
+        val result = normalize(
+            mapOf(
+                "list" to listOf("a"),
+                "map" to mapOf("a" to 1),
+                "int" to 1,
+            )
+        )
+        assertEquals(mapOf("int" to 1), result)
+    }
+
+    @Test
     fun `忽略键被过滤`() {
         val result = normalize(
             mapOf("keep" to 1, "drop" to 2),

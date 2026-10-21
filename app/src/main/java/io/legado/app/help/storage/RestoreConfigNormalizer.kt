@@ -18,11 +18,16 @@ internal fun normalizeConfigMap(
     val finalMap = mutableMapOf<String, Any>()
     map.forEach { (key, value) ->
         if (!keyIsNotIgnore(key)) return@forEach
+        // null 不是“值为字符串 null”：XML/JSON 缺字段或显式 null 都应跳过，
+        // 否则 webDavPassword 会被写成 "null"。
+        if (value == null) return@forEach
         if (key == PreferKey.showBrightnessView || key == PreferKey.brightnessVwPos) return@forEach
         when (key) {
             PreferKey.webDavPassword -> {
-                val password = decryptWebDavPassword(value.toString())
-                    ?: value.toString().takeIf { !hasLocalWebDavPassword }
+                // 正常备份里密码一定是字符串；数字/对象等非法类型直接忽略，不 toString 后写入。
+                val raw = value as? String ?: return@forEach
+                val password = decryptWebDavPassword(raw)
+                    ?: raw.takeIf { !hasLocalWebDavPassword }
                 password?.let { finalMap[key] = it }
             }
 

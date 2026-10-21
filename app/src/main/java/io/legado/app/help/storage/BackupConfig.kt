@@ -8,6 +8,22 @@ import io.legado.app.utils.GSON
 import io.legado.app.utils.fromJsonObject
 import splitties.init.appCtx
 
+/**
+ * 解析 restoreIgnore/backupIgnore/dbIgnore JSON。
+ *
+ * 逐键保留 Boolean：旧备份或手改文件里只要有一个字段是数字/对象，不能把整张
+ * HashMap<String, Boolean> 解析失败后当成“全空”，否则用户设置的忽略项会全部失效。
+ */
+internal fun parseIgnoreConfigMap(json: String?): HashMap<String, Boolean> {
+    if (json.isNullOrBlank()) return hashMapOf()
+    val raw = GSON.fromJsonObject<Map<String, Any?>>(json).getOrNull() ?: return hashMapOf()
+    val result = HashMap<String, Boolean>(raw.size)
+    raw.forEach { (key, value) ->
+        if (value is Boolean) result[key] = value
+    }
+    return result
+}
+
 internal val alwaysIgnoredPreferenceKeys = setOf(
     PreferKey.defaultCover,
     PreferKey.defaultCoverDark,
@@ -41,29 +57,25 @@ object BackupConfig {
     private val ignoreConfigPath = FileUtils.getPath(appCtx.filesDir, "restoreIgnore.json")
     val ignoreConfig: HashMap<String, Boolean> by lazy {
         val file = FileUtils.createFileIfNotExist(ignoreConfigPath)
-        val json = file.readText()
-        GSON.fromJsonObject<HashMap<String, Boolean>>(json).getOrNull() ?: hashMapOf()
+        parseIgnoreConfigMap(file.readText())
     }
 
     private val backupIgnoreConfigPath = FileUtils.getPath(appCtx.filesDir, "backupIgnore.json")
     val backupIgnoreConfig: HashMap<String, Boolean> by lazy {
         val file = FileUtils.createFileIfNotExist(backupIgnoreConfigPath)
-        val json = file.readText()
-        GSON.fromJsonObject<HashMap<String, Boolean>>(json).getOrNull() ?: hashMapOf()
+        parseIgnoreConfigMap(file.readText())
     }
 
     private val dbIgnoreConfigPath = FileUtils.getPath(appCtx.filesDir, "dbIgnore.json")
     val dbIgnoreConfig: HashMap<String, Boolean> by lazy {
         val file = FileUtils.createFileIfNotExist(dbIgnoreConfigPath)
-        val json = file.readText()
-        GSON.fromJsonObject<HashMap<String, Boolean>>(json).getOrNull() ?: hashMapOf()
+        parseIgnoreConfigMap(file.readText())
     }
 
     private val backupDbIgnoreConfigPath = FileUtils.getPath(appCtx.filesDir, "backupDbIgnore.json")
     val backupDbIgnoreConfig: HashMap<String, Boolean> by lazy {
         val file = FileUtils.createFileIfNotExist(backupDbIgnoreConfigPath)
-        val json = file.readText()
-        GSON.fromJsonObject<HashMap<String, Boolean>>(json).getOrNull() ?: hashMapOf()
+        parseIgnoreConfigMap(file.readText())
     }
 
     private const val readConfigKey = "readConfig"

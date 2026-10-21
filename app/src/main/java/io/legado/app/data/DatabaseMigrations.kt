@@ -947,9 +947,11 @@ object DatabaseMigrations {
         override fun onPostMigrate(db: SupportSQLiteDatabase) {
             // 旧音频/图片书不再属于本应用：保留数据、标为需下载的文本并移出书架。
             val oldTypes = BookType.audio or BookType.image or BookType.video
+            // 必须用 SQLite 的位或 `|`；写成 `or` 会被当成逻辑或，整列变成 0/1，
+            // 书籍的 text/local/webFile 等位会全部丢失。
             db.execSQL(
-                "UPDATE books SET type = (type & ~$oldTypes) or ${BookType.text} or ${BookType.notShelf} " +
-                    "WHERE type & $oldTypes > 0"
+                "UPDATE books SET type = (type & ~$oldTypes) | ${BookType.text} | ${BookType.notShelf} " +
+                    "WHERE (type & $oldTypes) > 0"
             )
         }
     }
