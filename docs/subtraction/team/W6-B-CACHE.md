@@ -97,3 +97,10 @@
 6. **`CacheDownloadAdmissionQueue` 自身未加锁**，仍依赖 `CacheBookService` 外部 `synchronized`；本报告只覆盖纯队列语义。
 7. **1,000,000 上限是防御策略**：真实书目录超过 100 万章会被拒绝；当前仓库未见这种书。
 8. Android Service/Compose UI 集成、下载通知与多书 FIFO 调度未在本次单测中启动。
+
+## 收口补充（主控）
+
+在上表 27 项之外，主控补了 1 项模型层回归：`CacheBookModelFailureTest.hugeRangeIsRejectedBeforeExpandingTheRange`
+（`Range(0, Int.MAX_VALUE)` 不得在 `(start..end).toSet()` 处 OOM）。生产修复为
+`CacheDownloadModels.sanitizedForCache()` + `CacheBookModel.addRequest` 入口过滤，队列与模型共用
+`MAX_CACHE_CHAPTER_INDEX = 1_000_000`。因此本波最终为 **28 项测试 / 10 项修复**。
