@@ -37,8 +37,8 @@
 
 当前工程是 Android-first 的渐进迁移仓库，不是已经完成的 KMP 工程：
 
-- Gradle 模块：`:app`、`:modules:book`、`:modules:rhino`、`:baselineprofile`；`modules/web` 是独立 Vue 3
-  工程。
+- Gradle 模块：`:app`、`:modules:book`、`:modules:rhino`、`:baselineprofile`；`modules/web` 是归档的独立
+  Vue 3 前端源码，不参与 APK 构建。
 - `:app` 同时包含 Android UI、数据、领域、服务和大量遗留 View 代码；包目录只表达逻辑边界，尚无 Gradle
   编译隔离。
 - 新 UI 以 Jetpack Compose、Material 3、Navigation 3、Koin、StateFlow/SharedFlow 为默认；阅读器渲染核心等成熟
@@ -182,7 +182,7 @@ KMP 任务名在模块实际创建后才存在；不要假装运行尚未定义�
 - 当前 minSdk 26、target/compile SDK 37；Release 启用 R8 与资源压缩，`noR8` 变体用于排障。
 - Rhino 书源规则、Android 服务与阅读器渲染属于高行为风险平台能力，迁移前必须建立兼容测试或
   capability 边界。
-- `modules/web` 必须连接应用内 Ktor WebService；开发环境通过 `VITE_API` 指向设备服务地址。
+- `modules/web` 与内置 Ktor WebService 已随减法方案归档；不要重新接入 APK 构建或恢复服务入口。
 
 ## 交付说明
 
