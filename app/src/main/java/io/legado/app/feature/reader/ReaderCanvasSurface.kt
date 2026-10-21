@@ -2936,16 +2936,15 @@ private fun ReaderPage.isSearchResult(text: ReaderElement.Text): Boolean {
 
 // 旧 `TextPage.upPageAloudSpan` 遍历页内**所有**行（含标题行）设置朗读高亮，因此这里不再
 // 排除 emphasized：标题/标题分段在被朗读时同样高亮。
-private fun ReaderPage.isReadAloud(text: ReaderElement.Text): Boolean =
-    readAloudParagraphIndex != null && text.paragraphIndex == readAloudParagraphIndex
+
 
 private fun ReaderPage.resolvedColorArgb(text: ReaderElement.Text, accentColorArgb: Int): Int =
-    if (text.link != null || isSearchResult(text) || isReadAloud(text)) accentColorArgb else text.style.colorArgb
+    if (text.link != null || isSearchResult(text)) accentColorArgb else text.style.colorArgb
 
 private fun ReaderPage.dynamicEmphasisUnderlineRuns(): List<ReaderEmphasisUnderlineRun> {
     val style = emphasisUnderlineStyle ?: return emptyList()
     // 命中位置只决定哪一行划线，线仍是整行（对照旧 View TextLine.drawTextLine）。
-    return emphasisUnderlineRunsFor(style) { isSearchResult(it) || isReadAloud(it) }
+    return emphasisUnderlineRunsFor(style) { isSearchResult(it) }
 }
 
 @Composable

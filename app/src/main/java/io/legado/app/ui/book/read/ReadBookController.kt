@@ -824,7 +824,6 @@ class ReadBookController(
                 searchStart = selection?.anchor?.takeIf { pageHasSearchSelection },
                 searchEndInclusive = selection?.focus?.takeIf { pageHasSearchSelection },
                 searchIsTitle = selection?.anchorIsTitle == true,
-                readAloudParagraphIndex = null,
                 revision = decorated.revision xor (selection?.hashCode()?.toLong() ?: 0L),
             )
         }

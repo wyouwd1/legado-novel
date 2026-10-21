@@ -25,20 +25,10 @@ class ReaderPageTest {
     }
 
     @Test fun htmlLinkUsesAccentColorAndUnderlineWithLegacyPriority() {
-        val link = text(link = "https://example", readAloud = true)
+        val link = text(link = "https://example")
 
         assertEquals(0xff22aa44.toInt(), link.resolvedColorArgb(0xff22aa44.toInt()))
         assertTrue(link.drawsLinkUnderline)
-    }
-
-    @Test fun readAloudUsesAccentButOrdinaryTextKeepsItsConfiguredColor() {
-        val ordinary = text()
-        val readAloud = text(readAloud = true)
-
-        assertEquals(0xff123456.toInt(), ordinary.resolvedColorArgb(0xff22aa44.toInt()))
-        assertFalse(ordinary.drawsLinkUnderline)
-        assertEquals(0xff22aa44.toInt(), readAloud.resolvedColorArgb(0xff22aa44.toInt()))
-        assertFalse(readAloud.drawsLinkUnderline)
     }
 
     @Test fun searchResultUsesAccentWithoutPretendingToBeAnHtmlLink() {
@@ -50,7 +40,6 @@ class ReaderPageTest {
 
     private fun text(
         link: String? = null,
-        readAloud: Boolean = false,
         searchResult: Boolean = false,
     ) = ReaderElement.Text(
         bounds = ReaderRect(0f, 0f, 10f, 20f),
@@ -59,7 +48,6 @@ class ReaderPageTest {
         style = ReaderTextStyle(colorArgb = 0xff123456.toInt(), fontSizePx = 20f),
         selected = false,
         emphasized = false,
-        readAloud = readAloud,
         searchResult = searchResult,
         link = link,
         chapterPosition = 0,
