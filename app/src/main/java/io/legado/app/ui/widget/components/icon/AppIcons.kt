@@ -124,12 +124,6 @@ object AppIcons {
     @Composable
     fun mainDestination(destination: MainDestination, selected: Boolean): ImageVector {
         return when (destination) {
-            MainDestination.Home -> if (isMiuix) {
-                MiuixIcons.Regular.ContactsBook
-            } else {
-                if (selected) Icons.Default.Home else Icons.Outlined.Home
-            }
-
             MainDestination.Bookshelf -> if (isMiuix) {
                 if (selected) MiuixIcons.Regular.Notes else MiuixIcons.Regular.Notes
             } else {

@@ -98,7 +98,6 @@ private fun buildMainUiState(
 ): MainUiState {
     val destinations = MainDestination.ordered(appShell.mainNavigationOrder).filter {
         when (it) {
-            MainDestination.Home -> appShell.showHome
             MainDestination.Explore -> appShell.showDiscovery
             else -> true
         }
@@ -111,11 +110,9 @@ private fun buildMainUiState(
         useFloatingBottomBarLiquidGlass = appShell.useFloatingBottomBarLiquidGlass,
         labelVisibilityMode = appShell.labelVisibilityMode,
         navExtended = appShell.navExtended,
-        navIconHome = appShell.navIconHome,
         navIconBookshelf = appShell.navIconBookshelf,
         navIconExplore = appShell.navIconExplore,
         navIconMy = appShell.navIconMy,
-        navIconHomeSelected = appShell.navIconHomeSelected,
         navIconBookshelfSelected = appShell.navIconBookshelfSelected,
         navIconExploreSelected = appShell.navIconExploreSelected,
         navIconMySelected = appShell.navIconMySelected,

@@ -442,9 +442,6 @@ fun MainActivity.mainEntryProvider(
                     )
                 )
             },
-            onNavigateToBackupSettings = {
-                onNavigateToRoute(MainRouteSettingsBackup)
-            },
             onNavigateToBookInfo = { name, author, bookUrl, origin, coverPath, sharedCoverKey ->
                 onNavigateToRoute(
                     MainRouteBookInfo(
@@ -481,9 +478,6 @@ fun MainActivity.mainEntryProvider(
             },
             onNavigateToReadRecord = {
                 onNavigateToRoute(MainRouteReadRecord)
-            },
-            onNavigateToReadRecordOverview = {
-                onNavigateToRoute(MainRouteReadRecordOverview)
             },
             onNavigateToHighlightTagRule = {
                 onNavigateToRoute(MainRouteHighlightTagRule)

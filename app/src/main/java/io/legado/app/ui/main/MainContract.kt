@@ -13,11 +13,9 @@ data class MainUiState(
     val useFloatingBottomBarLiquidGlass: Boolean = false,
     val labelVisibilityMode: String = "auto",
     val navExtended: Boolean = false,
-    val navIconHome: String = "",
     val navIconBookshelf: String = "",
     val navIconExplore: String = "",
     val navIconMy: String = "",
-    val navIconHomeSelected: String = "",
     val navIconBookshelfSelected: String = "",
     val navIconExploreSelected: String = "",
     val navIconMySelected: String = "",
@@ -26,14 +24,12 @@ data class MainUiState(
     val secondaryThemeColorNight: Int = 0,
 ) {
     fun customIconPath(destination: MainDestination): String = when (destination) {
-        MainDestination.Home -> navIconHome
         MainDestination.Bookshelf -> navIconBookshelf
         MainDestination.Explore -> navIconExplore
         MainDestination.My -> navIconMy
     }
 
     fun selectedCustomIconPath(destination: MainDestination): String = when (destination) {
-        MainDestination.Home -> navIconHomeSelected
         MainDestination.Bookshelf -> navIconBookshelfSelected
         MainDestination.Explore -> navIconExploreSelected
         MainDestination.My -> navIconMySelected

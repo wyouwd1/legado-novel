@@ -8,11 +8,6 @@ sealed class MainDestination(
     val route: String,
     @StringRes val labelId: Int
 ) {
-    object Home : MainDestination(
-        route = "home",
-        labelId = R.string.home
-    )
-
     object Bookshelf : MainDestination(
         route = "bookshelf",
         labelId = R.string.bookshelf
@@ -30,7 +25,7 @@ sealed class MainDestination(
     )
 
     companion object {
-        val mainDestinations = persistentListOf<MainDestination>(Home, Bookshelf, Explore, My)
+        val mainDestinations = persistentListOf<MainDestination>(Bookshelf, Explore, My)
 
         fun ordered(order: String): List<MainDestination> {
             val byRoute = mainDestinations.associateBy { it.route }

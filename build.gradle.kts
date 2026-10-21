@@ -226,7 +226,6 @@ val verifyConfigArchitecture = tasks.register<VerifyConfigArchitectureTask>(
             "io/legado/app/base/BaseService.kt" to 1,
             "io/legado/app/data/repository/CoverAlbumRepository.kt" to 4,
             "io/legado/app/data/repository/HighlightRuleRepository.kt" to 9,
-            "io/legado/app/data/repository/HomeDashboardRepository.kt" to 3,
             "io/legado/app/data/repository/ReadRecordRepository.kt" to 1,
             "io/legado/app/data/repository/SettingsRepository.kt" to 7,
             "io/legado/app/help/config/LocalConfig.kt" to 3,

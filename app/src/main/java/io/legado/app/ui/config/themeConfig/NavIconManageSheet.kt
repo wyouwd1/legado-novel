@@ -54,12 +54,6 @@ fun NavIconManageSheet(
 ) {
     val destinations = listOf(
         NavIconDestination(
-            "home",
-            R.string.home,
-            settings.navIconHome,
-            settings.navIconHomeSelected,
-        ),
-        NavIconDestination(
             "bookshelf",
             R.string.bookshelf,
             settings.navIconBookshelf,
@@ -216,7 +210,6 @@ private fun NavigationIconColumnHeader(label: String) {
 
 private val NavIconDestination.mainDestination: MainDestination
     get() = when (key) {
-        MainDestination.Home.route -> MainDestination.Home
         MainDestination.Bookshelf.route -> MainDestination.Bookshelf
         MainDestination.Explore.route -> MainDestination.Explore
         else -> MainDestination.My

@@ -111,7 +111,8 @@ import io.legado.app.help.WebCacheManager
 import io.legado.app.help.coil.CoverExtras
 import io.legado.app.help.webView.WebJsExtensions
 import io.legado.app.ui.association.OnLineImportActivity
-import io.legado.app.ui.main.homepage.modules.BannerModule
+import io.legado.app.ui.widget.components.book.BookBannerItemUi
+import io.legado.app.ui.widget.components.book.BookBannerRow
 import io.legado.app.ui.theme.LegadoTheme
 import io.legado.app.ui.theme.LocalHazeState
 import io.legado.app.ui.theme.LocalLegadoThemeColors
@@ -2077,9 +2078,8 @@ private fun RelatedBooksBanner(
                 )
             }
         }
-        BannerModule(
-            books = books.map { io.legado.app.ui.main.homepage.HomepageBookItemUi(book = it) }
-                .toImmutableList(),
+        BookBannerRow(
+            books = books.map { BookBannerItemUi(book = it) }.toImmutableList(),
             onClick = onBookClick,
             modifier = Modifier
                 .fillMaxWidth()

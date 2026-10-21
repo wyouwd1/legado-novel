@@ -84,7 +84,6 @@ import io.legado.app.feature.explore.ExploreMainRoute
 import io.legado.app.ui.main.bookshelf.BookShelfItem
 import io.legado.app.ui.main.bookshelf.BookshelfRouteScreen
 import io.legado.app.ui.main.bookshelf.BookshelfViewModel
-import io.legado.app.ui.main.home.HomeRouteScreen
 import io.legado.app.ui.main.my.MyRouteScreen
 import io.legado.app.ui.main.my.PrefClickEvent
 import io.legado.app.ui.theme.LegadoTheme
@@ -134,7 +133,6 @@ fun MainScreen(
     onNavigateToCache: (Long) -> Unit,
     onNavigateToBookCacheManage: () -> Unit,
     onOpenBookshelfBook: (BookShelfItem, String?) -> Unit,
-    onNavigateToBackupSettings: () -> Unit,
     onNavigateToBookInfo: (name: String, author: String, bookUrl: String, origin: String?, coverPath: String?, sharedCoverKey: String?) -> Unit,
     onNavigateToExploreShow: (title: String?, sourceUrl: String, exploreUrl: String?) -> Unit,
     onNavigateToSourceLogin: (type: io.legado.app.ui.login.SourceLoginType, sourceUrl: String) -> Unit,
@@ -143,7 +141,6 @@ fun MainScreen(
     onNavigateToBookSourceEdit: (String?) -> Unit,
     onNavigateToRuleSub: () -> Unit,
     onNavigateToReadRecord: () -> Unit,
-    onNavigateToReadRecordOverview: () -> Unit,
     onNavigateToHighlightTagRule: () -> Unit,
     onNavigateToAbout: () -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -499,28 +496,6 @@ fun MainScreen(
                         )
                         CompositionLocalProvider(LocalLifecycleOwner provides pageLifecycleOwner) {
                             when (destination) {
-                            MainDestination.Home -> HomeRouteScreen(
-                                onOpenBook = { book ->
-                                    context.startActivityForBook(book)
-                                },
-                                onNavigateToBookInfo = { name, author, bookUrl, origin, coverPath, sharedCoverKey ->
-                                    onNavigateToBookInfo(
-                                        name ?: "",
-                                        author ?: "",
-                                        bookUrl,
-                                        origin,
-                                        coverPath,
-                                        sharedCoverKey,
-                                    )
-                                },
-                                onOpenExploreShow = onNavigateToExploreShow,
-                                onOpenBackupSettings = onNavigateToBackupSettings,
-                                onNavigateToReadRecord = onNavigateToReadRecord,
-                                onNavigateToReadRecordOverview = onNavigateToReadRecordOverview,
-                                sharedTransitionScope = sharedTransitionScope,
-                                animatedVisibilityScope = animatedVisibilityScope,
-                            )
-
                             MainDestination.Bookshelf -> BookshelfRouteScreen(
                                 scrollToTopRequest = bookshelfScrollToTopRequest,
                                 onScrollToTopRequestHandled = { handledRequest ->

@@ -1,4 +1,4 @@
-package io.legado.app.ui.main.homepage.modules
+package io.legado.app.ui.widget.components.book
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -27,16 +27,20 @@ import androidx.compose.ui.unit.dp
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.domain.model.BookShelfState
 import io.legado.app.ui.main.bookCoverSharedElementKey
-import io.legado.app.ui.main.homepage.HomepageBookItemUi
 import io.legado.app.ui.theme.fadingEdge
 import io.legado.app.ui.widget.components.card.TextCard
 import io.legado.app.ui.widget.components.image.cover.CoilBookCover
 import kotlinx.collections.immutable.ImmutableList
 
+data class BookBannerItemUi(
+    val book: SearchBook,
+    val shelfState: BookShelfState = BookShelfState.NOT_IN_SHELF,
+)
+
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun BannerModule(
-    books: ImmutableList<HomepageBookItemUi>,
+fun BookBannerRow(
+    books: ImmutableList<BookBannerItemUi>,
     onClick: (SearchBook, String?) -> Unit,
     onLongClick: ((SearchBook, String?) -> Unit)? = null,
     modifier: Modifier = Modifier,
