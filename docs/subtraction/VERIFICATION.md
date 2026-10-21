@@ -293,3 +293,24 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 - **翻译的 AI provider 入口断链**：`TranslationConfigScreen` 删除了跳转 AI 配置的入口，但设置项仍可选 `PROVIDER_APP_AI` → 用户选中后无处配置。登记 W3 处理。
 - **lint 基线仍有 33 条过时条目**（指向**存在**的文件、但问题已消失）：静态脚本无法判定，需用 lint 报告精确清理 → 登记 W5。
 - **AI/知识库专用 strings 未清理**（4 语言，含 `ai_*`、`book_characters`、`character_network`、`plot_events` 等）→ 登记 W5；当前仅产生 lint warning，不影响构建。
+
+### 7.4 W2a · 朗读 / 音频 / TTS / cast / BGM 域删除（2026-10-21）
+
+**提交**：`dd61c2bfd`（289 files / +103 / **-53,373**）
+**边界**：整文件删除 228 个 app 源码（177 main + 51 test）；保留 `AnalyzeUrl` 的 media3、正文分页/绘制、`preserveReadAloudPosition` 语义、书源/备份链路。Manifest 同步删除 3 个朗读/音频 service 与 `MediaButtonReceiver`。
+
+| 命令 | 结果 |
+|---|---|
+| `:app:compileAppDebugKotlin` | **BUILD SUCCESSFUL**（209 → 0 错；W2a 收敛完成） |
+| `testAppDebugUnitTest` | **1262 / 0 失败 / 0 错误**（235 XML；基线 1571，减少来自删除的 50+ 朗读/播放测试文件） |
+| `verifyConfigArchitecture` | **通过**（21 键/71、1 键/0、8 键/20；缺失文件键 0） |
+| `assembleAppDebug` | **通过**；APK arm64 **65M**、armv7 **64M**、universal **71M**（W1-3 基线 69/68/75M） |
+| `git diff --check` | 0 |
+| 架构门基线脚本 | 三个基线均无指向不存在文件的键 |
+| lint | **未完成复跑**：上一轮仅 4 个 `MissingClass`（TTS/HttpReadAloud/AudioPlay/MediaButtonReceiver），已从 Manifest 移除；全量 lint 在 `lintAnalyzeAppDebug` 阶段超时（10 分钟），登记 W5 |
+
+**残留/顺延**：
+- `BookType.audio` / `BookSourceType.audio` 类型位与 DAO 位运算仍保留 → W2-S6/W4。
+- `ReaderElement.RoleCast/BgmScene`、`castRenderHash`、`CastMarkers` 文本工具仍保留 → W2b（已侦察，见 `team/W2B-CORE-PLAN.md`）。
+- `readAloudParagraphIndex`、`readAloud: Color`（文字高亮色）保留 → W2c；不得误删。
+- 真机手测未做 → W5。
