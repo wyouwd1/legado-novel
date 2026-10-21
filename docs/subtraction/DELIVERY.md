@@ -1,4 +1,4 @@
-# 减法交付说明（W1–W3）
+# 减法交付说明（W1–W4，W5 部分）
 
 > 分支：`subtract/novel-only` ｜ 生成：2026-10-21 ｜ 依据：`PLAN-CANDIDATES.md` 方案 A（加权 4.00/5）
 
@@ -13,12 +13,12 @@
 | W3c | `97fa73e8b` | 翻译设置/任务/缓存/阅读页入口/导出翻译 | -1,961 行 |
 | 测试依赖 | `7437a6469` | 删除 ktor 后显式补 `kotlin-reflect` | +1 行 |
 
-主源码从 W0 的 **1,752 文件 / 335,597 行** 收敛到 **1,398 文件 / 244,560 行**。
+主源码从 W0 的 **1,752 文件 / 335,597 行** 收敛到约 **1,300 文件 / 230,000 行**（W3 后 1,398 / 244,560；W4 删除 110 文件）。
 
 ## 2. 结果（提交后验证）
 
 - `:app:compileAppDebugKotlin`：**BUILD SUCCESSFUL**
-- `testAppDebugUnitTest`：**1,255 / 0 失败 / 0 错误**（233 XML）
+- `testAppDebugUnitTest`：**1,222 / 0 失败 / 0 错误**（225 XML）
 - `verifyConfigArchitecture`：**通过**（20 键/68、1 键/0、8 键/20，无缺失键）
 - `assembleAppDebug`：**通过**；APK arm64 **60M**、armv7 **59M**、universal **66M**（W0 基线 71.7/71.2/78.2 MB）
 - `git diff --check`：0
@@ -30,11 +30,10 @@
 
 ## 4. 明确未完成 / 风险
 
-1. **W2b**：`ReaderElement.RoleCast/BgmScene`、`ReaderCastOptions`、`castRenderHash`、`CastMarkers` 等阅读核心死代码仍在（生产链路不可达，已侦察：`team/W2B-CORE-PLAN.md`）。不删除不影响行为，但不满足“代码零残留”的最终形态。
-2. **W4**：Room `version = 131` 未升版；RSS/AI/TTS/cast/BGM/Homepage 旧 entity/DAO/表仍在数据库定义中。删除必须与 `version+1` + migration 同批，尚未执行。`BookType.audio/image` 类型位与 `books.type` 僵尸数据也在这一步清理。
-3. **W5**：翻译/AI/TTS 专用字符串（4 语言）、`PreferKey.llm*`、部分 lint 基线过时条目未清；lint 全量复跑受 `lintAnalyzeAppDebug` 超时限制（最近一次仅 4 个 Manifest MissingClass，已修复）。
-4. **未做真机手测**：阅读、换源、缓存、书源调试、备份恢复、升级安装均未在真机验证。
-5. **兼容性**：旧 Nav3 保存栈中的朗读/音频 route 已删除，升级后首次恢复可能回主页；`BookSource.homepageModules` 字段保留读取但不展示；旧 `httpTTS.json` 备份忽略而不报错（待 W4 验证）。
+1. **W2b/W2c**：`ReaderElement.RoleCast/BgmScene`、`ReaderCastOptions`、`castRenderHash`、`CastMarkers` 等阅读核心死代码仍在（生产链路不可达，已侦察：`team/W2B-CORE-PLAN.md`）。不删除不影响行为，但不满足“代码零残留”的最终形态。
+2. **W5 剩余**：lint 全量复跑仍受 `lintAnalyzeAppDebug` 超时限制；`assembleAppNoR8` 在打包阶段因 Gradle daemon 内存崩溃（`mergeDexAppNoR8` 后 daemon disappeared），未取得 NoR8 APK。
+3. **未做真机手测**：阅读、换源、缓存、书源调试、备份恢复、升级安装均未在真机验证；Room 131→132 迁移仅经 schema/KSP 验证，未做设备升级安装。
+4. **兼容性**：旧 Nav3 保存栈中的朗读/音频 route 已删除，升级后首次恢复可能回主页；`BookSource.homepageModules` 字段保留读取但不展示；旧 `httpTTS.json`/RSS/首页模块备份文件忽略而不报错。
 
 ## 5. 复现命令
 
