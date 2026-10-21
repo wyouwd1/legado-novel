@@ -159,19 +159,19 @@ W2a 删除已落盘（**225 文件 `git rm` 已暂存**）+ 11 个接入点已�
 
 | # | 任务 | 认领 | 状态 | 证据 |
 |---|---|---|---|---|
-| W4-1 | Room `version+1` + 新 migration（**不改历史 migration**）：DROP 或保留空表（`read_aloud_*`/`bgm_*`/`voice_pool*`/`cast_*`/`cloud_tts_engine`/`httpTTS`/rss/ai/homepage 表） | Migrator | ⬜ | 迁移代码 + 测试 |
-| W4-2 | `books.type` 僵尸数据清理（audio/image 移出书架） | Migrator | ⬜ | 迁移测试断言 |
-| W4-3 | 旧备份/主题包字段兼容（`httpTTS.json` 忽略而非报错；`showRss`/`navIconRss*` 保留读取） | Migrator | ⬜ | 备份恢复测试 |
-| W4-4 | 迁移测试 + 真机升级安装验证 | Verifier | ⬜ | 测试输出 + 安装记录 |
+| W4-1 | Room `version+1` + 新 migration（**不改历史 migration**）：DROP 或保留空表（`read_aloud_*`/`bgm_*`/`voice_pool*`/`cast_*`/`cloud_tts_engine`/`httpTTS`/rss/ai/homepage 表） | Migrator | 🟢 | `d167de175`；132 schema；40 表 @DeleteTable |
+| W4-2 | `books.type` 僵尸数据清理（audio/image 移出书架） | Migrator | 🟢 | onPostMigrate：audio/image→text+notShelf；编辑只允许 text |
+| W4-3 | 旧备份/主题包字段兼容（`httpTTS.json` 忽略而非报错；`showRss`/`navIconRss*` 保留读取） | Migrator | 🟢 | 备份/恢复停止读写 RSS/httpTTS/homepage 文件 |
+| W4-4 | 迁移测试 + 真机升级安装验证 | Verifier | 🟡 | schema + 编译验证；真机升级未做 |
 
 ## W5 · 收口交付（串行）
 
 | # | 任务 | 认领 | 状态 | 证据 |
 |---|---|---|---|---|
 | W5-1 | 基线最终复核（每条与实际一致）+ 清理 lint 基线中 33 条「文件存在但问题已消失」的过时条目 | Verifier | ⬜ | 架构门输出 + lint 报告 |
-| W5-6 | 清理 AI/知识库专用 strings（4 语言：`ai_*`、`book_characters`、`character_network`、`plot_events` 等） | Scribe | ⬜ | `grep -c` 归零 |
-| W5-2 | 文档同步：`README.md`、`AGENTS.md`、`docs/dev/feature-catalog.md`、`docs/index.md` | Scribe | ⬜ | diff |
-| W5-3 | `assembleAppDebug` / `assembleAppRelease` / `assembleAppNoR8` + APK 体积对比 | Verifier | ⬜ | 构建输出 |
+| W5-6 | 清理 AI/知识库专用 strings（4 语言：`ai_*`、`book_characters`、`character_network`、`plot_events` 等） | Scribe | 🟢 | `7fb79c9d1`；4 语言删除 931 键 |
+| W5-2 | 文档同步：`README.md`、`AGENTS.md`、`docs/dev/feature-catalog.md`、`docs/index.md` | Scribe | 🟡 | 减法文档已同步；全仓 feature catalog 待 W2b 后一次更新 |
+| W5-3 | `assembleAppDebug` / `assembleAppRelease` / `assembleAppNoR8` + APK 体积对比 | Verifier | 🟡 | debug 60/59/66M；NoR8 打包阶段 Gradle daemon 内存崩溃 |
 | W5-4 | 真机手测清单 | Verifier + 用户 | ⬜ | `VERIFICATION.md` 手测表 |
 | W5-5 | 交付说明：改动范围、取舍、验证、未验证风险 | Orchestrator | ⬜ | 交付文档 |
 
