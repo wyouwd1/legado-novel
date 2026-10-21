@@ -341,14 +341,6 @@ data class Book(
         return this.durChapterIndex
     }
 
-    fun setTranslationMode(enabled: Boolean) {
-        config.translationMode = enabled
-    }
-
-    fun getTranslationMode(): Boolean {
-        return config.translationMode
-    }
-
     // dailyChapters 的 setter 和 getter
     fun setDailyChapters(dailyChapters: Int) {
         config.dailyChapters = dailyChapters

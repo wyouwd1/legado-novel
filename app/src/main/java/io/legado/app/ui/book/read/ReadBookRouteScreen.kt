@@ -82,7 +82,6 @@ import io.legado.app.feature.reader.platform.ReaderPerfTrace
 import io.legado.app.help.IntentHelp
 import io.legado.app.model.ReadBook
 import io.legado.app.model.SourceCallBack
-import io.legado.app.model.translation.TranslationChapterStatus
 import io.legado.app.ui.book.read.page.entities.PageDirection
 import io.legado.app.ui.book.read.sheet.ReaderBookSheetRoute
 import io.legado.app.ui.book.read.sheet.ReaderBookSourceActions
@@ -841,13 +840,6 @@ fun ReadBookRouteScreen(
                 onIntent = viewModel::onIntent,
                 seekState = viewModel.seekState,
             )
-            AnimatedVisibility(
-                visible = state.translationStatus == TranslationChapterStatus.Thinking,
-                enter = fadeIn(tween(180)) + scaleIn(tween(220), initialScale = 0.88f),
-                exit = fadeOut(tween(140)) + scaleOut(tween(180), targetScale = 0.88f),
-            ) {
-                TranslationThinkingCapsule()
-            }
             if (featureOverlaysInitialized) {
                 ReadBookOverlayRoute(
                     viewModel = viewModel,

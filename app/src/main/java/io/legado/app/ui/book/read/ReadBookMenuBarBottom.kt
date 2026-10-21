@@ -220,7 +220,6 @@ internal fun MenuBottomBar(
             state.isLocalTxt,
             state.bookSource,
             state.isAutoPage,
-            state.translationMode,
             state.useReplaceRule,
             eyeProtectionEnabled,
         ) {

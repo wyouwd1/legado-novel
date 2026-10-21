@@ -2,34 +2,15 @@ package io.legado.app.data.repository
 
 import androidx.datastore.preferences.core.Preferences
 import io.legado.app.constant.PreferKey
-import io.legado.app.domain.model.TranslationConstants
 import io.legado.app.domain.model.settings.BookExportSettings
 import io.legado.app.domain.model.settings.ChangeSourceSettings
 import io.legado.app.domain.model.settings.CoverSettings
 import io.legado.app.domain.model.settings.DownloadCacheSettings
 import io.legado.app.domain.model.settings.ImportBookSettings
-import io.legado.app.domain.model.settings.TranslationSettings
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class Phase2SettingsMappingTest {
-
-    @Test
-    fun `翻译设置写读映射往返恒等`() {
-        assertRoundTrips(
-            samples = listOf(
-                TranslationSettings(
-                    provider = TranslationConstants.PROVIDER_APP_AI,
-                    targetLanguage = "ja",
-                    maxCharsPerChunk = 12_345,
-                    concurrentChunks = 3,
-                    retryCount = 4,
-                )
-            ),
-            toPrefMap = TranslationSettings::toPrefMap,
-            fromPreferences = Preferences::toTranslationSettings,
-        )
-    }
 
     @Test
     fun `换源设置写读映射覆盖每个布尔字段`() {

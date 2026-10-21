@@ -828,7 +828,6 @@ private fun RowScope.TitleBarActionButtons(
         state.isLocalTxt,
         state.bookSource,
         state.isAutoPage,
-        state.translationMode,
         eyeProtectionActive,
     ) {
         loadTitleBarActions(

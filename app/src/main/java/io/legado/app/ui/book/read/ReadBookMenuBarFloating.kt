@@ -75,7 +75,6 @@ internal fun FloatingIconRow(
         state.isLocalTxt,
         state.bookSource,
         state.isAutoPage,
-        state.translationMode,
         state.useReplaceRule,
         eyeProtectionActive,
     ) {

@@ -62,7 +62,6 @@ import io.legado.app.model.SourceCallBack
 import io.legado.app.model.analyzeRule.AnalyzeRule
 import io.legado.app.model.analyzeRule.AnalyzeRule.Companion.setChapter
 import io.legado.app.model.analyzeRule.AnalyzeRule.Companion.setCoroutineContext
-import io.legado.app.model.translation.TranslationChapterStatus
 import io.legado.app.ui.book.read.sheet.ReaderBookSheetTab
 import io.legado.app.ui.book.searchContent.SearchResult
 import io.legado.app.utils.GSON
@@ -102,7 +101,6 @@ class ReadBookViewModel(
     application: Application,
     private val getReadingProgressUseCase: GetReadingProgressUseCase,
     private val uploadReadingProgressUseCase: UploadReadingProgressUseCase,
-    val translateChapterUseCase: io.legado.app.domain.usecase.TranslateChapterUseCase,
     private val readSettingsRepository: ReadSettingsRepository,
     private val readBookStyleConfigRepository: ReadStyleGateway,
     private val localPreferencesRepository: SettingsRepository,
@@ -783,7 +781,6 @@ class ReadBookViewModel(
                 ReadBook.loadContent(false)
                 _uiState.update { it.copy(reSegment = false) }
             }
-            is ReadBookIntent.ToggleTranslation -> toggleTranslation()
             is ReadBookIntent.LoadContentProcesses -> contentProcessDelegate.load()
             is ReadBookIntent.ToggleContentProcess ->
                 contentProcessDelegate.toggle(intent.id, intent.enabled)
@@ -921,7 +918,6 @@ class ReadBookViewModel(
             is ReadBookIntent.SaveImage -> saveImage(intent.src)
             is ReadBookIntent.ReverseContent -> reverseContent()
             is ReadBookIntent.ReverseRemoveSameTitle -> reverseRemoveSameTitle()
-            is ReadBookIntent.RetranslateCurrentChapter -> retranslateCurrentChapter()
             // Menu actions
             is ReadBookIntent.MenuUpdateToc -> {
                 ReadBook.book?.let { book ->
@@ -1705,17 +1701,6 @@ class ReadBookViewModel(
     private fun syncFromReadBook(current: ReadBookUiState): ReadBookUiState {
         val book = ReadBook.book
         val chapterInput = ReadBook.readerChapterInputWindow.current
-        // 原先由 ReadAiDelegate 订阅翻译任务流；AI 域移除后改为直接取当前状态。
-        // 注意：失去持续订阅，状态仅在 syncFromReadBook 被触发时刷新。
-        val translationStatus = book
-            ?.takeIf { it.getTranslationMode() }
-            ?.let {
-                io.legado.app.model.translation.TranslationManager
-                    .getChapterTaskStateFlow(it.bookUrl, ReadBook.durChapterIndex)
-                    ?.value
-                    ?.status
-            }
-            ?: TranslationChapterStatus.Idle
         return current.copy(
             book = book,
             bookSource = ReadBook.bookSource,
@@ -1734,8 +1719,6 @@ class ReadBookViewModel(
             effectiveContentProcessCount = chapterInput?.content?.effectiveContentProcesses?.size ?: 0,
             effectiveReplaceRules = chapterInput?.content?.effectiveReplaceRules.orEmpty().toImmutableList(),
             chineseConverterActive = readSettingsRepository.currentSettings.chineseConverterType > 0,
-            translationMode = book?.getTranslationMode() ?: false,
-            translationStatus = translationStatus,
             isLocalTxt = book?.isLocalTxt == true,
             isEpub = book?.isEpub == true,
             useReplaceRule = book?.getUseReplaceRule(
@@ -2091,27 +2074,6 @@ class ReadBookViewModel(
                     ),
                 ),
             )
-        }
-    }
-
-    @Suppress("LongMethod")
-    private fun toggleTranslation() {
-        val book = ReadBook.book ?: return
-        val enabled = !book.getTranslationMode()
-        book.setTranslationMode(enabled)
-        book.save()
-        _uiState.update { it.copy(translationMode = enabled) }
-        ReadBook.loadContent(false)
-    }
-
-    private fun retranslateCurrentChapter() {
-        val book = ReadBook.book ?: return
-        viewModelScope.launch {
-            val chapter = currentChapter() ?: return@launch
-            io.legado.app.model.translation.TranslationManager.deleteTranslationCache(book, chapter)
-            book.setTranslationMode(true)
-            book.save()
-            ReadBook.loadContent(false)
         }
     }
 

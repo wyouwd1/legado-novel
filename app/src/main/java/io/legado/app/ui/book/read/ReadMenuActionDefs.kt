@@ -189,11 +189,6 @@ internal fun readMenuButtonInfos(context: Context): List<ReadMenuButtonInfo> = l
         context.getString(R.string.text_processing),
     ),
     ReadMenuButtonInfo(
-        "translate",
-        Icons.Default.Translate,
-        context.getString(R.string.translate),
-    ),
-    ReadMenuButtonInfo(
         "refresh_current",
         Icons.Default.Refresh,
         context.getString(R.string.menu_refresh_dur),
@@ -352,9 +347,6 @@ internal fun buildReadMenuActionDefs(
                 onIntent(ReadBookIntent.ToggleAutoPage)
                 onIntent(ReadBookIntent.HideMenu)
             }
-        },
-        def("translate", isActive = state.translationMode) {
-            onIntent(ReadBookIntent.ToggleTranslation)
         },
         def("refresh_current") {
             onIntent(ReadBookIntent.RefreshCurrentChapter)
