@@ -390,5 +390,27 @@ W6-C 的 SQLite 用例发现 `Migration_131_132` 把位或写成逻辑 `or`，�
 `type` 会被压成 `1`（丢失 text/local/webFile 等位）。修复为 `|` 并加 `DatabaseMigration131To132Test`
 （Robolectric framework SQLite 直接执行生产 SQL + 131/132 schema 差集恰好 40 表）。
 
-**仍未验证**：真实设备升级安装与 40 张表的 AutoMigration DROP 流程、真机阅读/命中/选区、缓存下载真实网络失败、
+**仍未验证**：真实 ARM 设备升级安装、真机阅读/命中/选区、缓存下载真实网络失败、
 备份恢复完整链路、`lintAppDebug` 全量、`assembleAppNoR8`。
+
+### 7.10 W7 · Android 模拟器验证（2026-10-21）
+
+> 环境：Android 35 x86_64 default image / emulator 37.2.12；WSL2 当前用户无 `/dev/kvm` 权限，
+> 使用 TCG 软件模拟。完整记录见 [`W7-EMULATOR.md`](./W7-EMULATOR.md)。
+
+| 项 | 结果 |
+|---|---|
+| 首次安装阻断 | `AppDatabase.dbCallback.onOpen` 仍 `update rssSources/httpTTS`；全新安装抛 `no such table: rssSources` 后进程被杀 |
+| 修复 | 删除 3 条旧域 SQL + `RSS_SOURCE_TABLE_NAME`；新增 `AppDatabaseFreshOpenTest`（Robolectric + 生产 callback） |
+| `testAppDebugUnitTest` | **1,315 / 0 failures / 0 errors / 0 skipped**（243 XML） |
+| `BookDaoTest`（设备） | **2/2 通过** |
+| `Migration131To132InstrumentedTest`（设备） | **1/1 通过**；真实 Room AutoMigration、40 表 DROP、媒体书 type/进度保留 |
+| `AndroidJsTest`（设备） | **2/2 通过**；Rhino + Hutool/Java 桥 |
+| UI 冒烟 | 全新 onboarding、书源管理、Settings、本地 TXT 1/2 50% → 2/2 100% |
+| `verifyConfigArchitecture` / `assembleAppDebug` | 均通过；APK arm64 **62,302 KB**、armv7 **61,853 KB**、universal **68,719 KB** |
+| `git diff --check` | 0 |
+
+**W7 测试清理**：删除引用已裁撤 HTTP TTS/manga/ReaderProvider 的 4 个失效 androidTest，替换空迁移占位测试；
+`AndroidJsTest` 改为验证仍然保留的 Rhino/Hutool 桥。`HttpTest`/`UpdateTest` 等网络型设备测试未纳入。
+**W7 仍未验证**：真实 ARM 设备阅读/手势/选区、真实书源网络、缓存下载、完整备份恢复、真实设备升级安装、
+`lintAppDebug` 全量、`assembleAppNoR8`。

@@ -3,7 +3,7 @@
 > 目标：把本仓库收敛为一台**纯小说阅读器**——阅读、书源、书架、搜索、缓存、本地导入、
 > 阅读设置/主题、替换净化、备份恢复；移除与小说阅读无关的扩展域。
 >
-> 状态：**W1–W6 已落地并提交**；W6 对抗测试 1,314 单测全绿；剩余 lint 全量复跑、NoR8 打包、真机手测与设备升级未完成，见 [`DELIVERY.md`](./DELIVERY.md) 与 [`W6-ADVERSARIAL.md`](./W6-ADVERSARIAL.md)。决策见 [`DECISION-MAP.md`](./DECISION-MAP.md)，候选方案择优见 [`PLAN-CANDIDATES.md`](./PLAN-CANDIDATES.md)。
+> 状态：**W1–W7 已落地并提交**；W7 在 Android 35 模拟器完成全新安装/阅读冒烟并修复首次建库崩溃，1,315 单测全绿；剩余 lint 全量复跑、NoR8 打包、真实 ARM 真机手测与真实设备升级未完成，见 [`DELIVERY.md`](./DELIVERY.md)、[`W6-ADVERSARIAL.md`](./W6-ADVERSARIAL.md) 与 [`W7-EMULATOR.md`](./W7-EMULATOR.md)。决策见 [`DECISION-MAP.md`](./DECISION-MAP.md)，候选方案择优见 [`PLAN-CANDIDATES.md`](./PLAN-CANDIDATES.md)。
 >
 > 创建：2026-10-14 ｜ 分支基线：`main` @ `070ca1a9b`
 
@@ -67,9 +67,10 @@
 | W1 | 共享点剥离 + 叶节点域删除（RSS / 漫画 / AI / 知识库·角色·评论） | 域内并行，热点串行 | 编译 + 单测 + 架构门通过并提交 | 🟢 完成 |
 | W2 | 朗读大块（D4b TTS/听书 + D4c 配音 + D4d BGM + D4a 音频书/播放器） | 1–2 路（与阅读页深度耦合） | 同上 | 🟢 完成 |
 | W3 | 首页自定义模块（D7）+ Web 归档（D8）+ 翻译（D9）+ 导航收敛（D7a） | 2–3 路并行 | 同上 | 🟢 完成 |
-| W4 | 数据层收口：Room 版本 + 迁移 + 旧数据清理 + 备份/主题兼容 | 串行 | 迁移测试 + 升级安装验证 | 🟡 SQL 测试通过；设备升级未跑 |
-| W5 | 收口：基线复核、官方文档同步、release 打包、真机手测 | 串行 | 全绿 + 手测清单勾完 | 🟡 lint/NoR8/手测残留 |
+| W4 | 数据层收口：Room 版本 + 迁移 + 旧数据清理 + 备份/主题兼容 | 串行 | 迁移测试 + 升级安装验证 | 🟡 SQL + 设备端 AutoMigration 通过；真实设备升级未跑 |
+| W5 | 收口：基线复核、官方文档同步、release 打包、真机手测 | 串行 | 全绿 + 手测清单勾完 | 🟡 lint/NoR8/真实 ARM 手测残留 |
 | W6 | 对抗性测试：异常输入、边界、并发、网络失败、错误假设 | 3 路并行 + 主控 | 105 新增测试 + 全量门禁 | 🟢 完成（`W6-ADVERSARIAL.md`） |
+| W7 | Android 模拟器：全新安装、onboarding、书源入口、本地阅读、设备端迁移 | 串行 | 设备证据 + 回归测试 | 🟢 完成（`W7-EMULATOR.md`） |
 
 ---
 

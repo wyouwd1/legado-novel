@@ -200,3 +200,17 @@ W2a 删除已落盘（**225 文件 `git rm` 已暂存**）+ 11 个接入点已�
 - 缓存队列 `Int.MAX_VALUE` 死循环、并发 CME、`prioritize` 未入队章被调度（已修）。
 - 阅读核心 NaN/Inf 字宽与图片尺寸污染整页几何、HTML 空结果吞正文（已修）。
 - W6 未验证：真机阅读/缓存/备份恢复、Room 设备升级、真实网络失败、lint 全量、NoR8。
+
+## W7 · Android 模拟器验证（2026-10-21）
+
+| # | 任务 | 认领 | 状态 | 证据 |
+|---|---|---|---|---|
+| W7-1 | 安装 API 35 x86_64 emulator，创建 AVD，软件模式启动 | lead | 🟢 | `W7-EMULATOR.md` §1；TCG 540×1200；App 首帧 43.8s |
+| W7-2 | 全新安装、onboarding、书架/书源/Settings UI 冒烟 | lead | 🟢 | `W7-EMULATOR.md` §2、§4；发现首次建库崩溃 |
+| W7-3 | 修复 `AppDatabase.onOpen` 旧表 SQL + 首次建库回归 | lead | 🟢 | `AppDatabase.kt`；`AppDatabaseFreshOpenTest`；1,315/0 |
+| W7-4 | 设备端 Room AutoMigration、DAO、Rhino 定向测试 | lead | 🟢 | `BookDaoTest` 2/2；`Migration131To132InstrumentedTest` 1/1；`AndroidJsTest` 2/2 |
+| W7-5 | 本地 TXT 阅读、翻页、进度验证 | lead | 🟢 | `W7-EMULATOR.md` §4；1/2 50% → 2/2 100% |
+
+**W7 关键修复**：全新安装首开时 `AppDatabase.dbCallback.onOpen` 仍执行已删除表的
+`update rssSources/httpTTS`，抛 `no such table: rssSources`；已删除旧 SQL 和常量，新增首次建库回归测试。
+**W7 未验证**：真实 ARM 设备、真实书源网络、缓存下载、完整备份恢复、真实设备升级、lint 全量、NoR8。
