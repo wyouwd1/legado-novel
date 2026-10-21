@@ -42,8 +42,6 @@ sealed interface MainUiIntent {
 }
 
 sealed interface MainEffect {
-    data class OpenUrl(val url: String) : MainEffect
-    data class CopyUrl(val url: String) : MainEffect
     data class StartActivity(val destination: Class<*>, val configTag: String? = null) : MainEffect
     data object ExitApp : MainEffect
     data object NavigateToReadRecord : MainEffect

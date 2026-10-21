@@ -19,10 +19,9 @@ import com.jeremyliao.liveeventbus.logger.DefaultLogger
 import com.script.rhino.ReadOnlyJavaObject
 import com.script.rhino.RhinoScriptEngine
 import com.script.rhino.RhinoWrapFactory
+import io.legado.app.api.ShortCuts
 import io.legado.app.constant.AppConst.channelIdBookSourceCheck
 import io.legado.app.constant.AppConst.channelIdDownload
-import io.legado.app.constant.AppConst.channelIdReadAloud
-import io.legado.app.constant.AppConst.channelIdWeb
 import io.legado.app.constant.PreferKey
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.Book
@@ -115,6 +114,7 @@ class App : Application(), SingletonImageLoader.Factory {
             androidContext(this@App)
             modules(appDatabaseModule, appModule)
         }
+        ShortCuts.buildShortCuts(this)
         @Suppress("DEPRECATION")
         AppConfig.initialize(
             shellGateway = get(),
@@ -298,31 +298,9 @@ class App : Application(), SingletonImageLoader.Factory {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
 
-        val readAloudChannel = NotificationChannel(
-            channelIdReadAloud,
-            getString(R.string.read_aloud),
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-            enableLights(false)
-            enableVibration(false)
-            setSound(null, null)
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        }
-
         val bookSourceCheckChannel = NotificationChannel(
             channelIdBookSourceCheck,
             getString(R.string.check_book_source),
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-            enableLights(false)
-            enableVibration(false)
-            setSound(null, null)
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        }
-
-        val webChannel = NotificationChannel(
-            channelIdWeb,
-            getString(R.string.web_service),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             enableLights(false)
@@ -335,9 +313,7 @@ class App : Application(), SingletonImageLoader.Factory {
         notificationManager.createNotificationChannels(
             listOf(
                 downloadChannel,
-                bookSourceCheckChannel,
-                readAloudChannel,
-                webChannel
+                bookSourceCheckChannel
             )
         )
     }

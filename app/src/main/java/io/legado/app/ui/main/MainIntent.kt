@@ -35,8 +35,6 @@ object MainIntent {
     const val EXTRA_WEB_VIEW_REFETCH = "refetchAfterSuccess"
     const val EXTRA_WEB_VIEW_HTML = "html"
 
-    const val EXTRA_WEB_SERVICE_LOCAL_NETWORK = "webServiceLocalNetwork"
-
 
     fun createLauncherIntent(context: Context): Intent {
         val launcherComponent =
@@ -53,15 +51,6 @@ object MainIntent {
             putExtra(EXTRA_START_ROUTE, MainRouteConst.ROUTE_MAIN)
         }
     }
-
-    /**
-     * 磁贴等无 Activity 的入口无法自行申请本地网络权限，转到宿主 Activity 申请并补启 Web 服务。
-     */
-    fun createWebServiceLocalNetworkIntent(context: Context): Intent =
-        createLauncherIntent(context).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra(EXTRA_WEB_SERVICE_LOCAL_NETWORK, true)
-        }
 
     fun createSourceLoginIntent(
         context: Context,

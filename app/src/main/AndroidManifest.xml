@@ -405,21 +405,6 @@
             android:name=".service.ExportBookService"
             android:foregroundServiceType="dataSync" />
         <service
-            android:name=".service.WebService"
-            android:foregroundServiceType="dataSync" />
-        <service
-            android:name=".service.WebTileService"
-            android:exported="true"
-            android:foregroundServiceType="dataSync"
-            android:icon="@drawable/ic_web_service_noti"
-            android:label="legado Web Service"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            >
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-        </service>
-        <service
             android:name=".service.DownloadService"
             android:foregroundServiceType="dataSync" />
 
@@ -433,12 +418,6 @@
                 android:value="true" />
         </service>
 
-        <provider
-            android:name=".api.ReaderProvider"
-            android:authorities="${applicationId}.readerProvider"
-            android:enabled="true"
-            android:exported="true"
-            tools:ignore="ExportedContentProvider" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"

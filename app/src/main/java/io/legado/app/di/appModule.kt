@@ -242,7 +242,6 @@ import io.legado.app.ui.main.MainViewModel
 import io.legado.app.ui.main.bookshelf.BookshelfCoverPreloader
 import io.legado.app.ui.main.bookshelf.BookshelfViewModel
 import io.legado.app.ui.main.explore.ExploreViewModel
-import io.legado.app.ui.main.my.MyViewModel
 import io.legado.app.ui.replace.ReplaceEditRoute
 import io.legado.app.ui.replace.ReplaceRuleViewModel
 import io.legado.app.ui.replace.edit.ReplaceEditViewModel
@@ -461,7 +460,6 @@ val appModule = module {
     viewModelOf(::ReadRecordViewModel)
     viewModelOf(::ReadRecordOverviewViewModel)
     viewModelOf(::ExploreShowViewModel)
-    viewModelOf(::MyViewModel)
     viewModelOf(::BookshelfViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::AboutViewModel)

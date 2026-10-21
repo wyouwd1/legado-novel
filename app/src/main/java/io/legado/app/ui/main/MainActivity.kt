@@ -66,7 +66,6 @@ import io.legado.app.help.http.LocalNetworkBlockedNotifier
 import io.legado.app.help.storage.Backup
 import io.legado.app.help.update.AppUpdateGitHub
 import io.legado.app.lib.dialogs.alert
-import io.legado.app.service.WebService
 import io.legado.app.ui.about.MarkdownSheet
 import io.legado.app.ui.about.UpdateDialog
 import io.legado.app.ui.book.read.ReadBookInputHandler
@@ -255,20 +254,6 @@ open class MainActivity : BaseComposeActivity() {
     private val backupSettingsGateway by inject<BackupSettingsGateway>()
     internal val navRouteTracker by inject<MainNavRouteTracker>()
     private val routeEvents = MutableSharedFlow<RouteEvent>(extraBufferCapacity = 1)
-    /**
-     * Web 服务与「局域网请求」各自持有独立的 launcher：授权结果互不影响，也不需要用一个可变字段
-     * 记录「本次申请的目的」——那种写法在配置变更/进程重建后会丢失，导致结果被误判为 Web 服务申请。
-     */
-    private val webServiceLocalNetworkPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            WebService.startForeground(this)
-        } else {
-            toastOnUi(R.string.web_service_local_network_permission_denied)
-        }
-    }
-
     private val localNetworkRequestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -293,14 +278,6 @@ open class MainActivity : BaseComposeActivity() {
         val shouldAutoCheckUpdate = startupUpdateCheckGate.consume(
             otherSettingsGateway.currentSettings.autoCheckUpdateOnStart
         )
-
-        // 智能自启：如果上次是手动开启状态（web_service_auto 为 true），则自启；
-        // 本地网络权限缺失时先申请，磁贴等入口也通过该 extra 转发到这里。
-        val requestWebService = otherSettingsGateway.currentSettings.webServiceAutoStart ||
-                intent?.getBooleanExtra(MainIntent.EXTRA_WEB_SERVICE_LOCAL_NETWORK, false) == true
-        if (requestWebService) {
-            startWebServiceWithLocalNetworkPermission()
-        }
 
         // 局域网请求（书源 / 图源 / WebDAV）被系统拦下时，前台立即补一次本地网络权限申请。
         lifecycleScope.launch {
@@ -335,18 +312,6 @@ open class MainActivity : BaseComposeActivity() {
         }
     }
 
-    /**
-     * Android 17 (API 37) 起 Web 服务需要本地网络权限才能接受局域网入站连接。
-     * 已授予直接启动；未授予先申请，授予后由 launcher 回调补启。
-     */
-    private fun startWebServiceWithLocalNetworkPermission() {
-        if (LocalNetworkAccess.isGranted(this)) {
-            WebService.startForeground(this)
-        } else {
-            webServiceLocalNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         requestLocalNetworkPermissionIfBlocked()
@@ -365,10 +330,6 @@ open class MainActivity : BaseComposeActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (intent.getBooleanExtra(MainIntent.EXTRA_WEB_SERVICE_LOCAL_NETWORK, false)) {
-            startWebServiceWithLocalNetworkPermission()
-            return
-        }
         if (!intent.hasExplicitStartRoute()) return
         routeEvents.tryEmit(
             RouteEvent(

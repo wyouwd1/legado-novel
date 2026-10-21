@@ -1,23 +1,11 @@
 package io.legado.app.constant
 
 object EventBus {
-    const val MEDIA_BUTTON = "mediaButton"
     const val UP_BOOKSHELF = "upBookToc"
     const val BOOKSHELF_REFRESH = "bookshelfRefresh"
-    const val ALOUD_STATE = "aloud_state"
-    const val TTS_PROGRESS = "ttsStart"
-    const val AUDIO_DS = "audioDs"
-    const val READ_ALOUD_DS = "readAloudDs"
     const val BATTERY_CHANGED = "batteryChanged"
     const val TIME_CHANGED = "timeChanged"
-    const val AUDIO_SUB_TITLE = "audioSubTitle"
-    const val AUDIO_STATE = "audioState"
-    const val AUDIO_PROGRESS = "audioProgress"
-    const val AUDIO_BUFFER_PROGRESS = "audioBufferProgress"
-    const val AUDIO_SIZE = "audioSize"
-    const val AUDIO_SPEED = "audioSpeed"
     const val NOTIFY_MAIN = "notifyMain"
-    const val WEB_SERVICE = "webService"
     const val UP_DOWNLOAD = "upDownload"
     const val UP_DOWNLOAD_STATE = "upDownloadState"
     const val SAVE_CONTENT = "saveContent"

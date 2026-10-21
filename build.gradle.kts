@@ -231,7 +231,6 @@ val verifyConfigArchitecture = tasks.register<VerifyConfigArchitectureTask>(
             "io/legado/app/help/config/LocalConfig.kt" to 3,
             "io/legado/app/help/config/ThemeConfigStore.kt" to 8,
             "io/legado/app/help/storage/Restore.kt" to 2,
-            "io/legado/app/service/WebService.kt" to 2,
             "io/legado/app/ui/association/ImportReplaceRuleDialog.kt" to 1,
             "io/legado/app/ui/book/explore/ExploreShowViewModel.kt" to 2,
             "io/legado/app/ui/book/read/ReadBookViewModel.kt" to 2,
@@ -240,7 +239,6 @@ val verifyConfigArchitecture = tasks.register<VerifyConfigArchitectureTask>(
             "io/legado/app/ui/config/otherConfig/OtherConfigViewModel.kt" to 1,
             "io/legado/app/ui/replace/ReplaceRuleViewModel.kt" to 2,
             "io/legado/app/utils/ContextExtensions.kt" to 12,
-            "io/legado/app/web/socket/BookSearchWebSocket.kt" to 2,
         )
     )
     legacyDaoInjectionBaseline.set(

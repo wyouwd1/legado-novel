@@ -75,11 +75,6 @@ fun OtherConfigScreen(
                     onCheckedChange = { onIntent(OtherConfigIntent.AutoCheckUpdateOnStartChanged(it)) }
                 )
 
-                SwitchSettingItem(
-                    title = stringResource(R.string.web_service_auto_start),
-                    checked = state.webServiceAutoStart,
-                    onCheckedChange = { onIntent(OtherConfigIntent.WebServiceAutoStartChanged(it)) }
-                )
             }
 
             SplicedColumnGroup(title = stringResource(R.string.main_activity)) {
@@ -139,13 +134,6 @@ fun OtherConfigScreen(
 
                 SplicedColumnGroup(title = stringResource(R.string.other_setting)) {
 
-                SwitchSettingItem(
-                    title = stringResource(R.string.web_service_wake_lock),
-                    description = stringResource(R.string.web_service_wake_lock_summary),
-                    checked = state.webServiceWakeLock,
-                    onCheckedChange = { onIntent(OtherConfigIntent.WebServiceWakeLockChanged(it)) }
-                )
-
                 InputSettingItem(
                     title = stringResource(R.string.source_edit_text_max_line),
                     value = state.sourceEditMaxLine.toString(),
@@ -157,12 +145,6 @@ fun OtherConfigScreen(
                     title = stringResource(R.string.direct_link_upload_rule),
                     description = stringResource(R.string.direct_link_upload_rule_summary),
                     onClick = { onIntent(OtherConfigIntent.ShowOverlay(OtherConfigOverlay.DirectLinkUpload)) }
-                )
-
-                InputSettingItem(
-                    title = stringResource(R.string.web_port_title),
-                    value = state.webPort.toString(),
-                    onConfirm = { onIntent(OtherConfigIntent.WebPortChanged(it.toInt())) }
                 )
 
                 ClickableSettingItem(

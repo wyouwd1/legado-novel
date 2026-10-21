@@ -74,8 +74,6 @@ class MainViewModel(
 
     private fun handlePrefClick(event: PrefClickEvent) {
         when (event) {
-            is PrefClickEvent.OpenUrl -> _effects.tryEmit(MainEffect.OpenUrl(event.url))
-            is PrefClickEvent.CopyUrl -> _effects.tryEmit(MainEffect.CopyUrl(event.url))
             is PrefClickEvent.StartActivity -> _effects.tryEmit(
                 MainEffect.StartActivity(
                     destination = event.destination,

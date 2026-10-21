@@ -68,40 +68,12 @@ import org.koin.androidx.compose.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-@SuppressLint("InlinedApi") // 仅 API 37+ 缺少权限时才发出该 effect，权限名常量会被内联
 @Composable
 fun MyRouteScreen(
-    viewModel: MyViewModel = koinViewModel(),
     onOpenSettings: () -> Unit,
     onNavigate: (PrefClickEvent) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            viewModel.onIntent(MyIntent.StartWebService)
-        } else {
-            Toast.makeText(
-                context,
-                R.string.web_service_local_network_permission_denied,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-    LaunchedEffect(viewModel) {
-        viewModel.effects.collectLatest { effect ->
-            when (effect) {
-                MyEffect.RequestLocalNetworkPermission -> localNetworkPermissionLauncher.launch(
-                    Manifest.permission.ACCESS_LOCAL_NETWORK
-                )
-            }
-        }
-    }
     MyScreen(
-        state = uiState,
-        onIntent = viewModel::onIntent,
         onOpenSettings = onOpenSettings,
         onNavigate = onNavigate,
     )
@@ -110,8 +82,6 @@ fun MyRouteScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MyScreen(
-    state: MyUiState,
-    onIntent: (MyIntent) -> Unit,
     onOpenSettings: () -> Unit,
     onNavigate: (PrefClickEvent) -> Unit,
 ) {
@@ -139,18 +109,6 @@ fun MyScreen(
                     )
                 )
         ) {
-            SplicedColumnGroup(
-                title = ""
-            ) {
-                WebServiceSettingBlock(
-                    uiState = state,
-                    onToggleWebService = {
-                        onIntent(MyIntent.ToggleWebService)
-                    },
-                    onNavigate = onNavigate
-                )
-            }
-
             SplicedColumnGroup(
                 title = stringResource(R.string.rule_segment),
             ) {
@@ -256,54 +214,4 @@ fun MyScreen(
 }
 
 
-@Composable
-fun WebServiceSettingBlock(
-    uiState: MyUiState,
-    onToggleWebService: () -> Unit,
-    onNavigate: (PrefClickEvent) -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        SwitchSettingItem(
-            title = stringResource(R.string.web_service),
-            description = if (uiState.isWebServiceRun) {
-                uiState.webServiceAddress
-            } else {
-                stringResource(R.string.web_service_desc)
-            },
-            imageVector = Icons.Default.Web,
-            checked = uiState.isWebServiceRun,
-            onCheckedChange = { onToggleWebService() }
-        )
 
-        AnimatedVisibility(
-            visible = uiState.isWebServiceRun,
-            enter = expandVertically(),
-            exit = shrinkVertically()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                SmallPlainButton(
-                    onClick = {
-                        onNavigate(PrefClickEvent.CopyUrl(uiState.webServiceAddress))
-                    },
-                    icon = Icons.Default.ContentCopy,
-                    text = stringResource(R.string.copy_url)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                SmallPlainButton(
-                    onClick = {
-                        onNavigate(PrefClickEvent.OpenUrl(uiState.webServiceAddress))
-                    },
-                    icon = Icons.Default.OpenInBrowser,
-                    text = stringResource(R.string.open_in_browser)
-                )
-            }
-        }
-    }
-}

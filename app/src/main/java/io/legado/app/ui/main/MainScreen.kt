@@ -152,13 +152,6 @@ fun MainScreen(
     LaunchedEffect(effects, context) {
         effects.collectLatest { effect ->
             when (effect) {
-                is MainEffect.OpenUrl -> {
-                    context.startActivity(
-                        Intent(Intent.ACTION_VIEW, effect.url.toUri())
-                    )
-                }
-
-                is MainEffect.CopyUrl -> context.sendToClip(effect.url)
                 is MainEffect.StartActivity -> {
                     context.startActivity(Intent(context, effect.destination).apply {
                         effect.configTag?.let { putExtra("configTag", it) }

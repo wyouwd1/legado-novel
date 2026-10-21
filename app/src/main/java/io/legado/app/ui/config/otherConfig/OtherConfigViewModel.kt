@@ -64,8 +64,6 @@ class OtherConfigViewModel(
                 updateOtherSetting { it.copy(updateToVariant = intent.value) }
             is OtherConfigIntent.AutoCheckUpdateOnStartChanged ->
                 updateOtherSetting { it.copy(autoCheckUpdateOnStart = intent.value) }
-            is OtherConfigIntent.WebServiceAutoStartChanged ->
-                updateOtherSetting { it.copy(webServiceAutoStart = intent.value) }
             is OtherConfigIntent.AutoRefreshChanged ->
                 updateOtherSetting { it.copy(autoRefresh = intent.value) }
             is OtherConfigIntent.DefaultToReadChanged ->
@@ -80,17 +78,8 @@ class OtherConfigViewModel(
                 updateOtherSetting { it.copy(autoClearExpired = intent.value) }
             is OtherConfigIntent.ShowAddToShelfAlertChanged ->
                 updateOtherSetting { it.copy(showAddToShelfAlert = intent.value) }
-            is OtherConfigIntent.WebServiceWakeLockChanged ->
-                updateOtherSetting { it.copy(webServiceWakeLock = intent.value) }
             is OtherConfigIntent.SourceEditMaxLineChanged ->
                 updateOtherSetting { it.copy(sourceEditMaxLine = intent.value) }
-            is OtherConfigIntent.WebPortChanged -> {
-                updateOtherSetting(
-                    onSuccess = {
-                        _effects.tryEmit(OtherConfigEffect.RestartWebService)
-                    },
-                ) { it.copy(webPort = intent.value) }
-            }
             is OtherConfigIntent.ProcessTextChanged -> setProcessTextEnable(intent.value)
             is OtherConfigIntent.RecordLogChanged ->
                 updateOtherSetting { it.copy(recordLog = intent.value) }
@@ -304,7 +293,6 @@ private fun OtherSettings.toUiState(current: OtherConfigUiState): OtherConfigUiS
     current.copy(
         updateToVariant = updateToVariant,
         autoCheckUpdateOnStart = autoCheckUpdateOnStart,
-        webServiceAutoStart = webServiceAutoStart,
         autoRefresh = autoRefresh,
         defaultToRead = defaultToRead,
 
@@ -313,9 +301,7 @@ private fun OtherSettings.toUiState(current: OtherConfigUiState): OtherConfigUiS
         replaceEnableDefault = replaceEnableDefault,
         autoClearExpired = autoClearExpired,
         showAddToShelfAlert = showAddToShelfAlert,
-        webServiceWakeLock = webServiceWakeLock,
         sourceEditMaxLine = sourceEditMaxLine,
-        webPort = webPort,
         processText = processText,
         recordLog = recordLog,
         recordHeapDump = recordHeapDump,
