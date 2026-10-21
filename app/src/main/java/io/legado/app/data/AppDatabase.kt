@@ -234,7 +234,6 @@ abstract class AppDatabase : RoomDatabase() {
 
         const val BOOK_TABLE_NAME = "books"
         const val BOOK_SOURCE_TABLE_NAME = "book_sources"
-        const val RSS_SOURCE_TABLE_NAME = "rssSources"
 
         val dbCallback = object : Callback() {
 
@@ -339,18 +338,6 @@ abstract class AppDatabase : RoomDatabase() {
                 val upBookSourceLoginUiSql =
                     "update book_sources set loginUi = null where loginUi = 'null'"
                 db.execSQL(upBookSourceLoginUiSql)
-                @Language("sql")
-                val upRssSourceLoginUiSql =
-                    "update rssSources set loginUi = null where loginUi = 'null'"
-                db.execSQL(upRssSourceLoginUiSql)
-                @Language("sql")
-                val upHttpTtsLoginUiSql =
-                    "update httpTTS set loginUi = null where loginUi = 'null'"
-                db.execSQL(upHttpTtsLoginUiSql)
-                @Language("sql")
-                val upHttpTtsConcurrentRateSql =
-                    "update httpTTS set concurrentRate = '0' where concurrentRate is null"
-                db.execSQL(upHttpTtsConcurrentRateSql)
                 db.query("select * from keyboardAssists order by serialNo").use {
                     if (it.count == 0) {
                         DefaultData.keyboardAssists.forEach { keyboardAssist ->
