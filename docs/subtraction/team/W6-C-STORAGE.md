@@ -1,7 +1,7 @@
 # W6-C 存储/迁移对抗性测试报告
 
-> 分支 `subtract/novel-only` ｜ 执行时间 2026-10-21 14:05–14:32 CST ｜ 未 commit。  
-> 范围：`utils/compress/**`、`help/storage/**`、`data/DatabaseMigrations.kt`（仅证明缺陷时）、对应单测。  
+> 分支 `subtract/novel-only` ｜ 执行时间 2026-10-21 14:05–14:32 CST ｜ 未 commit。
+> 范围：`utils/compress/**`、`help/storage/**`、`data/DatabaseMigrations.kt`（仅证明缺陷时）、对应单测。
 > 结论：**修复 6 个已证明缺陷，新增 30 个永久回归测试；定向测试 49 项 + 迁移测试 2 项全绿。**
 
 ## 0. 结果速览
@@ -45,9 +45,9 @@
 ### C3-1（高危）Migration_131_132 把位或写成逻辑 `or`，整列 type 变 0/1
 
 - **输入**：v131 `books` 中 `type` 含 audio(32)/image(64)/video(4) 位的行，例如 `audio`、`audio|local`、`text|audio`。
-- **实际（修复前）**：`onPostMigrate` SQL 为  
-  `UPDATE books SET type = (type & ~100) or 8 or 1024 WHERE type & 100 > 0`  
-  SQLite 的 `OR` 是逻辑或，结果恒为 `0/1`，实际所有命中行 `type = 1`。  
+- **实际（修复前）**：`onPostMigrate` SQL 为
+  `UPDATE books SET type = (type & ~100) or 8 or 1024 WHERE type & 100 > 0`
+  SQLite 的 `OR` 是逻辑或，结果恒为 `0/1`，实际所有命中行 `type = 1`。
   **受影响范围**：所有带 audio/image/video 任一旧位的旧书；包括本地音频/图片书（`local` 位 256 被清）、`text|audio`（text 位 8 被清）、`webFile|audio`（webFile 位 128 被清）。行数据、书名、作者、章节进度列不受影响，但 `type` 语义丢失，`isLocal`/`isText` 判定失效，书可能从书架消失或无法打开。
 - **期望**：清除 audio/image/video 位，保留其余位，并置 `text|notShelf`。例如：
   - `audio` (32) → `text|notShelf` (1032)

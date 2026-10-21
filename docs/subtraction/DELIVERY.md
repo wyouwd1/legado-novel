@@ -1,4 +1,4 @@
-# 减法交付说明（W1–W4，W5 部分）
+# 减法交付说明（W1–W6，W5 剩余项）
 
 > 分支：`subtract/novel-only` ｜ 生成：2026-10-21 ｜ 依据：`PLAN-CANDIDATES.md` 方案 A（加权 4.00/5）
 
@@ -18,9 +18,9 @@
 ## 2. 结果（提交后验证）
 
 - `:app:compileAppDebugKotlin`：**BUILD SUCCESSFUL**
-- `testAppDebugUnitTest`：**1,209 / 0 失败 / 0 错误**（225 XML）
+- `testAppDebugUnitTest`：**1,314 / 0 失败 / 0 错误 / 0 跳过**（242 XML；W6 新增 105 项对抗回归）
 - `verifyConfigArchitecture`：**通过**（20 键/68、1 键/0、8 键/20，无缺失键）
-- `assembleAppDebug`：**通过**；APK arm64 **60M**、armv7 **59M**、universal **66M**（W0 基线 71.7/71.2/78.2 MB）
+- `assembleAppDebug`：**通过**；APK arm64 **62,308 KB**、armv7 **61,860 KB**、universal **68,724 KB**（W0 基线 71.7/71.2/78.2 MB）
 - `git diff --check`：0
 - 独立验证：`team/W2A-VERIFY.md`（PASS；反证 grep 无删除符号代码引用；保留项核对通过）
 
@@ -31,8 +31,15 @@
 ## 4. 明确未完成 / 风险
 
 1. **W5 剩余**：lint 全量复跑仍受 `lintAnalyzeAppDebug` 超时限制；`assembleAppNoR8` 在打包阶段因 Gradle daemon 内存崩溃（`mergeDexAppNoR8` 后 daemon disappeared），未取得 NoR8 APK；`lintVitalAnalyzeAppNoR8` 在崩溃前已通过。
-2. **未做真机手测**：阅读、换源、缓存、书源调试、备份恢复、升级安装均未在真机验证；Room 131→132 迁移仅经 schema/KSP 验证，未做设备升级安装。
+2. **未做真机手测**：阅读、换源、缓存、书源调试、备份恢复、升级安装均未在真机验证；Room 131→132 已补真实 SQLite 的 `onPostMigrate` 测试，但 AutoMigration 的 40 条 DROP TABLE 与设备升级安装仍未跑。
 3. **兼容性**：旧 Nav3 保存栈中的朗读/音频 route 已删除，升级后首次恢复可能回主页；`BookSource.homepageModules` 字段保留读取但不展示；旧 `httpTTS.json`/RSS/首页模块备份文件忽略而不报错。
+
+## 4.1 W6 对抗性测试（2026-10-21）
+
+- 新增 **105 项**永久回归测试，修复 **24 项**缺陷；详细证据见 [`W6-ADVERSARIAL.md`](./W6-ADVERSARIAL.md)。
+- 高危修复：`Migration_131_132` 的 SQL 位或误写为逻辑 `or`（旧 audio/image/video 书 type 被压成 1）；
+  `ZipUtils` 同前缀兄弟目录可越界写；缓存队列 `Int.MAX_VALUE` 死循环与模型层超大 Range OOM。
+- 最终门禁：`testAppDebugUnitTest` **1,314 / 0**；`verifyConfigArchitecture` 通过；`assembleAppDebug` 通过。
 
 ## 5. 复现命令
 

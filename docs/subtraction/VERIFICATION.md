@@ -367,3 +367,28 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 | CastMarkers | 收敛为纯文本注入/剥离/偏移工具；新增 `CastMarkersTextTest` 5 例 |
 | W2c | 删除 `ReaderPage.Text.readAloud`、`readAloudParagraphIndex` 与 Canvas `isReadAloud` 分支；保留文字强调色 `readAloud: Color` |
 | 验证 | `compileAppDebugKotlin`/`compileAppDebugUnitTestKotlin` 通过；`feature.reader.*` 测试通过；全量 `testAppDebugUnitTest` **1,209 / 0**；架构门通过；`assembleAppDebug` 通过 |
+
+### 7.9 W6 · 对抗性测试与修复（2026-10-21）
+
+> 目标：异常输入、边界值、并发、网络失败、错误假设；先失败测试后修复，测试永久保留。
+> 详细分工与证据见 [`W6-ADVERSARIAL.md`](./W6-ADVERSARIAL.md)、`team/W6-A-READER.md`、`team/W6-B-CACHE.md`、`team/W6-C-STORAGE.md`。
+
+| 项 | 结果 |
+|---|---|
+| 新增测试 | **105 项**（A 42 / B 28 / C 30 / D 5） |
+| 修复缺陷 | **24 项**（含 3 项高危：迁移 SQL 位或、ZIP 越界、队列死循环/OOM） |
+| `testAppDebugUnitTest` | **1,314 / 0 failures / 0 errors / 0 skipped**（242 XML） |
+| `verifyConfigArchitecture` | 通过（20 键/68、1 键/0、8 键/20；无缺失键） |
+| `assembleAppDebug` | 通过；APK arm64 **62,308 KB**、armv7 **61,860 KB**、universal **68,724 KB** |
+| `git diff --check` | 0 |
+| 阅读专项 | 79 类 / 544 项，0 失败 |
+| 缓存专项 | 66 项，0 失败 |
+| 存储/迁移专项 | 49 + 2 项，0 失败 |
+
+**W4 迁移结论修正**：W4 当时只做了 schema/KSP 与 `@DeleteTable` 静态核对，未执行 `onPostMigrate` 的真实 SQL；
+W6-C 的 SQLite 用例发现 `Migration_131_132` 把位或写成逻辑 `or`，所有带 audio/image/video 位的旧书
+`type` 会被压成 `1`（丢失 text/local/webFile 等位）。修复为 `|` 并加 `DatabaseMigration131To132Test`
+（Robolectric framework SQLite 直接执行生产 SQL + 131/132 schema 差集恰好 40 表）。
+
+**仍未验证**：真实设备升级安装与 40 张表的 AutoMigration DROP 流程、真机阅读/命中/选区、缓存下载真实网络失败、
+备份恢复完整链路、`lintAppDebug` 全量、`assembleAppNoR8`。

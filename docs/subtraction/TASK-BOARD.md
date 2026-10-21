@@ -184,3 +184,19 @@ W2a 删除已落盘（**225 文件 `git rm` 已暂存**）+ 11 个接入点已�
 | 2026-10-14 | Orchestrator | `docs/subtraction/**` | 规划文档（未被其他任务认领） |
 | 2026-10-14 | Scout | 只读全仓 | TTS 域测绘，未写文件 |
 | 2026-10-14 | Verifier | `.pi/tasks/**` | 基线编译输出 |
+
+## W6 · 对抗性测试与修复（2026-10-21）
+
+| # | 任务 | 认领 | 状态 | 证据 |
+|---|---|---|---|---|
+| W6-A | 阅读核心：断行/分页/测量/章节源/角色标记异常输入、边界、终止性 | attacker-reader | 🟢 | `W6-A-READER.md`；42 测试；8 缺陷；阅读包 544/0 |
+| W6-B | 缓存队列/状态存储/准入：负下标、Int.MAX、并发、重复回调 | attacker-cache | 🟢 | `W6-B-CACHE.md`；28 测试；10 缺陷；缓存 66/0 |
+| W6-C | ZIP 路径穿越、损坏包、备份配置、Room 131→132 SQL | scout-w2b | 🟢 | `W6-C-STORAGE.md`；30 测试；6 缺陷；存储 49+2/0 |
+| W6-D | 网络失败契约 + 主控复核 + 全量门禁 + 文档同步 | lead | 🟢 | `W6-ADVERSARIAL.md` §4；5 测试；1,314/0；架构门/assemble 通过 |
+
+**W6 关键修复**：
+- `Migration_131_132` 的 SQL 位或误写为逻辑 `or` → 所有 audio/image/video 旧书 `type=1`（高危，已修为 `|` 并加真实 SQLite 测试）。
+- `ZipUtils` 同前缀兄弟目录可越界写（安全，已改为严格 canonical 边界）。
+- 缓存队列 `Int.MAX_VALUE` 死循环、并发 CME、`prioritize` 未入队章被调度（已修）。
+- 阅读核心 NaN/Inf 字宽与图片尺寸污染整页几何、HTML 空结果吞正文（已修）。
+- W6 未验证：真机阅读/缓存/备份恢复、Room 设备升级、真实网络失败、lint 全量、NoR8。
