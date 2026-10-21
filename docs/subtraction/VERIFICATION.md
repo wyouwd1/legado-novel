@@ -336,3 +336,24 @@ W4 待删的数据层（`data/{dao,entities,repository}/Rss*`）、`appDatabaseM
 **残留/顺延**：翻译/AI/TTS 专用 strings 4 语言、`PreferKey.llm*`、`BookType.audio`/DB 旧表与 DAO → W4/W5；lint 复跑仍受 `lintAnalyzeAppDebug` 超时限制。
 
 > 注：W3b 的提交号与 W3a/W3c 以 `git log` 实际值为准；本文按交付时 HEAD 顺序记录。
+
+### 7.6 W4 · 数据层收口（2026-10-21）
+
+| 项 | 结果 |
+|---|---|
+| 提交 | `d167de175` |
+| 范围 | 137 文件，+2,292 / -13,101（含 110 删除、26 修改、1 新增 schema） |
+| Room | `version 131→132`；`Migration_131_132` 用 `@DeleteTable` 删除 40 张旧表 |
+| 旧数据 | `books.type` 中 audio/image/video 位清零，并补 `text+notShelf`，保留数据、移出书架 |
+| 删除域 | RSS、AI/知识库、朗读/TTS、配音 cast、BGM、首页模块、HTTP TTS 的 entity/DAO/repository/usecase/UI |
+| 兼容 | 旧备份中 RSS/httpTTS/homepage 文件忽略；书籍编辑仅允许 text |
+| 验证 | `compileAppDebugKotlin`、`compileAppDebugUnitTestKotlin`、`verifyConfigArchitecture` 通过；`testAppDebugUnitTest` **1,222 / 0**；`assembleAppDebug` 通过 |
+
+### 7.7 W5 · 字符串与偏好清理（2026-10-21）
+
+| 项 | 结果 |
+|---|---|
+| 提交 | `7fb79c9d1` |
+| strings | 4 语言删除 931 个已裁撤域键（zh-HK/TW 各 443）；删除 `book_type_audio/image` |
+| PreferKey | 删除 Translation 段与 `aiRewritePresets` |
+| 验证 | `processAppDebugResources`、`compileAppDebugKotlin` 通过 |
