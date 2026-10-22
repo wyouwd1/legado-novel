@@ -1,7 +1,6 @@
 # AGENTS.md
 
-本文件定义仓库级不变量。专项流程放在 `.agents/skills/`，长期方案放在 `docs/dev/`
-；不要把临时任务、讨论过程或一次性结论继续堆进本文件。
+本文件定义仓库级不变量。长期方案放在 `docs/dev/`；不要把临时任务、讨论过程或一次性结论继续堆进本文件。
 
 ## 资料优先级
 
@@ -9,21 +8,11 @@
 
 1. 用户本次目标、范围与验收条件。
 2. 本文件的仓库级约束。
-3. 与任务匹配的 `.agents/skills/*/SKILL.md` 及其明确要求读取的 reference。
-4. `docs/dev/` 中的专项设计或迁移计划。
-5. 当前源码、测试、Gradle 配置和相邻实现；它们用于确认当前版本的真实 API 与行为。
-6. 外部资料只作为设计依据；涉及会变化的 Android、Kotlin、Compose 或库 API 时，以官方当前文档和本仓库版本为准。
+3. `docs/dev/` 中的专项设计或迁移计划。
+4. 当前源码、测试、Gradle 配置和相邻实现；它们用于确认当前版本的真实 API 与行为。
+5. 外部资料只作为设计依据；涉及会变化的 Android、Kotlin、Compose 或库 API 时，以官方当前文档和本仓库版本为准。
 
 文档与源码不一致时，先指出差异。不要为了让实现符合过期文档而静默改代码。
-
-## Skill 路由
-
-- XML/View/Activity/Fragment/RecyclerView 到 Compose 的页面迁移、新 Compose 页面：使用
-  `legado-compose-migration`。
-- Compose Screen、Contract、ViewModel、导航、状态与兼容边界审查：使用 `legado-compose-review`。
-- Gradle 模块拆分、`commonMain` 抽取、KMP/CMP、`expect/actual`、平台能力适配、迁移门禁或相关脚手架：使用
-  `legado-kmp-migration`。
-- 单个任务可组合 skill，但只读取与当前工作切片有关的 reference。
 
 ## 工作方式
 
@@ -84,7 +73,7 @@ platform implementations (Android/JVM/iOS/...)
 - 新屏幕使用 Compose；不要新增 XML/View Activity/Fragment。
 - Android Compose 新屏幕采用 UDF/MVI：`@Stable XxxUiState`、`XxxIntent`、`XxxEffect`；ViewModel 直接继承
   `ViewModel`，私有 `MutableStateFlow` / `MutableSharedFlow(extraBufferCapacity = 16)`，对外只暴露只读
-  Flow，并由单一 `onIntent` 分发用户动作。共享 Feature 的状态宿主按 KMP skill 单独决策。
+  Flow，并由单一 `onIntent` 分发用户动作。共享 Feature 的状态宿主按 KMP 迁移纪律单独决策。
 - Screen/Content 保持无业务逻辑、无 DAO/网络/存储直连；ViewModel 通过 Gateway/Repository/UseCase
   访问业务能力。
 - 所有 UiState 与 UI item 数据类标注 `@Stable`。Compose 渲染边界中的集合使用
@@ -95,7 +84,7 @@ platform implementations (Android/JVM/iOS/...)
   predictive back。
 - Activity 仅在遗留 `Intent`/result 兼容确有需要时作为薄宿主保留。
 
-具体文件形态和审查清单由 Compose migration/review skill 维护，本文件不复制完整模板。
+具体文件形态和审查清单由 `docs/dev/feature-first-structure.md` 维护，本文件不复制完整模板。
 
 ## 数据与设置边界
 
@@ -176,7 +165,7 @@ KMP 任务名在模块实际创建后才存在；不要假装运行尚未定义�
   `kotlin.io.encoding.Base64` 严格填充会导致部分书源取章名/正文回归）。版本固定 5.8.22 勿升级。
   应用内部加密主体仍用现有 JCA（`javax.crypto`/`java.security`）与 `help/crypto` 路径，KMP 抽取时
   再通过能力契约替换 JVM API。
-- 代码 namespace 为 `io.legado.app`，Android `applicationId` 为 `io.legato.kazusa`，不要混用。
+- 代码 namespace 为 `io.legado.app`，Android `applicationId` 为 `io.legadonovel`，不要混用。
 - 当前 minSdk 26、target/compile SDK 37；Release 启用 R8 与资源压缩，`noR8` 变体用于排障。
 - Rhino 书源规则、Android 服务与阅读器渲染属于高行为风险平台能力，迁移前必须建立兼容测试或
   capability 边界。
