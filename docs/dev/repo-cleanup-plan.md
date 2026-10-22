@@ -170,11 +170,11 @@ rsync -a --exclude .git --exclude build --exclude app/build /path/to/repo/ zx@21
 
 **2026-10-22 实测结果**：基线单测 245 s（1,315 tests / 0 failures）；清理后打包+单测 222 s（1,315 tests / 0 failures）；Release 319 s（BUILD SUCCESSFUL，universal APK 21,818,886 B，签名 `CN=Legado Novel`）。首轮发现的 `PrivateConfigViewModelTest` 原有编译错误已单独修复（`fix(test)` 提交），修复后两次运行均通过。
 
-## 6. 待人工决策（不计入本次自动执行）
+## 6. 后续决策项处理结果（2026-10-22）
 
-1. `legado.jks` 是否为生产签名密钥（用已知口令导出证书，与已发布 APK 的 `apksigner verify --print-certs` 比对）。
-2. WebService 设置链路是否彻底删除（`OtherSettings` 三字段 + 4 个测试断言）。
-3. `privacyPolicy.md` / `disclaimer.md` 的 Firebase 表述改写。
-4. `auto-release.yml` 是否保留发布链（当前 HapeLee 门永假）。
-5. `gradle.properties` 6 个 `android.*` 过期 flag 是否删除（先 `--warning-mode all` 记录警告）。
-6. `upstream-archive` 分支的 28 个独有提交是否需要长期保留（已打 tag）。
+1. `legado.jks`：与上游 `HapeLee/legado-with-MD3` **同 blob**（`89ea725f…`），是公开测试 key，不是本仓库发布密钥（本仓库用 217 上生成的 `legado-novel.jks`，证书 `7143b093…`）。已从 HEAD 删除，无需轮换。
+2. WebService 设置链路：已删除 `OtherSettings` 的 `webServiceAutoStart`/`webServiceWakeLock`/`webPort`、`AppConfig` getter、读写映射、4 个 `PreferKey`、备份排除项、7×4 条字符串；`OtherSettingsMappingTest` 同步。
+3. 隐私文本：`privacyPolicy.md`、`disclaimer.md`、README 已改为「当前版本不集成第三方统计或崩溃分析服务」。
+4. `auto-release.yml`：571→239 行；删除永不执行的 `create_release`/Telegram 发布链、`workflow_call.publish` 输入与 HapeLee 签名门，保留 push/PR/dispatch 构建。
+5. `gradle.properties`：删除 6 个 AGP 4.x/默认值 flag；`:app:lintAppDebug` 0 error、`assembleAppDebug` 通过。
+6. `upstream-archive`：已打 tag `archive/upstream-pre-subtract-20260916` 并推送 origin，本地分支已删除（28 个提交由 tag 保留）。
