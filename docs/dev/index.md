@@ -58,4 +58,4 @@
 ## 外部资源
 
 - [Legado GitHub](https://github.com/wyouwd1/legado-novel) — 项目源码和 Issue 跟踪
-- [legado-with-MD3 Wiki](https://github.com/wyouwd1/legado-novel/wiki) — 社区维护的文档
+- [Legado Novel Wiki](https://github.com/wyouwd1/legado-novel/wiki) — 社区维护的文档

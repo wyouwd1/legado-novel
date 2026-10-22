@@ -37,7 +37,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = 'legado'
+rootProject.name = 'legado-novel'
 
 include ':app'
 include ':modules:book'
