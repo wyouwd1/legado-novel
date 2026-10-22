@@ -395,8 +395,9 @@ W6-C 的 SQLite 用例发现 `Migration_131_132` 把位或写成逻辑 `or`，�
 
 ### 7.10 W7 · Android 模拟器验证（2026-10-21）
 
-> 环境：Android 35 x86_64 default image / emulator 37.2.12；WSL2 当前用户无 `/dev/kvm` 权限，
-> 使用 TCG 软件模拟。完整记录见 [`W7-EMULATOR.md`](./W7-EMULATOR.md)。
+> 环境：217 测试机（Ubuntu 24.04）上的 Android 35 x86_64 default image / emulator 37.2.12；`zx`
+> 用户不在 `kvm` 组，使用 TCG 软件模拟。模拟器只在 217 使用，本机 WSL 不装 emulator。
+> 完整记录见 [`W7-EMULATOR.md`](./W7-EMULATOR.md)。
 
 | 项 | 结果 |
 |---|---|

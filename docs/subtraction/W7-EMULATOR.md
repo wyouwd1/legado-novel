@@ -7,7 +7,7 @@
 
 | 项 | 值 |
 |---|---|
-| 主机 | WSL2 Ubuntu，32 vCPU / 15 GiB |
+| 主机 | 217 测试机（`test-env-wifi`，`zx` 账号）：Ubuntu 24.04，16 vCPU / 15 GiB；模拟器与 AVD 只装在这台机器 |
 | Emulator | `emulator 37.2.12`（`$HOME/android-sdk/emulator`） |
 | System image | `system-images;android-35;default;x86_64`（checksum `2d857d17…` 已核对） |
 | AVD | `legado-api35`，Pixel 6 配置，运行分辨率降到 540×1200 |
@@ -17,6 +17,9 @@
 
 TCG 下 1080p 会让 SystemUI 自身 ANR；降到 540×1200 后系统可交互，App 首次绘制约 **43.8 s**。
 这是模拟器 CPU 性能限制，不是产品启动耗时结论。
+
+本机 WSL 不装 emulator/AVD：模拟器测试一律在 217 执行；真机测试由本机 WSL 调 Windows 侧
+`adb.exe` 完成（见 §3.1）。
 
 ## 2. 首次安装发现并修复的阻断缺陷
 
@@ -72,6 +75,29 @@ adb shell am instrument -w -r \
 `Migration131To132InstrumentedTest` 是 W7 新增的 androidTest；它补上了 W6 只做 Robolectric SQL
 执行、未让 Room 自己跑 AutoMigration 的缺口。注意 `wrap` 只是 TCG 下绕过 20 秒进程启动超时的
 测试夹具开关，不进入产品代码。
+
+### 3.1 真机复核（2026-10-22，PLK110 / Android 16）
+
+同一组用例在真机上重跑；安装包取自 217 的增量构建产物（`subtract/novel-only` `37a2bb51f9`，
+APK 时间戳晚于对应源码最后修改时间，未做 clean 重打包）。真机 PLK110 接在本机 Windows 侧，
+经 `adb.exe` 安装并执行。
+
+```bash
+adb install -r -t app/build/outputs/apk/app/debug/app-app-arm64-v8a-debug.apk
+adb install -r -t app/build/outputs/apk/androidTest/app/debug/app-app-debug-androidTest.apk
+adb shell am start -n io.legato.kazusa.debug/io.legado.app.ui.main.MainActivity
+adb shell am instrument -w -r \
+  -e class io.legado.app.data.dao.BookDaoTest,io.legado.app.data.Migration131To132InstrumentedTest,io.legado.app.AndroidJsTest \
+  io.legato.kazusa.debug.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+| 项 | 结果 |
+|---|---|
+| 安装（app / androidTest） | `Success` / `Success` |
+| 首次启动 `MainActivity` | `Status: ok`，`3.26.16_debug`，logcat 无 `FATAL EXCEPTION`、crash 目录为空 |
+| 定向测试 | **OK (5 tests)**，`Time: 0.24`；真机未使用 `wrap.*` 夹具开关 |
+
+真机只复核了启动路径与这 5 个用例；阅读渲染、手势、选区、真实书源网络等手工项仍见 §6。
 
 ## 4. UI 冒烟（模拟器截图 + UIAutomator）
 
