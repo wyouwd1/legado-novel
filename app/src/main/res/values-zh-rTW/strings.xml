@@ -1,7 +1,7 @@
 <resources>
     <!--App-->
-    <string name="app_name">閱讀</string>
-    <string name="app_name_a">閱讀·A</string>
+    <string name="app_name">Legado 小說</string>
+    <string name="app_name_a">Legado 小說·A</string>
     <string name="receiving_shared_label">閱讀·搜尋</string>
     <string name="tip_perm_request_storage">閱讀需要存取記憶卡權限，請前往「設定」—「應用程式權限」—打開所需權限</string>
 
@@ -1760,8 +1760,6 @@
     <string name="descending_order">降序</string>
     <string name="checking_update">正在檢查更新…</string>
     <string name="search_empty">無可用內容</string>
-    <string name="firebase_enable_title">匿名統計</string>
-    <string name="firebase_enable_summary">允許應用使用 Google Firebase 進行崩潰和效能報告</string>
     <string name="locate_current">定位目前位置</string>
     <string name="system_media_control_compatibility_change">系統媒體控制相容性</string>
     <string name="system_media_control_compatibility_change_summary">如果鎖定畫面上缺少系統媒體控制項，請啟用此選項（例如 OneUI 7.0、OriginOS）</string>

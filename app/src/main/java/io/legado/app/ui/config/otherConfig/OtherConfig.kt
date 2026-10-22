@@ -17,7 +17,6 @@ object OtherConfig {
     val defaultToRead get() = settings.defaultToRead
     val notificationsPost get() = settings.notificationsPost
     val ignoreBatteryPermission get() = settings.ignoreBatteryPermission
-    val firebaseEnable get() = settings.firebaseEnable
     val defaultBookTreeUri get() = settings.defaultBookTreeUri
     val antiAlias get() = settings.antiAlias
     val replaceEnableDefault get() = settings.replaceEnableDefault

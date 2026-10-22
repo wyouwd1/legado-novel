@@ -190,14 +190,6 @@ fun PrivateConfigScreen(
                         description = stringResource(R.string.ignore_battery_permission_rationale),
                         onClick = { onIntent(PrivateConfigIntent.RequestBatteryPermission) }
                     )
-                    SwitchSettingItem(
-                        title = stringResource(R.string.firebase_enable_title),
-                        description = stringResource(R.string.firebase_enable_summary),
-                        checked = state.firebaseEnable,
-                        onCheckedChange = {
-                            onIntent(PrivateConfigIntent.SetFirebaseEnabled(it))
-                        }
-                    )
                 }
             }
         }

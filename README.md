@@ -1,17 +1,23 @@
-# Legado with MD3
+# Legado Novel
 
 <p align="left">
-  <a href="https://github.com/HapeLee/legado-with-MD3">简体中文</a> ｜ 
-  <a href="https://github.com/HapeLee/legado-with-MD3/blob/main/English.md">English</a>
+  <a href="https://github.com/wyouwd1/legado-novel">简体中文</a> ｜ 
+  <a href="https://github.com/wyouwd1/legado-novel/blob/main/English.md">English</a>
 </p>
 
 ## 📖 介绍
 
-**Legado with MD3** 是基于开源项目 [阅读 (Legado)](https://github.com/gedoor/legado) 开发的 Material
-Design 3 风格重构版本。
+**Legado Novel** 是只保留小说阅读闭环的精简版，基于开源项目 [阅读（Legado）](https://github.com/gedoor/legado)
+开发，并沿用 [HapeLee/legado-with-MD3](https://github.com/HapeLee/legado-with-MD3) 的 Material 3 界面与
+Jetpack Compose 迁移成果。
 
-本项目在对 UI 进行重绘的基础上，加入了多项分支独有功能，并正在逐步从传统 View 迁移至 Jetpack Compose
-框架，目标是提供更加现代、流畅且一致的阅读体验。
+本项目移除漫画、听书/TTS、AI 对话、词典翻译、首页发现、关联书籍、知识库、欢迎页等模块，保留书架、书源、
+正文阅读、缓存下载、备份恢复与本地/网络导入等小说主链路，目标是更轻、更稳的个人阅读器。
+
+> [!NOTE]
+> **上游关系：**[gedoor/legado](https://github.com/gedoor/legado) →
+> [HapeLee/legado-with-MD3](https://github.com/HapeLee/legado-with-MD3) → 本项目。上游代码与设计版权归原作者
+> 所有，本项目同样以 GPL-3.0 发布，完整许可证见 [LICENSE](./LICENSE)。
 
 > [!CAUTION]
 > **注意事项：**

@@ -4,10 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.legado.app.R
 import io.legado.app.domain.gateway.LocalPasswordGateway
-import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.domain.gateway.PrivateAccessGateway
 import io.legado.app.domain.model.PrivateBiometricStatus
-import io.legado.app.domain.model.settings.OtherSettings
 import io.legado.app.domain.model.settings.PrivateAccessSettings
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +18,6 @@ import splitties.init.appCtx
 class PrivateConfigViewModel(
     private val privateAccessGateway: PrivateAccessGateway,
     private val localPasswordGateway: LocalPasswordGateway,
-    private val otherSettingsGateway: OtherSettingsGateway,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PrivateConfigUiState())
@@ -44,11 +41,6 @@ class PrivateConfigViewModel(
         viewModelScope.launch {
             privateAccessGateway.settings.collect { settings ->
                 _uiState.update { it.copy(settings = settings) }
-            }
-        }
-        viewModelScope.launch {
-            otherSettingsGateway.settings.collect { settings ->
-                _uiState.update { it.copy(firebaseEnable = settings.firebaseEnable) }
             }
         }
         privateAccessGateway.refreshBiometricStatus()
@@ -95,9 +87,6 @@ class PrivateConfigViewModel(
             PrivateConfigIntent.RequestBatteryPermission ->
                 _effects.tryEmit(PrivateConfigEffect.RequestBatteryPermission)
 
-            is PrivateConfigIntent.SetFirebaseEnabled -> updateOtherSettings {
-                it.copy(firebaseEnable = intent.enabled)
-            }
         }
     }
 
@@ -161,13 +150,6 @@ class PrivateConfigViewModel(
     private fun updateSettings(transform: (PrivateAccessSettings) -> PrivateAccessSettings) {
         viewModelScope.launch {
             runCatching { privateAccessGateway.updateSettings(transform) }
-                .onFailure { showMessageRes(R.string.save_failed) }
-        }
-    }
-
-    private fun updateOtherSettings(transform: (OtherSettings) -> OtherSettings) {
-        viewModelScope.launch {
-            runCatching { otherSettingsGateway.update(transform) }
                 .onFailure { showMessageRes(R.string.save_failed) }
         }
     }

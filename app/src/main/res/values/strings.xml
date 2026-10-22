@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--App-->
-    <string name="app_name">Legado</string>
-    <string name="app_name_a">Legado·A</string>
+    <string name="app_name">Legado Novel</string>
+    <string name="app_name_a">Legado Novel·A</string>
     <string name="receiving_shared_label">Legado·search</string>
     <string name="tip_perm_request_storage">Legado needs storage access to find and read books. Please go "App Settings" to allow "Storage Permission".</string>
 
@@ -1752,8 +1752,6 @@
     <string name="descending_order">Descending</string>
     <string name="checking_update">Checking for Updates…</string>
     <string name="search_empty">No content available</string>
-    <string name="firebase_enable_title">Anonymous Statistics</string>
-    <string name="firebase_enable_summary">Allow the app to use Google Firebase for crash and performance reports</string>
     <string name="locate_current">Locate Current</string>
     <string name="padding_display_cutouts">Fill Display Cutout</string>
     <string name="system_media_control_compatibility_change">System Media Control Compatibility</string>

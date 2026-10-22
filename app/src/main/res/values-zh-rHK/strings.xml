@@ -1,7 +1,7 @@
 <resources>
     <!--App-->
-    <string name="app_name">閲讀</string>
-    <string name="app_name_a">閲讀·A</string>
+    <string name="app_name">Legado 小說</string>
+    <string name="app_name_a">Legado 小說·A</string>
     <string name="receiving_shared_label">閲讀·搜尋</string>
     <string name="tip_perm_request_storage">閲讀需要訪問存儲卡權限，請前往「設定」—「應用程式權限」—開啟所需要的權限</string>
 
@@ -1666,8 +1666,6 @@
     <string name="filter_hide_same_name_author">隱藏書架中不同源書籍</string>
     <string name="filter_show_all">顯示全部</string>
     <string name="filter_show_not_in_shelf_only">僅顯示不在書架中的書籍</string>
-    <string name="firebase_enable_summary">允許應用使用 Google Firebase 進行崩潰和效能報告</string>
-    <string name="firebase_enable_title">匿名統計</string>
     <string name="first_read">請先閱讀服務條款和用戶協議</string>
     <string name="fixed_book_type">鎖定書籍類型</string>
     <string name="fixed_book_type_summary">書籍更新時不覆蓋書籍類型</string>

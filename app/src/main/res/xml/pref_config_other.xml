@@ -74,12 +74,6 @@
             android:summary="@string/ignore_battery_permission_rationale"
             android:title="@string/background_permission" />
 
-        <io.legado.app.lib.prefs.SwitchPreference
-            android:defaultValue="true"
-            android:key="firebaseEnable"
-            android:summary="@string/firebase_enable_summary"
-            android:title="@string/firebase_enable_title" />
-
         <io.legado.app.lib.prefs.Preference
             android:key="localPassword"
             android:summary="@string/set_local_password_summary"

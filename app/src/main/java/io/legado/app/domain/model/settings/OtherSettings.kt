@@ -8,7 +8,6 @@ data class OtherSettings(
     val defaultToRead: Boolean = false,
     val notificationsPost: Boolean = true,
     val ignoreBatteryPermission: Boolean = true,
-    val firebaseEnable: Boolean = true,
     val defaultBookTreeUri: String? = null,
     val antiAlias: Boolean = false,
     val replaceEnableDefault: Boolean = true,
