@@ -131,7 +131,7 @@ class BaselineProfileGenerator {
 
     private fun packageName(): String =
         InstrumentationRegistry.getArguments().getString("targetAppId")
-            ?: "io.legato.kazusa"
+            ?: "io.legadonovel"
 
     private companion object {
         val BOOKSHELF_LIST: BySelector = By.res("bookshelf_list")

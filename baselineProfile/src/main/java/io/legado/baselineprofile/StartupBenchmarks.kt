@@ -47,10 +47,10 @@ class StartupBenchmarks {
         benchmark(CompilationMode.Partial(BaselineProfileMode.Require))
 
     private fun benchmark(compilationMode: CompilationMode) {
-        // 默认值必须是 applicationId（io.legato.kazusa），不是 namespace（io.legado.app）；
+        // 默认值必须是 applicationId（io.legadonovel），不是 namespace（io.legado.app）；
         // AGP 在设备上跑 Macrobenchmark 时会传 targetAppId，只有手动跑用例时才用这个兜底值。
         val packageName = InstrumentationRegistry.getArguments().getString("targetAppId")
-            ?: "io.legato.kazusa"
+            ?: "io.legadonovel"
 
         rule.measureRepeated(
             packageName = packageName,

@@ -29,3 +29,9 @@ replay_pid*.log
 
 # === AI 工具工件 ===
 .pi/
+
+# === 本地规划与验证数据（不入库） ===
+/.planning/
+/docs/book-source-verification/
+*.jks
+*.keystore

@@ -188,13 +188,6 @@ abstract class VerifyConfigArchitectureTask : DefaultTask() {
     }
 }
 
-buildscript {
-    extra.apply {
-        set("compile_sdk_version", 36)
-        set("build_tool_version", "34.0.0")
-    }
-}
-
 plugins {
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.android.application) apply false
