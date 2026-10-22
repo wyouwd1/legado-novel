@@ -88,8 +88,6 @@
     <string name="import_books_count">共%s個Text文件</string>
     <string name="is_loading">載入中…</string>
     <string name="retry">重試</string>
-    <string name="web_service">Web 服務</string>
-    <string name="web_service_desc">瀏覽器寫源、看書</string>
     <string name="web_edit_source">web編輯書源</string>
     <string name="offline_cache">離線快取</string>
     <string name="offline_cache_t">離線快取</string>
@@ -635,8 +633,6 @@
     <string name="e_ink_mode">E-Ink 模式</string>
     <string name="e_ink_mode_detail">去除動畫，最佳化電紙書使用體驗</string>
     <string name="web_menu">Web服務</string>
-    <string name="web_port_title">web埠</string>
-    <string name="web_port_summary">目前埠 %s</string>
     <string name="qr_share">二維碼分享</string>
     <string name="str_share">字串分享</string>
     <string name="wifi_share">wifi分享</string>
@@ -1190,8 +1186,6 @@
     <string name="sure_clear_search_history">是否確認清除所有搜尋歷史記錄</string>
     <string name="no_anim_scroll_page">禁用滾動點擊動畫</string>
     <string name="webdav_device_name">裝置名稱</string>
-    <string name="web_service_wake_lock">WebService喚醒鎖</string>
-    <string name="web_service_wake_lock_summary">開啟web服務的時候啟用喚醒鎖，有些手機開啟喚醒鎖會被殺後台</string>
     <string name="read_aloud_wake_lock">朗讀服務喚醒鎖</string>
     <string name="read_aloud_wake_lock_summary">開啟朗讀的時候啟用喚醒鎖，有些手機開啟喚醒鎖會被殺後台</string>
     <string name="change_search_scope">切換搜尋範圍</string>
@@ -1943,7 +1937,6 @@
     <string name="compose_engine">主題樣式</string>
     <string name="container_opacity">容器不透明度</string>
     <string name="container_opacity_summary">%d</string>
-    <string name="web_service_auto_start">開啟應用時啟動 Web 服務</string>
     <string name="read_aloud_preload">朗讀預載入數量</string>
     <string name="read_aloud_preload_summary">%d</string>
     <string name="audio_cache_clean_time">音訊快取保留時間（分鐘）</string>

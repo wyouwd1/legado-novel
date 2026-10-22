@@ -73,7 +73,6 @@ object AppConfig {
     val useDefaultCover get() = cover.useDefaultCover
     val recordLog get() = other.recordLog
     val recordHeapDump get() = other.recordHeapDump
-    val webServiceAutoStart get() = other.webServiceAutoStart
     val adaptSpecialStyle get() = read.adaptSpecialStyle
     val isNightTheme: Boolean
         get() = when (shell.themeMode) {
