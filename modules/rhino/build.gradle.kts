@@ -36,6 +36,5 @@ dependencies {
     api(libs.mozilla.rhino)
 
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.okhttp)
     implementation(libs.androidx.collection)
 }

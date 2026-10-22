@@ -142,7 +142,4 @@
 # Throwable
 -keepnames class * extends java.lang.Throwable
 -keepclassmembernames,allowobfuscation class * extends java.lang.Throwable{*;}
-# 忽略 Ktor 在 Android 上对 Java SE 管理类的引用
 -dontwarn java.lang.management.**
--dontwarn io.ktor.util.debug.IntellijIdeaDebugDetector
--keep,allowobfuscation class io.ktor.util.debug.** { *; }
