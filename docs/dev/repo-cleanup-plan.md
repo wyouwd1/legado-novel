@@ -2,6 +2,7 @@
 
 > 状态：**已验证（PASS），待执行**。2026-10-22 在 217 构建机对清理后的副本跑通：
 > `assembleAppDebug` + `testAppDebugUnitTest`（1,315 tests / 0 failures）+ `assembleAppRelease`（R8/lintVital 通过，产物 `io.legadonovel` / 3.26.16）。
+> GitHub Actions：`Verify` 与 `Auto Build` 在 `3041d5d32` 均通过（2026-10-22 12:27）。
 > 依据：2026-10-22 的 A/B/C/D 四份审计（本地 `.planning/2026-10-22-repo-cleanup/team/`，未入库）与 `30-CANDIDATES.md`。
 > 基线：`main` @ `f35d474e25`，跟踪文件 2,494 个 / 46.6 MB，`.git` 187 MB。
 
