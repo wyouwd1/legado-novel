@@ -3,13 +3,11 @@ package io.legado.app.ui.config.privateConfig
 import android.app.Application
 import android.os.Looper
 import io.legado.app.domain.gateway.LocalPasswordGateway
-import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.domain.gateway.PrivateAccessGateway
 import io.legado.app.domain.model.PrivateAccessState
 import io.legado.app.domain.model.PrivateBiometricStatus
 import io.legado.app.domain.model.PrivateUnlockScope
 import io.legado.app.domain.model.PrivateUnlockTarget
-import io.legado.app.domain.model.settings.OtherSettings
 import io.legado.app.domain.model.settings.PrivateAccessSettings
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
@@ -160,11 +158,9 @@ class PrivateConfigViewModelTest {
     private fun createViewModel(
         privateAccessGateway: FakePrivateAccessGateway = FakePrivateAccessGateway(),
         localPasswordGateway: FakeLocalPasswordGateway = FakeLocalPasswordGateway(),
-        otherSettingsGateway: FakeOtherSettingsGateway = FakeOtherSettingsGateway(),
     ) = PrivateConfigViewModel(
         privateAccessGateway = privateAccessGateway,
         localPasswordGateway = localPasswordGateway,
-        otherSettingsGateway = otherSettingsGateway,
     )
 
     private class FakePrivateAccessGateway(
@@ -239,16 +235,6 @@ class PrivateConfigViewModelTest {
 
         override suspend fun setPassword(password: String?) {
             savedPassword = password
-        }
-    }
-
-    private class FakeOtherSettingsGateway : OtherSettingsGateway {
-        private val settingsFlow = MutableStateFlow(OtherSettings())
-        override val currentSettings: OtherSettings get() = settingsFlow.value
-        override val settings: Flow<OtherSettings> get() = settingsFlow
-
-        override suspend fun update(transform: (OtherSettings) -> OtherSettings) {
-            settingsFlow.value = transform(settingsFlow.value)
         }
     }
 }
