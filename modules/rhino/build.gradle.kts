@@ -36,5 +36,7 @@ dependencies {
     api(libs.mozilla.rhino)
 
     implementation(libs.kotlinx.coroutines.core)
+    // RhinoClassShutter 直接使用 okio，依赖由 okhttp 传递提供
+    implementation(libs.okhttp)
     implementation(libs.androidx.collection)
 }
