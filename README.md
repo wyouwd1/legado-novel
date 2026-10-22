@@ -19,6 +19,12 @@ Jetpack Compose 迁移成果。
 > [HapeLee/legado-with-MD3](https://github.com/HapeLee/legado-with-MD3) → 本项目。上游代码与设计版权归原作者
 > 所有，本项目同样以 GPL-3.0 发布，完整许可证见 [LICENSE](./LICENSE)。
 
+## ⬇️ 下载
+
+编译好的 APK 在 [Releases](https://github.com/wyouwd1/legado-novel/releases)：
+`app-app-arm64-v8a-release.apk`（绝大多数手机）、`app-app-armeabi-v7a-release.apk`、
+`app-app-universal-release.apk`（不确定机型时用）。包名 `io.legadonovel`，可与其它阅读分支共存。
+
 > [!CAUTION]
 > **注意事项：**
 > 由于使用 Monet 引擎重构了主题系统，官方版本的主题在此版本中不再可用。
