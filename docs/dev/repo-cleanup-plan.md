@@ -82,7 +82,7 @@ git rm modules/rhino/lib/rhino-1.7.14.jar
 
 同步编辑：
 - 四语言 `strings.xml` 删除 `web_service_local_network_permission_denied`（各 1 条）。
-- `modules/rhino/build.gradle.kts` 删除未被源码使用的 OkHttp 依赖。
+- `modules/rhino/build.gradle.kts` 的 OkHttp **不可删除**：`RhinoClassShutter` 直接使用 `okio.*`，okio 由 OkHttp 传递提供（实测删除后 19 条编译错误，已回滚）。
 - `app/proguard-rules.pro` 删除 Ktor 专用 3 行。
 
 ### 阶段 3：归档一次性资料与归档前端（1 个提交，全部 `git mv`）
