@@ -14,7 +14,7 @@ hero:
       link: /dev/
     - theme: alt
       text: GitHub
-      link: https://github.com/HapeLee/legado-with-MD3
+      link: https://github.com/wyouwd1/legado-novel
 
 features:
   - icon: 📖

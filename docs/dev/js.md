@@ -22,7 +22,7 @@ Java 类和方法。本文档列出所有可用的内置变量、对象属性和
 - `java` 变量已被 Legado 修改，调用 `java.*` 下的包请使用 `Packages.java.*`
 - 在源规则中使用 `@js`、`<js>`、<code v-pre>{{}}</code> 可调用 Legado 内置的类和方法
 - 为安全起见，部分 Java
-  类调用被屏蔽，见 [RhinoClassShutter](https://github.com/HapeLee/legado-with-MD3/blob/master/modules/rhino/src/main/java/com/script/rhino/RhinoClassShutter.kt)
+  类调用被屏蔽，见 [RhinoClassShutter](https://github.com/wyouwd1/legado-novel/blob/main/modules/rhino/src/main/java/com/script/rhino/RhinoClassShutter.kt)
 - 不同源规则中支持调用的 Java 类和方法可能不同
 - `const` 声明的变量不支持块级作用域，循环中使用会出现值不变的问题，请改用 `var`
   :::
@@ -36,12 +36,12 @@ Java 类和方法。本文档列出所有可用的内置变量、对象属性和
 | `java`           | `Object`       | 全局  | 扩展工具对象，提供网络请求、加解密、文件操作等方法                                                                                                      |
 | `baseUrl`        | `String`       | 全局  | 当前请求的 URL                                                                                                                      |
 | `result`         | `Any`          | 全局  | 上一步规则的执行结果                                                                                                                     |
-| `book`           | `Book`         | 全局  | [书籍对象](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/data/entities/Book.kt)           |
-| `rssArticle`     | `RssArticle`   | 全局  | [RSS 文章对象](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/data/entities/RssArticle.kt) |
-| `chapter`        | `BookChapter`  | 全局  | [章节对象](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/data/entities/BookChapter.kt)    |
-| `source`         | `BaseSource`   | 全局  | [源对象](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/data/entities/BaseSource.kt)      |
-| `cookie`         | `CookieStore`  | 全局  | [Cookie 操作对象](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/help/http/CookieStore.kt) |
-| `cache`          | `CacheManager` | 全局  | [缓存操作对象](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/help/CacheManager.kt)          |
+| `book`           | `Book`         | 全局  | [书籍对象](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/data/entities/Book.kt)           |
+| `rssArticle`     | `RssArticle`   | 全局  | [RSS 文章对象](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/data/entities/RssArticle.kt) |
+| `chapter`        | `BookChapter`  | 全局  | [章节对象](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/data/entities/BookChapter.kt)    |
+| `source`         | `BaseSource`   | 全局  | [源对象](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/data/entities/BaseSource.kt)      |
+| `cookie`         | `CookieStore`  | 全局  | [Cookie 操作对象](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/help/http/CookieStore.kt) |
+| `cache`          | `CacheManager` | 全局  | [缓存操作对象](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/help/CacheManager.kt)          |
 | `title`          | `String`       | 全局  | 当前章节标题                                                                                                                         |
 | `src`            | `String`       | 全局  | 请求返回的源码                                                                                                                        |
 | `nextChapterUrl` | `String`       | 全局  | 下一章节 URL                                                                                                                       |
@@ -50,7 +50,7 @@ Java 类和方法。本文档列出所有可用的内置变量、对象属性和
 
 `java` 对象是 Legado 暴露给 JS 环境的核心工具对象，聚合了多个扩展类的方法。
 
-### 3.1 RSS 扩展 ([RssJsExtensions](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/ui/rss/read/RssJsExtensions.kt))
+### 3.1 RSS 扩展 ([RssJsExtensions](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/ui/rss/read/RssJsExtensions.kt))
 
 ::: warning 作用域限制
 只能在订阅源 `shouldOverrideUrlLoading` 规则中使用。URL 跳转拦截规则不能执行耗时操作。
@@ -61,7 +61,7 @@ java.searchBook(bookName: String)  // 调用 Legado 搜索
 java.addBook(bookUrl: String)      // 添加书架
 ```
 
-### 3.2 URL 解析 ([AnalyzeUrl](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/model/analyzeRule/AnalyzeUrl.kt))
+### 3.2 URL 解析 ([AnalyzeUrl](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/model/analyzeRule/AnalyzeUrl.kt))
 
 通过 `java.` 调用，仅在 `登录检查 JS` 规则中有效。
 
@@ -72,7 +72,7 @@ java.addBook(bookUrl: String)      // 添加书架
 | `getStrResponse(jsStr, sourceRegex)`               | `StrResponse` | 返回文本类型的访问结果         |
 | `getResponse()`                                    | `Response`    | 返回 Response 类型的访问结果 |
 
-### 3.3 规则解析 ([AnalyzeRule](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/model/analyzeRule/AnalyzeRule.kt))
+### 3.3 规则解析 ([AnalyzeRule](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/model/analyzeRule/AnalyzeRule.kt))
 
 ```js
 // 获取文本/文本列表
@@ -95,7 +95,7 @@ java.get(key)
 java.put(key, value)
 ```
 
-### 3.4 扩展工具 ([JsExtensions](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/help/JsExtensions.kt))
+### 3.4 扩展工具 ([JsExtensions](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/help/JsExtensions.kt))
 
 #### 链接解析
 
@@ -198,7 +198,7 @@ cache.delete(java.md5Encode16(url))  // 使缓存失效
 | `java.openUrl(url)`           | 跳转外部链接（HTTP 或 scheme）    |
 | `java.openUrl(url, mimeType)` | 指定 MIME 类型跳转，如 `video/*` |
 
-### 3.5 加解密 ([JsEncodeUtils](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/help/JsEncodeUtils.kt))
+### 3.5 加解密 ([JsEncodeUtils](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/help/JsEncodeUtils.kt))
 
 提供在 JavaScript 环境中快捷调用 crypto
 算法的函数，由 Android/JDK 原生 API（`javax.crypto`/`java.security`）实现。

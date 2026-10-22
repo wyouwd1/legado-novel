@@ -96,7 +96,7 @@ JavaScript 执行。
 
 | 变量       | 说明                                                                                                                                   |
 |:---------|:-------------------------------------------------------------------------------------------------------------------------------------|
-| `java`   | 仅支持 [JsExtensions](https://github.com/HapeLee/legado-with-MD3/blob/master/app/src/main/java/io/legado/app/help/JsExtensions.kt) 中的方法 |
+| `java`   | 仅支持 [JsExtensions](https://github.com/wyouwd1/legado-novel/blob/main/app/src/main/java/io/legado/app/help/JsExtensions.kt) 中的方法 |
 | `result` | 待解密图片的 `ByteArray`                                                                                                                   |
 | `src`    | 图片链接                                                                                                                                 |
 

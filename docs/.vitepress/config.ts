@@ -1,14 +1,11 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: '阅读',
-  description: 'Legado-with-MD3 使用文档',
-  base: '/legado-with-MD3/',
-  head: [
-    ['link', { rel: 'icon', href: '/legado-with-MD3/favicon.ico' }]
-  ],
+  title: 'Legado Novel 文档',
+  description: 'Legado Novel 使用文档',
+  base: '/legado-novel/',
+  head: [],
   themeConfig: {
-    logo: '/logo.png',
     siteTitle: 'Legado Docs',
     nav: [
       { text: '首页', link: '/' },
@@ -23,7 +20,6 @@ export default defineConfig({
             { text: '帮助文档', link: '/guide/' },
             { text: '阅读界面', link: '/guide/reading' },
             { text: '导入源管理', link: '/guide/book-source' },
-            { text: '订阅源管理', link: '/guide/rss-source' },
             { text: '替换规则', link: '/guide/replace-rule' },
           ],
         },
@@ -42,7 +38,6 @@ export default defineConfig({
             { text: '帮助文档', link: '/guide/' },
             { text: '阅读界面', link: '/guide/reading' },
             { text: '导入源管理', link: '/guide/book-source' },
-            { text: '订阅源管理', link: '/guide/rss-source' },
             { text: '替换规则', link: '/guide/replace-rule' },
           ],
         },
@@ -88,7 +83,6 @@ export default defineConfig({
           items: [
             { text: '源调试', link: '/dev/debug' },
             { text: '字典规则', link: '/dev/dict-rule' },
-            { text: '在线朗读规则', link: '/dev/tts-rule' },
             { text: 'TXT 目录正则', link: '/dev/txt-toc' },
             { text: 'MIME 类型参考', link: '/spec/mime-types' },
           ],
@@ -128,7 +122,6 @@ export default defineConfig({
           items: [
             { text: '源调试', link: '/dev/debug' },
             { text: '字典规则', link: '/dev/dict-rule' },
-            { text: '在线朗读规则', link: '/dev/tts-rule' },
             { text: 'TXT 目录正则', link: '/dev/txt-toc' },
             { text: 'MIME 类型参考', link: '/spec/mime-types' },
           ],
@@ -136,10 +129,10 @@ export default defineConfig({
       ],
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/HapeLee/legado-with-MD3' },
+      { icon: 'github', link: 'https://github.com/wyouwd1/legado-novel' },
     ],
     footer: {
-      message: '基于 Apache-2.0 许可发布',
+      message: '基于 GPL-3.0 许可发布',
       copyright: 'Copyright © 2026 Legado',
     },
     search: {
@@ -157,7 +150,7 @@ export default defineConfig({
       text: '最后更新于',
     },
     editLink: {
-      pattern: 'https://github.com/HapeLee/legado-with-MD3/edit/main/docs/:path',
+      pattern: 'https://github.com/wyouwd1/legado-novel/edit/main/docs/:path',
       text: '在 GitHub 上编辑此页面',
     },
   },

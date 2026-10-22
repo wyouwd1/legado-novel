@@ -60,10 +60,7 @@ Jetpack Compose 迁移成果。
 
 ## 💬 交流
 
-* **Telegram 群组：** [Legado with MD3](https://t.me/materado)
-* **版本发布：**
-  最新版本会自动发布至群组，也可在 [GitHub Releases](https://github.com/HapeLee/legado-with-MD3/releases)
-  下载。
+* **版本发布：** 在 [GitHub Releases](https://github.com/wyouwd1/legado-novel/releases) 下载。
 
 ---
 
