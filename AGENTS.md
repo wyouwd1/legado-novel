@@ -133,22 +133,30 @@ platform implementations (Android/JVM/iOS/...)
 
 ## 构建与验证
 
+**构建主机硬约束：本机/代理侧所有 Gradle 构建、测试、lint、assemble 必须在远程 217 构建机
+执行，禁止在本机（WSL）直接运行 `./gradlew` 或 `gradlew.bat`。**
+统一入口是 `scripts/build-217.sh`；脚本会把当前工作区 rsync 到 217，以远端构建用户、
+JDK 21、远端 Android SDK 和 `--no-daemon` 运行。本机只允许 `git diff --check`、
+`rg` 等不触发 Gradle 的静态检查；GitHub Actions 仍在云端运行。
+
+验证优先级：常规改动优先提交到分支并 push/PR 触发 GitHub Actions 的 `verify.yml`；只有对编译
+结果没把握、需要快速迭代定位错误时，才用 `scripts/build-217.sh` 在 217 上构建。
+
 开发与 CI 使用 JDK 21。按风险选择最小充分验证：
 
-```powershell
+```bash
 # Kotlin/Compose 快速编译
-.\gradlew.bat :app:compileAppDebugKotlin
+scripts/build-217.sh :app:compileAppDebugKotlin
 
 # 当前主验证集
-.\gradlew.bat testAppDebugUnitTest lintAppDebug verifyConfigArchitecture assembleAppDebug --continue --no-configuration-cache
+scripts/build-217.sh testAppDebugUnitTest lintAppDebug verifyConfigArchitecture assembleAppDebug --continue --no-configuration-cache
 
 # 资源、Manifest、生成绑定或打包变化
-.\gradlew.bat :app:assembleAppDebug
+scripts/build-217.sh :app:assembleAppDebug
 
-# Release/R8 相关
-.\gradlew.bat assembleAppRelease
-.\gradlew.bat assembleAppNoR8
-
+# Release/R8 相关（签名参数按 docs/dev/build-on-217.md 传入）
+scripts/build-217.sh assembleAppRelease
+scripts/build-217.sh assembleAppNoR8
 ```
 
 KMP 任务名在模块实际创建后才存在；不要假装运行尚未定义的 `commonTest`、目标编译或 API
