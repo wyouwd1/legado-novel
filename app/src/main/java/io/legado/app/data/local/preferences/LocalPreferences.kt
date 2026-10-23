@@ -67,6 +67,7 @@ object LocalPreferencesKeys {
     val CHANGE_SOURCE_LOAD_INFO = booleanPreferencesKey("changeSourceLoadInfo")
     val CHANGE_SOURCE_LOAD_TOC = booleanPreferencesKey("changeSourceLoadToc")
     val CHANGE_SOURCE_LOAD_WORD_COUNT = booleanPreferencesKey("changeSourceLoadWordCount")
+    val CHANGE_SOURCE_MIN_WORD_COUNT = intPreferencesKey("changeSourceMinWordCount")
     val CHANGE_SOURCE_SEARCH_SCOPE = stringPreferencesKey("changeSourceSearchScope")
 
     // Book source check options

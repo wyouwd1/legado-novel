@@ -38,6 +38,7 @@ class ChangeChapterSourceViewModel(
             loadInfo = initialSettings.loadInfo,
             loadToc = initialSettings.loadToc,
             loadWordCount = initialSettings.loadWordCount,
+            minWordCount = initialSettings.minWordCount,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -79,6 +80,7 @@ class ChangeChapterSourceViewModel(
                         loadInfo = settings.loadInfo,
                         loadToc = settings.loadToc,
                         loadWordCount = settings.loadWordCount,
+                        minWordCount = settings.minWordCount,
                     )
                 }
             }
@@ -197,12 +199,40 @@ class ChangeChapterSourceViewModel(
             }
 
             is ChangeChapterSourceIntent.SetLoadWordCount -> {
-                updateSetting { it.copy(loadWordCount = intent.enabled) }
-                _uiState.update { it.copy(loadWordCount = intent.enabled) }
-                if (intent.enabled) {
-                    startSearch()
-                } else {
+                if (!intent.enabled) {
+                    // 关闭「显示更多信息」后没有字数可用，联动清空字数过滤。
+                    updateSetting { it.copy(loadWordCount = false, minWordCount = 0) }
+                    _uiState.update { it.copy(loadWordCount = false, minWordCount = 0) }
                     refreshResults()
+                } else {
+                    updateSetting { it.copy(loadWordCount = true) }
+                    _uiState.update { it.copy(loadWordCount = true) }
+                    startSearch()
+                }
+            }
+
+            is ChangeChapterSourceIntent.SetMinWordCount -> {
+                val minWordCount = intent.value.coerceAtLeast(0)
+                if (_uiState.value.minWordCount == minWordCount) return
+                val needLoadWordCount = minWordCount > 0 && !_uiState.value.loadWordCount
+                _uiState.update {
+                    it.copy(
+                        minWordCount = minWordCount,
+                        loadWordCount = it.loadWordCount || minWordCount > 0,
+                    )
+                }
+                viewModelScope.launch {
+                    changeSourceSettingsGateway.update {
+                        it.copy(
+                            minWordCount = minWordCount,
+                            loadWordCount = it.loadWordCount || minWordCount > 0,
+                        )
+                    }
+                    if (needLoadWordCount) {
+                        startSearch()
+                    } else {
+                        filterResults()
+                    }
                 }
             }
             // Source actions
@@ -368,12 +398,12 @@ class ChangeChapterSourceViewModel(
     }
 
     private fun filterResults() {
-        val filtered = if (screenKey.isEmpty()) {
-            searchResults.toList()
-        } else {
-            searchResults.filter {
-                it.name.contains(screenKey) || it.originName.contains(screenKey)
-            }
+        val minWordCount = _uiState.value.minWordCount
+        val filtered = searchResults.filter {
+            (screenKey.isEmpty() ||
+                it.name.contains(screenKey) ||
+                it.originName.contains(screenKey)) &&
+                it.meetsMinWordCount(minWordCount)
         }
         val comparator = if (_uiState.value.loadWordCount) {
             compareByDescending<SearchBook> { ObservableSourceConfig.getBookScore(it) }

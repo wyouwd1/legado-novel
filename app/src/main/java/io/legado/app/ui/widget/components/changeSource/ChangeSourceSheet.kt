@@ -317,6 +317,11 @@ fun ChangeSourceSheet(
             label = stringResource(R.string.screen),
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        ChangeSourceWordCountFilter(
+            minWordCount = settings.minWordCount,
+            onMinWordCountChange = viewModel::onMinWordCountChange,
+        )
         Spacer(modifier = Modifier.height(12.dp))
         if (isSearching) {
             AppLinearProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -336,7 +341,14 @@ fun ChangeSourceSheet(
                 contentAlignment = Alignment.Center
             ) {
                 EmptyMessage(
-                    message = stringResource(R.string.search_empty)
+                    message = if (settings.minWordCount > 0) {
+                        stringResource(
+                            R.string.change_source_word_count_empty,
+                            settings.minWordCount,
+                        )
+                    } else {
+                        stringResource(R.string.search_empty)
+                    }
                 )
             }
         } else {

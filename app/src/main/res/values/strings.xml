@@ -2900,4 +2900,9 @@
     <string name="explore_main_content">Browse discovery content here</string>
     <string name="explore_source_list">Show discovery sources</string>
     <string name="explore_select_source">Select discovery source</string>
+    <string name="change_source_word_count">Words</string>
+    <string name="change_source_min_word_count">Minimum word count</string>
+    <string name="change_source_word_count_at_least">≥%1$d words</string>
+    <string name="change_source_word_count_unlimited">Unlimited</string>
+    <string name="change_source_word_count_empty">No results with at least %1$d words</string>
 </resources>

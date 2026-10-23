@@ -2591,4 +2591,9 @@
     <string name="explore_main_content">直接瀏覽發現內容</string>
     <string name="explore_source_list">顯示發現書源列表</string>
     <string name="explore_select_source">選擇發現書源</string>
+    <string name="change_source_word_count">字數</string>
+    <string name="change_source_min_word_count">最少字數</string>
+    <string name="change_source_word_count_at_least">≥%1$d字</string>
+    <string name="change_source_word_count_unlimited">不限</string>
+    <string name="change_source_word_count_empty">沒有字數 ≥ %1$d 的結果</string>
 </resources>

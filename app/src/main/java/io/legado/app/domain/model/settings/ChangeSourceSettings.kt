@@ -8,6 +8,8 @@ data class ChangeSourceSettings(
     val loadInfo: Boolean = false,
     val loadToc: Boolean = false,
     val loadWordCount: Boolean = false,
+    /** 只显示章节字数 ≥ 该值的结果；0 表示不过滤。 */
+    val minWordCount: Int = 0,
     val migrateChapters: Boolean = true,
     val migrateReadingProgress: Boolean = true,
     val migrateGroup: Boolean = true,

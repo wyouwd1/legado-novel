@@ -22,6 +22,7 @@ class Phase2SettingsMappingTest {
                 base.copy(loadInfo = true),
                 base.copy(loadToc = true),
                 base.copy(loadWordCount = true),
+                base.copy(minWordCount = 2000),
                 base.copy(migrateChapters = false),
                 base.copy(migrateReadingProgress = false),
                 base.copy(migrateGroup = false),
@@ -35,6 +36,13 @@ class Phase2SettingsMappingTest {
             toPrefMap = ChangeSourceSettings::toPrefMap,
             fromPreferences = Preferences::toChangeSourceSettings,
         )
+    }
+
+    @Test
+    fun `换源最少字数缺省为不限制`() {
+        val preferences = emptyMap<String, Any?>().toTestPreferences()
+
+        assertEquals(0, preferences.toChangeSourceSettings().minWordCount)
     }
 
     @Test

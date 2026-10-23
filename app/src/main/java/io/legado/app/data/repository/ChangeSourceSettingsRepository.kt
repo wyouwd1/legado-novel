@@ -7,6 +7,7 @@ import io.legado.app.domain.model.settings.ChangeSourceSettings
 import io.legado.app.domain.usecase.ChangeSourceMigrationOptions
 import io.legado.app.help.config.AppConfigStore
 import io.legado.app.help.config.compatDsBoolean
+import io.legado.app.help.config.compatDsInt
 import io.legado.app.help.config.compatDsString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -51,6 +52,7 @@ internal fun Preferences.toChangeSourceSettings() = ChangeSourceSettings(
     loadInfo = compatDsBoolean(LocalPreferencesKeys.CHANGE_SOURCE_LOAD_INFO.name) ?: false,
     loadToc = compatDsBoolean(LocalPreferencesKeys.CHANGE_SOURCE_LOAD_TOC.name) ?: false,
     loadWordCount = compatDsBoolean(LocalPreferencesKeys.CHANGE_SOURCE_LOAD_WORD_COUNT.name) ?: false,
+    minWordCount = compatDsInt(LocalPreferencesKeys.CHANGE_SOURCE_MIN_WORD_COUNT.name) ?: 0,
     migrateChapters = compatDsBoolean(KEY_MIGRATE_CHAPTERS) ?: true,
     migrateReadingProgress = compatDsBoolean(KEY_MIGRATE_READING_PROGRESS) ?: true,
     migrateGroup = compatDsBoolean(KEY_MIGRATE_GROUP) ?: true,
@@ -68,6 +70,7 @@ internal fun ChangeSourceSettings.toPrefMap(): Map<String, Any?> = mapOf(
     LocalPreferencesKeys.CHANGE_SOURCE_LOAD_INFO.name to loadInfo,
     LocalPreferencesKeys.CHANGE_SOURCE_LOAD_TOC.name to loadToc,
     LocalPreferencesKeys.CHANGE_SOURCE_LOAD_WORD_COUNT.name to loadWordCount,
+    LocalPreferencesKeys.CHANGE_SOURCE_MIN_WORD_COUNT.name to minWordCount,
     KEY_MIGRATE_CHAPTERS to migrateChapters,
     KEY_MIGRATE_READING_PROGRESS to migrateReadingProgress,
     KEY_MIGRATE_GROUP to migrateGroup,

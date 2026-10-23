@@ -41,6 +41,7 @@ import io.legado.app.ui.widget.components.EmptyMessage
 import io.legado.app.ui.widget.components.button.series.MediumPlainButton
 import io.legado.app.ui.widget.components.button.series.MediumTonalButton
 import io.legado.app.ui.widget.components.card.SelectionItemCard
+import io.legado.app.ui.widget.components.changeSource.ChangeSourceWordCountFilter
 import io.legado.app.ui.widget.components.menuItem.RoundDropdownMenu
 import io.legado.app.ui.widget.components.menuItem.RoundDropdownMenuItem
 import io.legado.app.ui.widget.components.modalBottomSheet.AppModalBottomSheet
@@ -227,6 +228,11 @@ private fun SearchContent(
         label = stringResource(R.string.screen),
         modifier = Modifier.fillMaxWidth()
     )
+    Spacer(modifier = Modifier.height(8.dp))
+    ChangeSourceWordCountFilter(
+        minWordCount = state.minWordCount,
+        onMinWordCountChange = { onIntent(ChangeChapterSourceIntent.SetMinWordCount(it)) },
+    )
     Spacer(modifier = Modifier.height(12.dp))
     if (state.isSearching) {
         AppLinearProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -246,7 +252,14 @@ private fun SearchContent(
             contentAlignment = Alignment.Center
         ) {
             EmptyMessage(
-                message = stringResource(R.string.search_empty)
+                message = if (state.minWordCount > 0) {
+                    stringResource(
+                        R.string.change_source_word_count_empty,
+                        state.minWordCount,
+                    )
+                } else {
+                    stringResource(R.string.search_empty)
+                }
             )
         }
     } else {

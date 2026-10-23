@@ -19,6 +19,8 @@ data class ChangeChapterSourceUiState(
     val loadInfo: Boolean = true,
     val loadToc: Boolean = true,
     val loadWordCount: Boolean = true,
+    /** 只显示当前章节字数 ≥ 该值的结果；0 表示不过滤。 */
+    val minWordCount: Int = 0,
     // TOC view
     val showToc: Boolean = false,
     val selectedSourceName: String = "",
@@ -64,6 +66,7 @@ sealed interface ChangeChapterSourceIntent {
     data class SetLoadInfo(val enabled: Boolean) : ChangeChapterSourceIntent
     data class SetLoadToc(val enabled: Boolean) : ChangeChapterSourceIntent
     data class SetLoadWordCount(val enabled: Boolean) : ChangeChapterSourceIntent
+    data class SetMinWordCount(val value: Int) : ChangeChapterSourceIntent
 
     // Source actions
     data class TopSource(val searchBook: SearchBook) : ChangeChapterSourceIntent

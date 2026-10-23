@@ -344,19 +344,19 @@ class ChangeBookSourceComposeViewModel(
 
     fun resume() = Unit
 
-    private fun filterResults() {
+    private fun filterResults(minWordCount: Int? = null) {
+        val currentSettings = changeSourceSettingsGateway.currentSettings
+        val effectiveMinWordCount = minWordCount ?: currentSettings.minWordCount
         val key = screenKey
         val filtered = synchronized(searchResults) {
-            if (key.isEmpty()) {
-                searchResults.toList()
-            } else {
-                searchResults.filter {
+            searchResults.filter {
+                (key.isEmpty() ||
                     it.originName.contains(key) ||
-                        it.latestChapterTitle?.contains(key) == true
-                }
+                    it.latestChapterTitle?.contains(key) == true) &&
+                    it.meetsMinWordCount(effectiveMinWordCount)
             }
         }
-        val comparator = if (settings.value.loadWordCount) {
+        val comparator = if (currentSettings.loadWordCount) {
             compareByDescending<SearchBook> { ObservableSourceConfig.getBookScore(it) }
                 .thenByDescending { io.legado.app.help.config.SourceConfig.getSourceScore(it.origin) }
                 .thenByDescending { it.chapterWordCount > 1000 }
@@ -426,11 +426,39 @@ class ChangeBookSourceComposeViewModel(
 
     fun onLoadWordCountChange(enabled: Boolean) {
         if (settings.value.loadWordCount == enabled) return
-        updateSetting { it.copy(loadWordCount = enabled) }
-        if (enabled) {
-            refreshMissingWordCounts()
-        } else {
-            refresh()
+        if (!enabled) {
+            // 关闭「显示更多信息」后没有字数可用，联动清空字数过滤，避免结果被全部隐藏。
+            viewModelScope.launch {
+                changeSourceSettingsGateway.update {
+                    it.copy(loadWordCount = false, minWordCount = 0)
+                }
+                withContext(Main) { refresh() }
+            }
+            return
+        }
+        updateSetting { it.copy(loadWordCount = true) }
+        refreshMissingWordCounts()
+    }
+
+    fun onMinWordCountChange(value: Int) {
+        val minWordCount = value.coerceAtLeast(0)
+        if (settings.value.minWordCount == minWordCount) return
+        val needLoadWordCount =
+            minWordCount > 0 && !changeSourceSettingsGateway.currentSettings.loadWordCount
+        viewModelScope.launch {
+            changeSourceSettingsGateway.update {
+                it.copy(
+                    minWordCount = minWordCount,
+                    // 字数过滤依赖「显示更多信息」；开启过滤时一并打开，避免所有结果都被当成未知字数。
+                    loadWordCount = it.loadWordCount || minWordCount > 0,
+                )
+            }
+            withContext(Main) {
+                filterResults(minWordCount)
+                if (needLoadWordCount) {
+                    refreshMissingWordCounts()
+                }
+            }
         }
     }
 
