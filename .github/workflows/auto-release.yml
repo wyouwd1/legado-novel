@@ -33,7 +33,7 @@ jobs:
       has_signing: ${{ steps.set-ver.outputs.has_signing }}
       tag_exists: ${{ steps.set-ver.outputs.tag_exists }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -139,7 +139,7 @@ jobs:
       COMMIT_NUMBER_VAL: ${{ needs.prepare.outputs.commit_number }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -285,7 +285,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
