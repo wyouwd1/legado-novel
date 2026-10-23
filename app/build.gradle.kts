@@ -24,6 +24,7 @@ val versionProps = Properties().apply {
 val versionMajor = versionProps["VERSION_MAJOR"]?.toString()?.toInt() ?: 0
 val versionMinor = versionProps["VERSION_MINOR"]?.toString()?.toInt() ?: 0
 val versionPatch = versionProps["VERSION_PATCH"]?.toString()?.toInt() ?: 0
+val versionCodeBase = versionProps["VERSION_CODE_BASE"]?.toString()?.toInt() ?: 32641
 val projectVersionName = "$versionMajor.$versionMinor.$versionPatch"
 val enableAbiSplits = providers.gradleProperty("enableAbiSplits")
     .map(String::toBoolean)
@@ -54,7 +55,10 @@ android {
         applicationId = "io.legadonovel"
         minSdk = 26
         targetSdk = 37
-        versionCode = System.getenv("COMMIT_NUMBER")?.toInt()?.let { 10000 + it } ?: 32641
+        // CI appends the commit count to a monotonically increasing base so a fresh
+        // checkout cannot produce a versionCode lower than the last published build.
+        versionCode = System.getenv("COMMIT_NUMBER")?.toInt()?.let { versionCodeBase + it }
+            ?: versionCodeBase
         versionName = System.getenv("APP_VERSION_NAME") ?: projectVersionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -166,6 +170,19 @@ android {
             // Robolectric 下取任何 R.string 都是 Resources$NotFoundException，
             // 整条阅读器测试线（Track D·D1c）就起不来。
             isIncludeAndroidResources = true
+        }
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            val abi = output.filters.firstOrNull {
+                it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
+            }?.identifier ?: "universal"
+            output.outputFileName.set(
+                "legado-novel-${System.getenv("APP_VERSION_NAME") ?: projectVersionName}-$abi.apk"
+            )
         }
     }
 }
