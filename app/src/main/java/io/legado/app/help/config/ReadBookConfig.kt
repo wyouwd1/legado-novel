@@ -580,7 +580,7 @@ object ReadBookConfig {
         private val shadowColorN: String = "#3E3D3B",
         val letterSpacing: Float = 0.1f,//字间距
         val lineSpacingExtra: Int = 12,//行间距
-        val paragraphSpacing: Int = 2,//段距
+        val paragraphSpacing: Int = 6,//段距
         val titleMode: Int = 0,//标题位置 0:居左 1:居中 2:隐藏
         val titleSize: Int = 4,//标题字号：相对模式为相对正文的偏移，绝对模式为绝对 sp
         val titleSizeRelative: Boolean? = null,//是否相对正文：null 表示按旧值自动识别

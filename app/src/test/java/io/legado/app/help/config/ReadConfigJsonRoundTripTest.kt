@@ -85,6 +85,16 @@ class ReadConfigJsonRoundTripTest {
     }
 
     @Test
+    fun `默认正文间距匹配阅读设置`() {
+        val config = ReadBookConfig.Config()
+
+        assertEquals(0.1f, config.letterSpacing, 0f)
+        assertEquals(12, config.lineSpacingExtra)
+        assertEquals(6, config.paragraphSpacing)
+        assertEquals("　　", config.paragraphIndent)
+    }
+
+    @Test
     fun `copy 会重置颜色记忆化缓存`() {
         // curTextColor() 把解析结果记在 @Transient 字段里，并用 initColorInt 挡住重复解析。
         // copy 只复制构造参数，两个字段都应回到未初始化——否则改了颜色的那份会沿用旧解析值。
