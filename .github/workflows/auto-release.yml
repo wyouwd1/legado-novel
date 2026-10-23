@@ -328,7 +328,7 @@ jobs:
           name: Pre-release v${{ needs.prepare.outputs.versionL }}
           prerelease: true
           generate_release_notes: true
-          files: artifacts/legado-${{ needs.prepare.outputs.versionL }}*.apk
+          files: artifacts/legado-novel-${{ needs.prepare.outputs.versionL }}*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
