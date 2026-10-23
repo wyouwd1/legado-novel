@@ -11,6 +11,7 @@ import io.legado.app.domain.gateway.OtherSettingsGateway
 import io.legado.app.domain.gateway.ThemeSettingsGateway
 import io.legado.app.domain.usecase.WebDavBackupUseCase
 import io.legado.app.exception.NoStackTraceException
+import io.legado.app.help.about.LegalDocuments
 import io.legado.app.help.config.LocalConfig
 import io.legado.app.help.storage.Restore
 import io.legado.app.utils.toastOnUi
@@ -57,11 +58,11 @@ class OnboardingViewModel(
     init {
         viewModelScope.launch {
             val privacy = withContext(Dispatchers.IO) {
-                runCatching { appCtx.assets.open("privacyPolicy.md").readBytes().decodeToString() }
+                runCatching { appCtx.assets.open(LegalDocuments.PRIVACY_POLICY).readBytes().decodeToString() }
                     .getOrDefault("")
             }
             val disclaimer = withContext(Dispatchers.IO) {
-                runCatching { appCtx.assets.open("disclaimer.md").readBytes().decodeToString() }
+                runCatching { appCtx.assets.open(LegalDocuments.DISCLAIMER).readBytes().decodeToString() }
                     .getOrDefault("")
             }
             _uiState.update { it.copy(privacyPolicy = privacy, disclaimer = disclaimer) }

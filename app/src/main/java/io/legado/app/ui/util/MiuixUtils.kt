@@ -43,13 +43,6 @@ data class AppState(
 val LocalAppState = compositionLocalOf { AppState() }
 val LocalIsWideScreen = staticCompositionLocalOf { false }
 
-interface MiuixNavigator {
-    fun pop()
-    fun push(route: Any)
-}
-
-val LocalNavigator = staticCompositionLocalOf<MiuixNavigator> { error("No navigator found!") }
-
 @Composable
 fun shouldShowSplitPane(): Boolean {
     val windowInfo = LocalWindowInfo.current

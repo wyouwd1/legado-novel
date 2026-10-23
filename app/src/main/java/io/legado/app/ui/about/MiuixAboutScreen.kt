@@ -49,8 +49,6 @@ import io.legado.app.ui.theme.LegadoTheme
 import io.legado.app.ui.util.BlurredBar
 import io.legado.app.ui.util.LocalAppState
 import io.legado.app.ui.util.LocalIsWideScreen
-import io.legado.app.ui.util.LocalNavigator
-import io.legado.app.ui.util.MiuixNavigator
 import io.legado.app.ui.util.pageContentPadding
 import io.legado.app.ui.util.pageScrollModifiers
 import io.legado.app.ui.util.rememberBlurBackdrop
@@ -89,7 +87,6 @@ fun MiuixAboutScreen(
     val topAppBarScrollBehavior = MiuixScrollBehavior()
     val lazyListState = rememberLazyListState()
     val isWideScreen = shouldShowSplitPane()
-    val licenseTitle = stringResource(R.string.about_license_title)
 
     val scrollProgress by remember {
         derivedStateOf {
@@ -120,22 +117,7 @@ fun MiuixAboutScreen(
         if (scrollProgress == 1f) MiuixTheme.colorScheme.surface else Color.Transparent
     }
 
-    val navigator = remember(licenseTitle) {
-        object : MiuixNavigator {
-            override fun pop() {
-                onBack()
-            }
-
-            override fun push(route: Any) {
-                if (route == "License") {
-                    onIntent(AboutIntent.ShowMdFile(licenseTitle, "LICENSE.md"))
-                }
-            }
-        }
-    }
-
     CompositionLocalProvider(
-        LocalNavigator provides navigator,
         LocalIsWideScreen provides isWideScreen
     ) {
         Scaffold(
@@ -181,9 +163,6 @@ private fun AboutContent(
 ) {
     val appState = LocalAppState.current
     val isWideScreen = LocalIsWideScreen.current
-    val privacyPolicyTitle = stringResource(R.string.about_privacy_policy_title)
-    val licenseTitle = stringResource(R.string.about_license_title)
-    val disclaimerTitle = stringResource(R.string.about_disclaimer_title)
 
     val backdrop = rememberBlurBackdrop()
     var blurRadius by remember { mutableFloatStateOf(60f) }
@@ -239,6 +218,52 @@ private fun AboutContent(
     val versionCodeProgress = ((scrollProgress - 0.05f) / 0.15f).coerceIn(0f, 1f)
     val projectNameProgress = ((scrollProgress - 0.20f) / 0.15f).coerceIn(0f, 1f)
     val iconProgress = ((scrollProgress - 0.35f) / 0.15f).coerceIn(0f, 1f)
+
+    @Composable
+    fun AboutSectionCard(section: AboutSection, modifier: Modifier = Modifier) {
+        Card(
+            modifier = modifier.then(
+                if (backdrop != null) {
+                    Modifier.textureBlur(
+                        backdrop = backdrop,
+                        shape = RoundedCornerShape(16.dp),
+                        blurRadius = blurRadius,
+                        noiseCoefficient = noiseCoefficient,
+                        colors = BlurColors(
+                            blendColors = cardBlend,
+                            brightness = brightness,
+                            contrast = contrast,
+                            saturation = saturation,
+                        ),
+                    )
+                } else {
+                    Modifier
+                },
+            ),
+            colors = CardDefaults.defaultColors(
+                if (backdrop != null) Color.Transparent else MiuixTheme.colorScheme.surfaceContainer,
+                Color.Transparent,
+            ),
+        ) {
+            for (item in section.items) {
+                val title = stringResource(item.titleRes)
+                val intent = item.toAboutIntent()
+                val trailingTextRes = item.trailingTextRes
+                if (trailingTextRes != null) {
+                    ArrowPreference(
+                        title = title,
+                        endActions = { ValueText(stringResource(trailingTextRes)) },
+                        onClick = { onIntent(intent) },
+                    )
+                } else {
+                    ArrowPreference(
+                        title = title,
+                        onClick = { onIntent(intent) },
+                    )
+                }
+            }
+        }
+    }
 
     BgEffectBackground(
         dynamicBackground = dynamicBackground,
@@ -360,140 +385,15 @@ private fun AboutContent(
                         .fillParentMaxHeight()
                         .padding(bottom = scrollPadding.calculateBottomPadding()),
                 ) {
-                    Card(
-                        modifier = Modifier
-                            .then(
-                                if (backdrop != null) {
-                                    Modifier
-                                        .textureBlur(
-                                            backdrop = backdrop,
-                                            shape = RoundedCornerShape(16.dp),
-                                            blurRadius = blurRadius,
-                                            noiseCoefficient = noiseCoefficient,
-                                            colors = BlurColors(
-                                                blendColors = cardBlend,
-                                                brightness = brightness,
-                                                contrast = contrast,
-                                                saturation = saturation,
-                                            ),
-                                        )
-                                } else {
-                                    Modifier
-                                },
-                            ),
-                        colors = CardDefaults.defaultColors(
-                            if (backdrop != null) Color.Transparent else MiuixTheme.colorScheme.surfaceContainer,
-                            Color.Transparent,
-                        ),
-                    ) {
-                        ArrowPreference(
-                            title = stringResource(R.string.check_update),
-                            onClick = { onIntent(AboutIntent.CheckUpdate) },
-                        )
-                        ArrowPreference(
-                            title = stringResource(R.string.contributors),
-                            endActions = {
-                                ValueText("GitHub")
-                            },
-                            onClick = { onIntent(AboutIntent.OpenUrl("https://github.com/wyouwd1/legado-novel")) },
-                        )
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .padding(top = 12.dp)
-                            .then(
-                                if (backdrop != null) {
-                                    Modifier
-                                        .textureBlur(
-                                            backdrop = backdrop,
-                                            shape = RoundedCornerShape(16.dp),
-                                            blurRadius = blurRadius,
-                                            noiseCoefficient = noiseCoefficient,
-                                            colors = BlurColors(
-                                                blendColors = cardBlend,
-                                                brightness = brightness,
-                                                contrast = contrast,
-                                                saturation = saturation,
-                                            ),
-                                        )
-                                } else {
-                                    Modifier
-                                },
-                            ),
-                        colors = CardDefaults.defaultColors(
-                            if (backdrop != null) Color.Transparent else MiuixTheme.colorScheme.surfaceContainer,
-                            Color.Transparent,
-                        ),
-                    ) {
-                        ArrowPreference(
-                            title = stringResource(R.string.privacy_policy),
-                            onClick = {
-                                onIntent(
-                                    AboutIntent.ShowMdFile(
-                                        privacyPolicyTitle,
-                                        "privacyPolicy.md"
-                                    )
-                                )
-                            },
-                        )
-                        ArrowPreference(
-                            title = stringResource(R.string.license),
-                            onClick = { onIntent(AboutIntent.ShowMdFile(licenseTitle, "LICENSE.md")) },
-                        )
-                        ArrowPreference(
-                            title = stringResource(R.string.disclaimer),
-                            onClick = {
-                                onIntent(
-                                    AboutIntent.ShowMdFile(
-                                        disclaimerTitle,
-                                        "disclaimer.md"
-                                    )
-                                )
-                            },
-                        )
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .padding(top = 12.dp)
-                            .then(
-                                if (backdrop != null) {
-                                    Modifier
-                                        .textureBlur(
-                                            backdrop = backdrop,
-                                            shape = RoundedCornerShape(16.dp),
-                                            blurRadius = blurRadius,
-                                            noiseCoefficient = noiseCoefficient,
-                                            colors = BlurColors(
-                                                blendColors = cardBlend,
-                                                brightness = brightness,
-                                                contrast = contrast,
-                                                saturation = saturation,
-                                            ),
-                                        )
-                                } else {
-                                    Modifier
-                                },
-                            ),
-                        colors = CardDefaults.defaultColors(
-                            if (backdrop != null) Color.Transparent else MiuixTheme.colorScheme.surfaceContainer,
-                            Color.Transparent,
-                        ),
-                    ) {
-                        ArrowPreference(
-                            title = stringResource(R.string.crash_log),
-                            onClick = { onIntent(AboutIntent.ShowCrashLogs) },
-                        )
-                        ArrowPreference(
-                            title = stringResource(R.string.save_log),
-                            onClick = { onIntent(AboutIntent.SaveLog) },
-                        )
-                        ArrowPreference(
-                            title = stringResource(R.string.create_heap_dump),
-                            onClick = { onIntent(AboutIntent.CreateHeapDump) },
-                        )
-                    }
+                    AboutSectionCard(AboutCatalog.overview)
+                    AboutSectionCard(
+                        section = AboutCatalog.documents,
+                        modifier = Modifier.padding(top = 12.dp),
+                    )
+                    AboutSectionCard(
+                        section = AboutCatalog.diagnostics,
+                        modifier = Modifier.padding(top = 12.dp),
+                    )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }

@@ -88,9 +88,6 @@ private fun MaterialAboutScreen(
     versionName: String,
 ) {
     val scrollBehavior = GlassTopAppBarDefaults.defaultScrollBehavior()
-    val privacyPolicyTitle = stringResource(R.string.about_privacy_policy_title)
-    val licenseTitle = stringResource(R.string.about_license_title)
-    val disclaimerTitle = stringResource(R.string.about_disclaimer_title)
 
     AppScaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -148,23 +145,14 @@ private fun MaterialAboutScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                FilledTonalIconButton(onClick = { onIntent(AboutIntent.OpenUrl("https://github.com/wyouwd1/legado-novel")) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_web_outline),
-                        contentDescription = stringResource(R.string.about_open_project_homepage)
-                    )
-                }
-                FilledTonalIconButton(onClick = { onIntent(AboutIntent.OpenUrl("https://github.com/wyouwd1/legado-novel")) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_github),
-                        contentDescription = stringResource(R.string.about_open_github)
-                    )
-                }
-                FilledTonalIconButton(onClick = { onIntent(AboutIntent.CheckUpdate) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_import),
-                        contentDescription = stringResource(R.string.check_update)
-                    )
+                for (action in AboutCatalog.headerActions) {
+                    val intent = action.toAboutIntent()
+                    FilledTonalIconButton(onClick = { onIntent(intent) }) {
+                        Icon(
+                            painter = painterResource(action.iconRes),
+                            contentDescription = stringResource(action.titleRes)
+                        )
+                    }
                 }
             }
 
@@ -172,54 +160,16 @@ private fun MaterialAboutScreen(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 title = ""
             ) {
-                SettingItemWithDivider {
-                    SettingItem(
-                        title = stringResource(R.string.contributors),
-                        onClick = { onIntent(AboutIntent.OpenUrl("https://github.com/wyouwd1/legado-novel")) }
-                    )
-                }
-                SettingItemWithDivider {
-                    SettingItem(
-                        title = stringResource(R.string.privacy_policy),
-                        onClick = {
-                            onIntent(
-                                AboutIntent.ShowMdFile(
-                                    privacyPolicyTitle,
-                                    "privacyPolicy.md"
-                                )
+                for (section in AboutCatalog.sections) {
+                    for (item in section.items) {
+                        val intent = item.toAboutIntent()
+                        SettingItemWithDivider {
+                            SettingItem(
+                                title = stringResource(item.titleRes),
+                                onClick = { onIntent(intent) }
                             )
                         }
-                    )
-                }
-                SettingItemWithDivider {
-                    SettingItem(
-                        title = stringResource(R.string.license),
-                        onClick = { onIntent(AboutIntent.ShowMdFile(licenseTitle, "LICENSE.md")) }
-                    )
-                }
-                SettingItemWithDivider {
-                    SettingItem(
-                        title = stringResource(R.string.disclaimer),
-                        onClick = { onIntent(AboutIntent.ShowMdFile(disclaimerTitle, "disclaimer.md")) }
-                    )
-                }
-                SettingItemWithDivider {
-                    SettingItem(
-                        title = stringResource(R.string.crash_log),
-                        onClick = { onIntent(AboutIntent.ShowCrashLogs) }
-                    )
-                }
-                SettingItemWithDivider {
-                    SettingItem(
-                        title = stringResource(R.string.save_log),
-                        onClick = { onIntent(AboutIntent.SaveLog) }
-                    )
-                }
-                SettingItemWithDivider {
-                    SettingItem(
-                        title = stringResource(R.string.create_heap_dump),
-                        onClick = { onIntent(AboutIntent.CreateHeapDump) }
-                    )
+                    }
                 }
             }
         }
