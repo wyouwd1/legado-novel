@@ -30,6 +30,7 @@ jobs:
       commit_number: ${{ steps.set-ver.outputs.commit_number }}
       latest_tag: ${{ steps.set-ver.outputs.last_tag }}
       is_release: ${{ steps.set-ver.outputs.is_release }}
+      has_signing: ${{ steps.set-ver.outputs.has_signing }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -38,6 +39,8 @@ jobs:
 
       - name: 计算版本号和构建号
         id: set-ver
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
           COMMIT_COUNT=$(git rev-list --count HEAD)
           echo "Commit 总数 (Build Number): $COMMIT_COUNT"
@@ -104,6 +107,12 @@ jobs:
           echo "commit_number=$COMMIT_COUNT" >> $GITHUB_OUTPUT
           echo "last_tag=$LAST_TAG_FOR_LOG" >> $GITHUB_OUTPUT
           echo "is_release=$IS_RELEASE" >> $GITHUB_OUTPUT # 新s的输出标志
+          if [[ -n "${SIGNING_KEY:-}" ]]; then
+            echo "has_signing=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_signing=false" >> $GITHUB_OUTPUT
+            echo "::warning::未配置 SIGNING_KEY，构建产物将未签名，create_release 会被跳过"
+          fi
 
   build:
     needs: prepare
@@ -136,6 +145,26 @@ jobs:
         run: |
           echo "清空18PlusList.txt"
           echo "">$GITHUB_WORKSPACE/app/src/main/assets/18PlusList.txt
+      - name: 配置 Release 签名
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [[ -z "${SIGNING_KEY:-}" ]]; then
+            echo "::warning::未配置 SIGNING_KEY，跳过签名配置"
+            exit 0
+          fi
+          echo "$SIGNING_KEY" | base64 -d > "$GITHUB_WORKSPACE/app/my-release-key.jks"
+          {
+            echo ""
+            echo "RELEASE_STORE_FILE=my-release-key.jks"
+            echo "RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "RELEASE_KEY_ALIAS=$KEY_ALIAS"
+            echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_WORKSPACE/gradle.properties"
+          echo "签名配置已写入 gradle.properties"
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
@@ -235,10 +264,12 @@ jobs:
           path: release-metadata.env
 
   # main 推送成功后自动发布 pre-release，附上三个架构的 APK。
+  # 必须已配置签名 secret 才发布：未签名 APK 无法安装，宁可不发。
   # 正式版（version.properties 的 VERSION_SUFFIX=0）不自动发布，避免覆盖已有正式 Release。
   create_release:
     needs: [ prepare, build ]
     if: |
+      needs.prepare.outputs.has_signing == 'true' &&
       needs.prepare.outputs.is_release != 'true' &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main'
@@ -272,6 +303,22 @@ jobs:
             mv "$f" "${out}.apk"
           done
           ls -l artifacts
+
+      - name: 校验 APK 签名
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          APKSIGNER=$(find "$SDK_ROOT/build-tools" -name apksigner -type f 2>/dev/null | sort -V | tail -n 1)
+          if [[ -z "$APKSIGNER" ]]; then
+            APKSIGNER=$(command -v apksigner || true)
+          fi
+          test -n "$APKSIGNER" || { echo "::error::找不到 apksigner"; exit 1; }
+          for f in artifacts/legado-*.apk; do
+            "$APKSIGNER" verify --print-certs "$f" >/dev/null || {
+              echo "::error::$f 签名校验失败，拒绝发布未签名 APK"
+              exit 1
+            }
+          done
+          echo "全部 APK 签名校验通过"
 
       - name: 创建 GitHub Pre-release
         uses: softprops/action-gh-release@v3
