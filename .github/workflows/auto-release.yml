@@ -294,13 +294,14 @@ jobs:
           }
           shopt -s nullglob
           for f in artifacts/*.apk; do
-            out="artifacts/legado-${VERSIONL}"
+            out="artifacts/legado-novel-${VERSIONL}"
             if [[ "$f" == *arm64-v8a* ]]; then
               out="${out}-arm64-v8a"
             elif [[ "$f" == *armeabi-v7a* ]]; then
               out="${out}-armeabi-v7a"
             fi
-            mv "$f" "${out}.apk"
+            out="${out}.apk"
+            [[ "$f" == "$out" ]] || mv "$f" "$out"
           done
           ls -l artifacts
 
