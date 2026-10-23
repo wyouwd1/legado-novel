@@ -285,6 +285,11 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
       - name: 下载 APK Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -328,6 +333,28 @@ jobs:
           done
           echo "全部 APK 签名校验通过"
 
+      - name: 生成 Release Notes
+        id: notes
+        run: |
+          CURRENT="v${{ needs.prepare.outputs.versionL }}"
+          PREV=$(git tag --sort=-creatordate | grep -v "^${CURRENT}$" | head -n 1 || true)
+          if [[ -n "$PREV" ]]; then
+            LOG=$(git log "$PREV"..HEAD --pretty=format:"- %s" --no-merges)
+            RANGE="${PREV}...${CURRENT}"
+          else
+            LOG=$(git log -1 --pretty=format:"- %s")
+            RANGE="${CURRENT}"
+          fi
+          {
+            echo "body<<EOF"
+            echo "### 更新内容"
+            echo ""
+            echo "${LOG:-- 无新增提交}"
+            echo ""
+            echo "**Full Changelog**: https://github.com/wyouwd1/legado-novel/compare/${RANGE}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v3
         with:
@@ -335,7 +362,7 @@ jobs:
           name: ${{ needs.prepare.outputs.is_release == 'true' && format('Release v{0}', needs.prepare.outputs.versionL) || format('Pre-release v{0}', needs.prepare.outputs.versionL) }}
           prerelease: ${{ needs.prepare.outputs.is_release != 'true' }}
           make_latest: ${{ needs.prepare.outputs.is_release == 'true' }}
-          generate_release_notes: true
+          body: ${{ steps.notes.outputs.body }}
           files: artifacts/legado-novel-${{ needs.prepare.outputs.versionL }}*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
