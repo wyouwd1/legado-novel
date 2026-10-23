@@ -31,6 +31,7 @@ jobs:
       latest_tag: ${{ steps.set-ver.outputs.last_tag }}
       is_release: ${{ steps.set-ver.outputs.is_release }}
       has_signing: ${{ steps.set-ver.outputs.has_signing }}
+      tag_exists: ${{ steps.set-ver.outputs.tag_exists }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -112,6 +113,12 @@ jobs:
           else
             echo "has_signing=false" >> $GITHUB_OUTPUT
             echo "::warning::未配置 SIGNING_KEY，构建产物将未签名，create_release 会被跳过"
+          fi
+          if git rev-parse -q --verify "refs/tags/v$FULL_VERSION_NAME" >/dev/null; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "::warning::tag v$FULL_VERSION_NAME 已存在，跳过发布（需要发布新版本时先 bump version.properties）"
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
           fi
 
   build:
@@ -265,12 +272,12 @@ jobs:
 
   # main 推送成功后自动发布 pre-release，附上三个架构的 APK。
   # 必须已配置签名 secret 才发布：未签名 APK 无法安装，宁可不发。
-  # 正式版（version.properties 的 VERSION_SUFFIX=0）不自动发布，避免覆盖已有正式 Release。
+  # VERSION_SUFFIX=0 发正式版，否则发 pre-release；tag 已存在时跳过，避免覆盖已发布版本。
   create_release:
     needs: [ prepare, build ]
     if: |
       needs.prepare.outputs.has_signing == 'true' &&
-      needs.prepare.outputs.is_release != 'true' &&
+      needs.prepare.outputs.tag_exists != 'true' &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -321,12 +328,13 @@ jobs:
           done
           echo "全部 APK 签名校验通过"
 
-      - name: 创建 GitHub Pre-release
+      - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ needs.prepare.outputs.versionL }}
-          name: Pre-release v${{ needs.prepare.outputs.versionL }}
-          prerelease: true
+          name: ${{ needs.prepare.outputs.is_release == 'true' && format('Release v{0}', needs.prepare.outputs.versionL) || format('Pre-release v{0}', needs.prepare.outputs.versionL) }}
+          prerelease: ${{ needs.prepare.outputs.is_release != 'true' }}
+          make_latest: ${{ needs.prepare.outputs.is_release == 'true' }}
           generate_release_notes: true
           files: artifacts/legado-novel-${{ needs.prepare.outputs.versionL }}*.apk
         env:
