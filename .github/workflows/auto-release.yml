@@ -9,11 +9,10 @@ on:
       # - '!**/assets/**'
       # - '!**.md'
       - '!**/ISSUE_TEMPLATE/**'
-  pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,7 +22,7 @@ jobs:
 
   prepare:
     runs-on: ubuntu-latest
-    if: ${{ !startsWith(github.event.head_commit.message, 'Merge pull request') }}
+    timeout-minutes: 10
     outputs:
       versionL: ${{ steps.set-ver.outputs.full_version_name }}
       version: ${{ steps.set-ver.outputs.current_version }}
@@ -34,8 +33,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: 计算版本号和构建号
         id: set-ver
@@ -77,16 +76,9 @@ jobs:
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
             # 标记为测试版 (VERSION_SUFFIX=1 或其他/空)，且在 main 分支推送
           
-            # 查找匹配当前 CURRENT_VERSION 的上一个 BETA TAG (e.g., 3.26.4-beta.X)
-            LAST_MATCHING_TAG=$(git tag --list "$CURRENT_VERSION-beta.*" --sort=-committerdate | head -n 1)
-          
-            if [[ $LAST_MATCHING_TAG =~ [0-9]+\.[0-9]+\.[0-9]+-beta\.([0-9]+) ]]; then
-              LAST_BUILD_NUM="${BASH_REMATCH[1]}"
-              NEW_BUILD_NUM=$((LAST_BUILD_NUM + 1))
-            else
-              NEW_BUILD_NUM=1
-            fi
-          
+            # Do not derive the beta number from tags: this build-only workflow does not
+            # create tags, so every push would otherwise reuse -beta.1.
+            NEW_BUILD_NUM="${GITHUB_RUN_NUMBER:-1}"
             VERSION_SUFFIX_NAME="-beta.$NEW_BUILD_NUM"
           
             # 日志从最近的任意 TAG 开始 (包括上一个 beta.x tag)
@@ -121,6 +113,7 @@ jobs:
         type: [ release ]
       fail-fast: false
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
       product: ${{ matrix.product }}
       type: ${{ matrix.type }}
@@ -132,7 +125,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          persist-credentials: false
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
@@ -168,10 +162,13 @@ jobs:
         run: |
           echo "移动 mapping 相关文件"
           MAPPING_DIR="${{ github.workspace }}/mapping"
+          MAPPING_ROOT="${{ github.workspace }}/app/build/outputs/mapping"
           mkdir -p "$MAPPING_DIR"
-          # 使用 find 代替 ls，避免参数列表过长
-          find ${{ github.workspace }}/app/build/outputs/mapping/ -name "missing_rules.txt" -exec mv {} "$MAPPING_DIR/missing_rules.txt" \;
-          find ${{ github.workspace }}/app/build/outputs/mapping/ -name "mapping.txt" -exec mv {} "$MAPPING_DIR/mapping.txt" \;
+          test -d "$MAPPING_ROOT" || { echo "::error::mapping directory missing"; exit 1; }
+          MAPPING_FILE=$(find "$MAPPING_ROOT" -name "mapping.txt" -print -quit)
+          test -n "$MAPPING_FILE" || { echo "::error::mapping.txt missing"; exit 1; }
+          mv "$MAPPING_FILE" "$MAPPING_DIR/mapping.txt"
+          find "$MAPPING_ROOT" -name "missing_rules.txt" -exec mv {} "$MAPPING_DIR/missing_rules.txt" \; || true
 
       - name: Upload Missing Rules File To Artifact
         if: matrix.type == 'release'
@@ -217,7 +214,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: legado.${{ env.product }}.${{ env.type }}.mapping
-          if-no-files-found: ignore
+          if-no-files-found: error
           path: ${{ github.workspace }}/mapping/mapping.txt
 
       - name: Save release metadata
@@ -236,4 +233,54 @@ jobs:
           name: release-metadata
           if-no-files-found: error
           path: release-metadata.env
+
+  # main 推送成功后自动发布 pre-release，附上三个架构的 APK。
+  # 正式版（version.properties 的 VERSION_SUFFIX=0）不自动发布，避免覆盖已有正式 Release。
+  create_release:
+    needs: [ prepare, build ]
+    if: |
+      needs.prepare.outputs.is_release != 'true' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: 下载 APK Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-apk-release'
+          path: artifacts
+          merge-multiple: true
+
+      - name: 整理 APK 文件名
+        run: |
+          VERSIONL="${{ needs.prepare.outputs.versionL }}"
+          test -n "$(find artifacts -maxdepth 1 -name '*.apk' -print -quit)" || {
+            echo "::error::没有下载到 APK artifact"
+            exit 1
+          }
+          shopt -s nullglob
+          for f in artifacts/*.apk; do
+            out="artifacts/legado-${VERSIONL}"
+            if [[ "$f" == *arm64-v8a* ]]; then
+              out="${out}-arm64-v8a"
+            elif [[ "$f" == *armeabi-v7a* ]]; then
+              out="${out}-armeabi-v7a"
+            fi
+            mv "$f" "${out}.apk"
+          done
+          ls -l artifacts
+
+      - name: 创建 GitHub Pre-release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ needs.prepare.outputs.versionL }}
+          name: Pre-release v${{ needs.prepare.outputs.versionL }}
+          prerelease: true
+          generate_release_notes: true
+          files: artifacts/legado-${{ needs.prepare.outputs.versionL }}*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
