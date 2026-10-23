@@ -76,7 +76,7 @@ jobs:
                 LAST_TAG_FOR_LOG=$(git tag --sort=-committerdate | head -n 2 | tail -n 1)
             fi
           
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]] && [[ "${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             # 标记为测试版 (VERSION_SUFFIX=1 或其他/空)，且在 main 分支推送
           
             # Do not derive the beta number from tags: this build-only workflow does not
