@@ -67,6 +67,7 @@ data class SearchUiState(
     val isManualStop: Boolean = false,
     val hasMore: Boolean = true,
     val processedSources: Int = 0,
+    val partialSources: Int = 0,
     val totalSources: Int = 0,
     val selectedSourceTypes: ImmutableSet<Int> = persistentSetOf(),
     val showScopeSheet: Boolean = false,

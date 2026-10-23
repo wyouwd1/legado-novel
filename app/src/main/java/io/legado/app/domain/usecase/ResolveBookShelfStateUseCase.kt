@@ -8,7 +8,29 @@ data class BookShelfKey(
     val url: String?
 )
 
+internal data class BookShelfNameAuthor(val name: String, val author: String)
+
+/**
+ * Hash-based shelf resolver for callers that evaluate many search results against one shelf.
+ * Building it is O(shelf); each lookup is O(1).
+ */
+class BookShelfLookup internal constructor(
+    private val exact: Set<BookShelfKey>,
+    private val nameAuthors: Set<BookShelfNameAuthor>,
+) {
+    fun resolve(name: String, author: String, url: String?): BookShelfState {
+        if (BookShelfKey(name, author, url) in exact) return BookShelfState.IN_SHELF
+        if (BookShelfNameAuthor(name, author) in nameAuthors) return BookShelfState.SAME_NAME_AUTHOR
+        return BookShelfState.NOT_IN_SHELF
+    }
+}
+
 class ResolveBookShelfStateUseCase {
+
+    fun prepare(shelf: Set<BookShelfKey>): BookShelfLookup = BookShelfLookup(
+        exact = shelf.toHashSet(),
+        nameAuthors = shelf.mapTo(HashSet()) { BookShelfNameAuthor(it.name, it.author) },
+    )
 
     fun execute(
         name: String,

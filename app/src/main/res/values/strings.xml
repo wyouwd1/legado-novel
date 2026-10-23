@@ -134,6 +134,8 @@
     <string name="local">Local</string>
     <string name="search">Search</string>
     <string name="all_results">All results</string>
+    <string name="search_partial_timeout">Search reached the %1$d s limit; showing partial results (%2$d sources pending).</string>
+    <string name="search_partial_footer">Some sources have not responded; results may be incomplete.</string>
     <string name="search_placeholder">Search…</string>
     <string name="input_search_key">Input search keyword</string>
     <string name="origin_format">Origin: %s</string>

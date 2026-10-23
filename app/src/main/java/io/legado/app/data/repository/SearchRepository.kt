@@ -93,26 +93,28 @@ class SearchRepositoryImpl(
         appDb.searchKeywordDao.deleteAll()
     }
 
-    override suspend fun getBookSourceParts(scope: BookSearchScope): List<BookSourcePart> =
-        withContext(Dispatchers.IO) {
-            val selectedSources = linkedSetOf<BookSourcePart>()
-            when {
-                scope.isAll -> selectedSources.addAll(appDb.bookSourceDao.allEnabledPart)
-                scope.isSource -> scope.sourceUrls.forEach { sourceUrl ->
-                    appDb.bookSourceDao.getBookSourcePart(sourceUrl)?.let { selectedSources.add(it) }
-                }
+    override suspend fun getSearchSources(
+        scope: BookSearchScope,
+        types: Set<Int>?,
+    ): List<BookSource> = withContext(Dispatchers.IO) {
+        val dao = appDb.bookSourceDao
+        val selected = when {
+            scope.isAll -> dao.getSearchSources()
+            scope.isSource -> dao.getSourcesByUrls(scope.sourceUrls)
+                .ifEmpty { dao.getSearchSources() }
 
-                else -> scope.groupNames.forEach { groupName ->
-                    selectedSources.addAll(appDb.bookSourceDao.getEnabledPartByGroup(groupName))
-                }
-            }
-
-            if (selectedSources.isEmpty()) {
-                appDb.bookSourceDao.allEnabledPart
-            } else {
-                selectedSources.toList().sortedBy { it.customOrder }
-            }
+            else -> scope.groupNames.flatMap { dao.getEnabledSourcesByGroup(it) }
+                .ifEmpty { dao.getSearchSources() }
         }
+
+        selected.asSequence()
+            .filter { it.enabled }
+            .filter { !it.searchUrl.isNullOrBlank() }
+            .filter { types == null || it.bookSourceType in types }
+            .distinctBy { it.bookSourceUrl }
+            .sortedBy { it.customOrder }
+            .toList()
+    }
 
     override suspend fun getBookSource(sourceUrl: String) = withContext(Dispatchers.IO) {
         appDb.bookSourceDao.getBookSource(sourceUrl)

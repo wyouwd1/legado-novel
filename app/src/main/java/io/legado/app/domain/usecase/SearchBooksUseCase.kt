@@ -2,38 +2,49 @@ package io.legado.app.domain.usecase
 
 import io.legado.app.constant.AppLog
 import io.legado.app.data.entities.BookSource
-import io.legado.app.data.entities.BookSourcePart
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.domain.gateway.BookSearchGateway
+import io.legado.app.domain.gateway.SourceSearch
 import io.legado.app.domain.model.BookSearchScope
 import io.legado.app.domain.model.MatchMode
 import io.legado.app.exception.NoStackTraceException
-import io.legado.app.model.webBook.WebBook
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.coroutineContext
+
+const val DEFAULT_SEARCH_CONCURRENCY = 32
+const val MAX_SEARCH_CONCURRENCY = 48
+const val SEARCH_DEADLINE_MS = 20_000L
+private const val DEFAULT_SOURCE_TIMEOUT_MS = 25_000L
+private const val SEARCH_DEADLINE_TICK_MS = 50L
 
 data class BookSearchRequest(
     val keyword: String,
     val page: Int,
     val scope: BookSearchScope,
     val matchMode: MatchMode,
-    val concurrency: Int,
+    val concurrency: Int = DEFAULT_SEARCH_CONCURRENCY,
     val types: Set<Int>? = null,
+    val deadlineMs: Long = SEARCH_DEADLINE_MS,
 )
 
 sealed interface SearchRunEvent {
@@ -50,154 +61,171 @@ sealed interface SearchRunEvent {
     data class Finished(
         val isEmpty: Boolean,
         val hasMore: Boolean,
+        val isPartial: Boolean = false,
+        val pendingSources: Int = 0,
     ) : SearchRunEvent
 }
 
 class BookSearchControl {
-    private val isResumed = MutableStateFlow(true)
+    private val resumed = MutableStateFlow(true)
+    val isResumed: StateFlow<Boolean> = resumed.asStateFlow()
 
     fun pause() {
-        isResumed.value = false
+        resumed.value = false
     }
 
     fun resume() {
-        isResumed.value = true
+        resumed.value = true
     }
 
     suspend fun awaitResumed() {
-        isResumed.first { it }
+        resumed.first { it }
     }
 }
 
 class SearchBooksUseCase(
     private val gateway: BookSearchGateway,
+    private val sourceSearch: SourceSearch,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val sourceTimeoutMs: Long = DEFAULT_SOURCE_TIMEOUT_MS,
 ) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun execute(
         request: BookSearchRequest,
         control: BookSearchControl,
-    ): Flow<SearchRunEvent> = flow {
+    ): Flow<SearchRunEvent> = channelFlow {
         val keyword = request.keyword.trim()
-        if (keyword.isBlank()) return@flow
+        if (keyword.isBlank()) return@channelFlow
 
-        val sourceParts = gateway.getBookSourceParts(request.scope)
-        if (sourceParts.isEmpty()) {
-            throw NoStackTraceException("启用书源为空")
-        }
-
-        val searchableSources = coroutineScope {
-            sourceParts.map { part ->
-                async(Dispatchers.IO) {
-                    val source = gateway.getBookSource(part.bookSourceUrl) ?: return@async null
-                    if (source.searchUrl.isNullOrBlank()) {
-                        return@async null
-                    }
-                    if (request.types != null && !request.types.contains(source.bookSourceType)) {
-                        return@async null
-                    }
-                    SearchableSource(part, source)
-                }
-            }.awaitAll().filterNotNull()
-        }
+        val searchableSources = gateway.getSearchSources(request.scope, request.types)
         if (searchableSources.isEmpty()) {
             throw NoStackTraceException("可搜索书源为空")
         }
 
         val merger = SearchResultMerger(keyword, request.matchMode)
-        val concurrency = request.concurrency.coerceAtLeast(1)
+        val concurrency = request.concurrency.coerceIn(1, MAX_SEARCH_CONCURRENCY)
         var hasMore = false
         var processedSources = 0
         var failedSources = 0
         var firstFailureMessage: String? = null
+        val deadlineReached = AtomicBoolean(false)
 
-        emit(SearchRunEvent.Started)
+        send(SearchRunEvent.Started)
 
-        searchableSources.asFlow()
-            .flatMapMerge(concurrency) { searchableSource ->
-                flow {
-                    control.awaitResumed()
-                    emit(searchSource(searchableSource, keyword, request.page, request.matchMode))
-                }.flowOn(Dispatchers.IO)
-            }
-            .collect { result ->
-                currentCoroutineContext().ensureActive()
-                processedSources++
-                when (result) {
-                    is SourceSearchResult.Found -> {
-                        result.books.forEach { it.releaseHtmlData() }
-                        hasMore = hasMore || (result.supportsNextPage && result.books.isNotEmpty())
-                        if (result.books.isNotEmpty()) {
-                            gateway.saveSearchBooks(result.books)
-                        }
-                        val change = merger.merge(result.books)
-                        emit(
-                            SearchRunEvent.Progress(
-                                upsertBooks = change.upsertBooks,
-                                removedBookUrls = change.removedBookUrls,
-                                resultCount = merger.count,
-                                processedSources = processedSources,
-                                totalSources = searchableSources.size,
+        val searchJob = async {
+            searchableSources.asFlow()
+                .flatMapMerge(concurrency) { source ->
+                    flow {
+                        control.awaitResumed()
+                        emit(searchSource(source, keyword, request.page, request.matchMode))
+                    }.flowOn(ioDispatcher)
+                }
+                .collect { result ->
+                    currentCoroutineContext().ensureActive()
+                    when (result) {
+                        is SourceSearchResult.Found -> {
+                            result.books.forEach { it.releaseHtmlData() }
+                            hasMore = hasMore || (result.supportsNextPage && result.books.isNotEmpty())
+                            if (result.books.isNotEmpty()) {
+                                gateway.saveSearchBooks(result.books)
+                            }
+                            val change = merger.merge(result.books)
+                            processedSources++
+                            send(
+                                SearchRunEvent.Progress(
+                                    upsertBooks = change.upsertBooks,
+                                    removedBookUrls = change.removedBookUrls,
+                                    resultCount = merger.count,
+                                    processedSources = processedSources,
+                                    totalSources = searchableSources.size,
+                                )
                             )
-                        )
-                    }
-
-                    is SourceSearchResult.Failed -> {
-                        failedSources++
-                        if (firstFailureMessage.isNullOrBlank()) {
-                            firstFailureMessage = result.throwable.localizedMessage
                         }
-                        AppLog.put("书源搜索出错\n${result.throwable.localizedMessage}", result.throwable)
-                        emit(
-                            SearchRunEvent.Progress(
-                                upsertBooks = emptyList(),
-                                removedBookUrls = emptyList(),
-                                resultCount = merger.count,
-                                processedSources = processedSources,
-                                totalSources = searchableSources.size,
+
+                        is SourceSearchResult.Failed -> {
+                            failedSources++
+                            if (firstFailureMessage.isNullOrBlank()) {
+                                firstFailureMessage = result.throwable.localizedMessage
+                            }
+                            AppLog.put("书源搜索出错\n${result.throwable.localizedMessage}", result.throwable)
+                            processedSources++
+                            send(
+                                SearchRunEvent.Progress(
+                                    upsertBooks = emptyList(),
+                                    removedBookUrls = emptyList(),
+                                    resultCount = merger.count,
+                                    processedSources = processedSources,
+                                    totalSources = searchableSources.size,
+                                )
                             )
-                        )
+                        }
                     }
                 }
-            }
+        }
 
-        if (merger.count == 0 && failedSources == searchableSources.size) {
+        // The deadline only counts time while the search engine is resumed. Pausing for a
+        // detail page or backgrounding the app must not consume the user's search budget.
+        val deadlineJob = launch {
+            var remaining = request.deadlineMs.coerceAtLeast(1L)
+            while (remaining > 0) {
+                control.awaitResumed()
+                val slice = minOf(remaining, SEARCH_DEADLINE_TICK_MS)
+                delay(slice)
+                if (control.isResumed.value) {
+                    remaining -= slice
+                }
+            }
+            deadlineReached.set(true)
+            searchJob.cancel()
+        }
+
+        try {
+            searchJob.await()
+        } catch (exception: CancellationException) {
+            if (!deadlineReached.get()) throw exception
+        } finally {
+            deadlineJob.cancel()
+        }
+
+        val isPartial = deadlineReached.get() && processedSources < searchableSources.size
+        if (!isPartial && merger.count == 0 && failedSources == searchableSources.size) {
             val error = firstFailureMessage?.takeIf { it.isNotBlank() } ?: "全部书源搜索失败"
             throw NoStackTraceException(error)
         }
 
-        emit(
+        send(
             SearchRunEvent.Finished(
-                isEmpty = merger.count == 0,
-                hasMore = hasMore && !merger.resultLimitReached,
+                isEmpty = merger.count == 0 && !isPartial,
+                hasMore = !isPartial && hasMore && !merger.resultLimitReached,
+                isPartial = isPartial,
+                pendingSources = if (isPartial) searchableSources.size - processedSources else 0,
             )
         )
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
     private suspend fun searchSource(
-        searchableSource: SearchableSource,
+        source: BookSource,
         keyword: String,
         page: Int,
         matchMode: MatchMode,
     ): SourceSearchResult {
         return try {
-            val source = searchableSource.source
             val supportsSearchPage = source.supportsSearchPage()
             if (page > 1 && !supportsSearchPage) {
                 return SourceSearchResult.Found(emptyList())
             }
-            val books = withTimeout(60000L) {
-                WebBook.searchBookAwait(
+            val books = withTimeout(sourceTimeoutMs) {
+                sourceSearch.search(
                     source,
                     keyword,
                     page,
-                    filter = { name, author, kind ->
-                        matchMode == MatchMode.DEFAULT ||
-                            name.contains(keyword, ignoreCase = true) ||
-                            author.contains(keyword, ignoreCase = true) ||
-                            kind?.contains(keyword, ignoreCase = true) == true
-                    }
-                )
+                ) { name, author, kind ->
+                    matchMode == MatchMode.DEFAULT ||
+                        name.contains(keyword, ignoreCase = true) ||
+                        author.contains(keyword, ignoreCase = true) ||
+                        kind?.contains(keyword, ignoreCase = true) == true
+                }
             }
             SourceSearchResult.Found(books, supportsSearchPage)
         } catch (exception: Throwable) {
@@ -206,12 +234,6 @@ class SearchBooksUseCase(
         }
     }
 
-
-
-    private data class SearchableSource(
-        val part: BookSourcePart,
-        val source: BookSource,
-    )
     private sealed interface SourceSearchResult {
         data class Found(
             val books: List<SearchBook>,
@@ -240,9 +262,6 @@ class SearchBooksUseCase(
         val count: Int
             get() = equalBooks.size + tagsBooks.size + containsBooks.size + otherBooks.size
 
-        private fun allBuckets(): Sequence<Map.Entry<SearchBookKey, SearchBook>> =
-            sequenceOf(equalBooks, tagsBooks, containsBooks, otherBooks).flatMap { it.entries }
-
         suspend fun merge(newBooks: List<SearchBook>): SearchBookChange {
             if (newBooks.isEmpty()) return SearchBookChange()
 
@@ -253,15 +272,13 @@ class SearchBooksUseCase(
                 coroutineContext.ensureActive()
                 val existingKey = bookUrlIndex[newBook.bookUrl]
                 if (existingKey != null) {
-                    val existingEntry = allBuckets().firstOrNull { it.key == existingKey }
-                    val existingBook = existingEntry?.value
+                    val existingBucket = findBucket(existingKey)
+                    val existingBook = existingBucket?.get(existingKey)
                     if (existingBook != null) {
+                        bookUrlIndex[newBook.bookUrl] = existingKey
                         existingBook.addOrigin(newBook.origin)
                         upsertBooks.add(existingBook)
-                        val existingBucket = findBucket(existingKey)
-                        if (existingBucket != null) {
-                            touchedBuckets.add(existingBucket)
-                        }
+                        touchedBuckets.add(existingBucket)
                         return@forEach
                     }
                 }
@@ -273,6 +290,9 @@ class SearchBooksUseCase(
                     bookUrlIndex[newBook.bookUrl] = key
                     upsertBooks.add(newBook)
                 } else {
+                    // A same name/author edition can arrive under another URL first; remember
+                    // that alias so a later result with the alias URL cannot create a duplicate.
+                    bookUrlIndex[newBook.bookUrl] = key
                     currentBook.addOrigin(newBook.origin)
                     upsertBooks.add(currentBook)
                 }

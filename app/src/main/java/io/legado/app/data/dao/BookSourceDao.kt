@@ -267,6 +267,31 @@ interface BookSourceDao {
     )
     val allEnabledGroupsUnProcessed: List<String>
 
+    @Query(
+        """select * from book_sources
+        where enabled = 1 and trim(searchUrl) <> ''
+        order by customOrder asc"""
+    )
+    fun getSearchSources(): List<BookSource>
+
+    @Query(
+        """select * from book_sources
+        where bookSourceUrl in (:sourceUrls)
+        order by customOrder asc"""
+    )
+    fun getSourcesByUrls(sourceUrls: List<String>): List<BookSource>
+
+    @Query(
+        """select * from book_sources
+        where enabled = 1
+        and (bookSourceGroup = :group
+            or bookSourceGroup like :group || ',%'
+            or bookSourceGroup like '%,' || :group
+            or bookSourceGroup like '%,' || :group || ',%')
+        order by customOrder asc"""
+    )
+    fun getEnabledSourcesByGroup(group: String): List<BookSource>
+
     @Query("select * from book_sources where bookSourceUrl = :key")
     fun getBookSource(key: String): BookSource?
 

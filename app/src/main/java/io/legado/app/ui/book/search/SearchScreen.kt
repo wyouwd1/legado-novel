@@ -447,6 +447,7 @@ fun SearchScreen(
                                         hasMore = state.hasMore,
                                         hasResult = false,
                                         committedQuery = state.committedQuery,
+                                        partialSources = state.partialSources,
                                         onLoadMore = { onIntent(SearchIntent.LoadMore) },
                                     )
                                 }
@@ -454,25 +455,25 @@ fun SearchScreen(
                         }
 
                         if (state.results.isNotEmpty()) {
-                            val sourceGroupedResults = remember(state.results) {
-                                state.results
-                                    .groupBy { it.book.origin }
-                                    .map { (origin, books) ->
-                                        SourceGroup(
-                                            origin = origin,
-                                            sourceName = books.firstOrNull()?.book?.originName?.takeIf { it.isNotBlank() }
-                                                ?: origin,
-                                            items = books
-                                        )
-                                    }
-                            }
-
                             AnimatedContent(
                                 targetState = isSourceGroupedMode,
                                 label = "SearchLayoutTransition",
                                 modifier = Modifier.fillMaxSize(),
                             ) { isSourceGrouped ->
                                 if (isSourceGrouped) {
+                                    val sourceGroupedResults = remember(state.results) {
+                                        state.results
+                                            .groupBy { it.book.origin }
+                                            .map { (origin, books) ->
+                                                SourceGroup(
+                                                    origin = origin,
+                                                    sourceName = books.firstOrNull()?.book?.originName
+                                                        ?.takeIf { it.isNotBlank() }
+                                                        ?: origin,
+                                                    items = books
+                                                )
+                                            }
+                                    }
                                     LazyColumn(
                                         state = groupedListState,
                                         modifier = Modifier.fillMaxSize(),
@@ -523,6 +524,7 @@ fun SearchScreen(
                                                 hasMore = state.hasMore,
                                                 hasResult = true,
                                                 committedQuery = state.committedQuery,
+                                                partialSources = state.partialSources,
                                                 onLoadMore = { onIntent(SearchIntent.LoadMore) },
                                             )
                                         }
@@ -580,6 +582,7 @@ fun SearchScreen(
                                                 hasMore = state.hasMore,
                                                 hasResult = true,
                                                 committedQuery = state.committedQuery,
+                                                partialSources = state.partialSources,
                                                 onLoadMore = { onIntent(SearchIntent.LoadMore) },
                                             )
                                         }
@@ -1063,6 +1066,7 @@ private fun SearchResultFooter(
     hasMore: Boolean,
     hasResult: Boolean,
     committedQuery: String,
+    partialSources: Int,
     onLoadMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -1082,6 +1086,13 @@ private fun SearchResultFooter(
                     Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                     AppText(text = stringResource(R.string.is_loading))
                 }
+            }
+
+            partialSources > 0 -> {
+                Text(
+                    text = stringResource(R.string.search_partial_footer),
+                    color = LegadoTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             !hasResult && committedQuery.isNotBlank() -> {

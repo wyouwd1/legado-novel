@@ -111,6 +111,7 @@ import io.legado.app.domain.gateway.PrivateContentGateway
 import io.legado.app.domain.gateway.ReadSettingsGateway
 import io.legado.app.domain.gateway.ReadStyleGateway
 import io.legado.app.domain.gateway.ReadingProgressGateway
+import io.legado.app.domain.gateway.SourceSearch
 import io.legado.app.domain.gateway.ThemePackageSettingsGateway
 import io.legado.app.domain.gateway.ThemeSettingsGateway
 import io.legado.app.domain.gateway.WebDavBackupGateway
@@ -158,6 +159,7 @@ import io.legado.app.help.config.ThemePackageManager
 import io.legado.app.help.http.okHttpClient
 import io.legado.app.model.LegacyReaderSession
 import io.legado.app.model.ReaderSession
+import io.legado.app.model.webBook.WebBookSourceSearch
 import io.legado.app.ui.about.AboutViewModel
 import io.legado.app.ui.association.ImportDictRuleViewModel
 import io.legado.app.ui.association.ImportReplaceRuleViewModel
@@ -357,7 +359,8 @@ val appModule = module {
     }
     single<SearchRepository> { get<SearchRepositoryImpl>() }
     single<BookSearchGateway> { get<SearchRepositoryImpl>() }
-    singleOf(::SearchBooksUseCase)
+    single<SourceSearch> { WebBookSourceSearch }
+    single { SearchBooksUseCase(get(), get()) }
     singleOf(::ChangeSourceSearchUseCase)
     singleOf(::GetChapterContentUseCase)
     singleOf(::CheckBookContentQualityUseCase)

@@ -78,6 +78,8 @@
     <string name="local">本機</string>
     <string name="search">搜尋</string>
     <string name="all_results">全部結果</string>
+    <string name="search_partial_timeout">搜尋達到 %1$d 秒上限，已顯示部分結果（%2$d 個書源未完成）。</string>
+    <string name="search_partial_footer">部分書源未回應，結果可能不完整。</string>
     <string name="search_placeholder">搜尋…</string>
     <string name="input_search_key">Input search keyword</string>
     <string name="origin_format">來源：%s</string>

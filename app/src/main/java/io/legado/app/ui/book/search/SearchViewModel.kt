@@ -2,17 +2,18 @@ package io.legado.app.ui.book.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.legado.app.R
 import io.legado.app.data.entities.BookSourcePart
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.data.local.preferences.LocalPreferencesKeys
 import io.legado.app.data.repository.SearchRepository
 import io.legado.app.data.repository.SettingsRepository
-import io.legado.app.domain.gateway.DownloadCacheSettingsGateway
 import io.legado.app.domain.model.BookSearchScope
 import io.legado.app.domain.model.ContentQualityConfig
 import io.legado.app.domain.model.ContentQualityProgress
 import io.legado.app.domain.model.MatchMode
 import io.legado.app.domain.usecase.AddToBookshelfUseCase
+import io.legado.app.domain.usecase.BookShelfLookup
 import io.legado.app.domain.usecase.BookSearchControl
 import io.legado.app.domain.usecase.BookSearchRequest
 import io.legado.app.domain.usecase.BookShelfKey
@@ -20,6 +21,8 @@ import io.legado.app.domain.usecase.CheckBookContentQualityUseCase
 import io.legado.app.domain.usecase.ExploreBooksUseCase
 import io.legado.app.domain.usecase.ResolveBookShelfStateUseCase
 import io.legado.app.domain.usecase.ResolveBookshelfConflictUseCase
+import io.legado.app.domain.usecase.DEFAULT_SEARCH_CONCURRENCY
+import io.legado.app.domain.usecase.SEARCH_DEADLINE_MS
 import io.legado.app.domain.usecase.SearchBooksUseCase
 import io.legado.app.domain.usecase.SearchRunEvent
 import io.legado.app.ui.book.conflict.BookshelfConflictController
@@ -59,7 +62,6 @@ class SearchViewModel(
     private val resolveBookshelfConflictUseCase: ResolveBookshelfConflictUseCase,
     private val checkBookContentQualityUseCase: CheckBookContentQualityUseCase,
     private val localPreferencesRepository: SettingsRepository,
-    private val downloadCacheSettingsGateway: DownloadCacheSettingsGateway,
 ) : ViewModel() {
 
     private val searchLayoutMode = localPreferencesRepository
@@ -597,6 +599,7 @@ class SearchViewModel(
                 hasMore = true,
                 processedSources = 0,
                 totalSources = 0,
+                partialSources = 0,
                 emptyScopeAction = null,
                 expandedSourceUrl = null,
                 expandedSourceName = null,
@@ -648,7 +651,7 @@ class SearchViewModel(
                             page = page,
                             scope = BookSearchScope(searchScope.toString()),
                             matchMode = _uiState.value.matchMode,
-                            concurrency = downloadCacheSettingsGateway.currentSettings.threadCount,
+                            concurrency = DEFAULT_SEARCH_CONCURRENCY,
                             types = _uiState.value.selectedSourceTypes.takeIf { it.isNotEmpty() },
                         ),
                         searchControl
@@ -673,21 +676,41 @@ class SearchViewModel(
             }
 
             is SearchRunEvent.Progress -> {
-                removeSearchResults(event.removedBookUrls)
-                mergeSearchResults(event.upsertBooks)
-                _uiState.update {
-                    it.copy(
-                        results = buildSearchResultItems(
-                            shelf = bookshelfKeys.value,
-                        ).toImmutableList(),
-                        processedSources = event.processedSources,
-                        totalSources = event.totalSources,
-                    )
+                if (event.upsertBooks.isEmpty() && event.removedBookUrls.isEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            processedSources = event.processedSources,
+                            totalSources = event.totalSources,
+                        )
+                    }
+                } else {
+                    removeSearchResults(event.removedBookUrls)
+                    mergeSearchResults(event.upsertBooks)
+                    _uiState.update {
+                        it.copy(
+                            results = buildSearchResultItems(
+                                shelf = bookshelfKeys.value,
+                            ).toImmutableList(),
+                            processedSources = event.processedSources,
+                            totalSources = event.totalSources,
+                        )
+                    }
                 }
             }
 
             is SearchRunEvent.Finished -> {
                 wasSearching = false
+                if (event.isPartial) {
+                    emitEffect(
+                        SearchEffect.ShowMessage(
+                            appCtx.getString(
+                                R.string.search_partial_timeout,
+                                (SEARCH_DEADLINE_MS / 1000).toInt(),
+                                event.pendingSources,
+                            )
+                        )
+                    )
+                }
                 _uiState.update { state ->
                     val emptyAction = if (searchResultBooks.isEmpty() && event.isEmpty && !searchScope.isAll()) {
                         SearchEmptyScopeAction(
@@ -706,7 +729,9 @@ class SearchViewModel(
                         isSearching = false,
                         hasMore = event.hasMore &&
                             hasNewPageResults &&
-                            !exactSearchShouldStopAfterFirstPage,
+                            !exactSearchShouldStopAfterFirstPage &&
+                            !event.isPartial,
+                        partialSources = if (event.isPartial) event.pendingSources else 0,
                         emptyScopeAction = emptyAction,
                     )
                 }
@@ -738,6 +763,7 @@ class SearchViewModel(
                 results = persistentListOf(),
                 processedSources = 0,
                 totalSources = 0,
+                partialSources = 0,
                 isSearching = false,
                 isManualStop = false,
                 hasMore = true,
@@ -964,16 +990,15 @@ class SearchViewModel(
     }
 
     private fun List<SearchBook>.toSearchResultItems(
-        shelf: Set<BookShelfKey>
+        shelfLookup: BookShelfLookup,
     ): List<SearchResultItemUi> {
         return map { book ->
             SearchResultItemUi(
                 book = book,
-                shelfState = resolveBookShelfStateUseCase.execute(
+                shelfState = shelfLookup.resolve(
                     name = book.name,
                     author = book.author,
                     url = book.bookUrl,
-                    shelf = shelf
                 )
             )
         }
@@ -982,21 +1007,22 @@ class SearchViewModel(
     private fun buildSearchResultItems(
         shelf: Set<BookShelfKey>,
     ): List<SearchResultItemUi> {
+        val lookup = resolveBookShelfStateUseCase.prepare(shelf)
         return searchResultBooks.values
             .sortedWithSearchPriority(_uiState.value.committedQuery, _uiState.value.matchMode)
-            .toSearchResultItems(shelf)
+            .toSearchResultItems(lookup)
     }
 
     private fun List<SearchResultItemUi>.withShelfState(
         shelf: Set<BookShelfKey>
     ): List<SearchResultItemUi> {
+        val lookup = resolveBookShelfStateUseCase.prepare(shelf)
         return map { item ->
             item.copy(
-                shelfState = resolveBookShelfStateUseCase.execute(
+                shelfState = lookup.resolve(
                     name = item.book.name,
                     author = item.book.author,
                     url = item.book.bookUrl,
-                    shelf = shelf
                 )
             )
         }
@@ -1066,32 +1092,6 @@ class SearchViewModel(
         if (bookUrls.isEmpty()) return
         val removedUrls = bookUrls.toHashSet()
         searchResultBooks.entries.removeAll { (_, book) -> book.bookUrl in removedUrls }
-    }
-
-    private fun Collection<SearchBook>.sortedWithSearchPriority(
-        keyword: String,
-        matchMode: MatchMode,
-    ): List<SearchBook> {
-        val equalBooks = arrayListOf<SearchBook>()
-        val tagsBooks = arrayListOf<SearchBook>()
-        val containsBooks = arrayListOf<SearchBook>()
-        val otherBooks = arrayListOf<SearchBook>()
-        forEach { book ->
-            when {
-                book.name.equals(keyword, ignoreCase = true) ||
-                    book.author.equals(keyword, ignoreCase = true) -> equalBooks.add(book)
-                book.kind?.contains(keyword, ignoreCase = true) == true -> tagsBooks.add(book)
-                book.name.contains(keyword, ignoreCase = true) ||
-                    book.author.contains(keyword, ignoreCase = true) -> containsBooks.add(book)
-                matchMode == MatchMode.DEFAULT -> otherBooks.add(book)
-            }
-        }
-        return buildList(size) {
-            addAll(equalBooks.sortedByDescending { it.origins.size })
-            addAll(tagsBooks.sortedByDescending { it.origins.size })
-            addAll(containsBooks.sortedByDescending { it.origins.size })
-            addAll(otherBooks)
-        }
     }
 
     private data class SearchResultKey(
