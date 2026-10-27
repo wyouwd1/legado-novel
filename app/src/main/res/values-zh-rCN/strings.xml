@@ -2898,6 +2898,7 @@
     <string name="explore_select_source">选择发现书源</string>
     <string name="change_source_word_count">字数</string>
     <string name="change_source_min_word_count">最少字数</string>
+    <string name="change_source_min_word_count_menu">最少字数：%1$s</string>
     <string name="change_source_word_count_at_least">≥%1$d字</string>
     <string name="change_source_word_count_unlimited">不限</string>
     <string name="change_source_word_count_empty">没有字数 ≥ %1$d 的结果</string>

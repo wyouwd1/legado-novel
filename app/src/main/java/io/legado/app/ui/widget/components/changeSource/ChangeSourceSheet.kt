@@ -126,7 +126,13 @@ fun ChangeSourceSheet(
     var loadingAction by remember { mutableStateOf(false) }
     var showOptionsMenu by rememberSaveable { mutableStateOf(false) }
     var showFilterSheet by rememberSaveable { mutableStateOf(false) }
+    var showWordCountDialog by rememberSaveable { mutableStateOf(false) }
     val bookAddedToShelfText = stringResource(R.string.book_added_to_shelf)
+    val wordCountLabel = if (settings.minWordCount > 0) {
+        stringResource(R.string.change_source_word_count_at_least, settings.minWordCount)
+    } else {
+        stringResource(R.string.change_source_word_count_unlimited)
+    }
     // 不在书架的书换源，只是给这本还没上架的书换个源，不存在「新增还是替换」的歧义，直接替换即可。
     val canAddAsNew = allowAddAsNew && !oldBook.isNotShelf
 
@@ -273,6 +279,17 @@ fun ChangeSourceSheet(
                             }
                         )
                         RoundDropdownMenuItem(
+                            text = stringResource(
+                                R.string.change_source_min_word_count_menu,
+                                wordCountLabel,
+                            ),
+                            isSelected = settings.minWordCount > 0,
+                            onClick = {
+                                showWordCountDialog = true
+                                dismiss()
+                            }
+                        )
+                        RoundDropdownMenuItem(
                             text = stringResource(R.string.book_source_manage),
                             onClick = {
                                 context.startActivity(
@@ -316,11 +333,6 @@ fun ChangeSourceSheet(
             },
             label = stringResource(R.string.screen),
             modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        ChangeSourceWordCountFilter(
-            minWordCount = settings.minWordCount,
-            onMinWordCountChange = viewModel::onMinWordCountChange,
         )
         Spacer(modifier = Modifier.height(12.dp))
         if (isSearching) {
@@ -592,6 +604,15 @@ fun ChangeSourceSheet(
         onApplyScope = { selection ->
             viewModel.applyScopeSelection(selection)
             showFilterSheet = false
+        }
+    )
+    ChangeSourceWordCountDialog(
+        show = showWordCountDialog,
+        minWordCount = settings.minWordCount,
+        onDismissRequest = { showWordCountDialog = false },
+        onConfirm = { value ->
+            viewModel.onMinWordCountChange(value)
+            showWordCountDialog = false
         }
     )
 }

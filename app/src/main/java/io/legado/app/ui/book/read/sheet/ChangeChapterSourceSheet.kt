@@ -41,7 +41,7 @@ import io.legado.app.ui.widget.components.EmptyMessage
 import io.legado.app.ui.widget.components.button.series.MediumPlainButton
 import io.legado.app.ui.widget.components.button.series.MediumTonalButton
 import io.legado.app.ui.widget.components.card.SelectionItemCard
-import io.legado.app.ui.widget.components.changeSource.ChangeSourceWordCountFilter
+import io.legado.app.ui.widget.components.changeSource.ChangeSourceWordCountDialog
 import io.legado.app.ui.widget.components.menuItem.RoundDropdownMenu
 import io.legado.app.ui.widget.components.menuItem.RoundDropdownMenuItem
 import io.legado.app.ui.widget.components.modalBottomSheet.AppModalBottomSheet
@@ -62,6 +62,12 @@ fun ChangeChapterSourceSheet(
 ) {
     var showOptionsMenu by remember { mutableStateOf(false) }
     var showFilterSheet by remember { mutableStateOf(false) }
+    var showWordCountDialog by remember { mutableStateOf(false) }
+    val wordCountLabel = if (state.minWordCount > 0) {
+        stringResource(R.string.change_source_word_count_at_least, state.minWordCount)
+    } else {
+        stringResource(R.string.change_source_word_count_unlimited)
+    }
 
     AppModalBottomSheet(
         show = show,
@@ -108,6 +114,17 @@ fun ChangeChapterSourceSheet(
                             isSelected = state.loadWordCount,
                             onClick = {
                                 onIntent(ChangeChapterSourceIntent.SetLoadWordCount(!state.loadWordCount))
+                                dismiss()
+                            }
+                        )
+                        RoundDropdownMenuItem(
+                            text = stringResource(
+                                R.string.change_source_min_word_count_menu,
+                                wordCountLabel,
+                            ),
+                            isSelected = state.minWordCount > 0,
+                            onClick = {
+                                showWordCountDialog = true
                                 dismiss()
                             }
                         )
@@ -166,6 +183,15 @@ fun ChangeChapterSourceSheet(
         onApplyScope = { selection ->
             onIntent(ChangeChapterSourceIntent.ApplyScope)
             showFilterSheet = false
+        }
+    )
+    ChangeSourceWordCountDialog(
+        show = showWordCountDialog,
+        minWordCount = state.minWordCount,
+        onDismissRequest = { showWordCountDialog = false },
+        onConfirm = { value ->
+            onIntent(ChangeChapterSourceIntent.SetMinWordCount(value))
+            showWordCountDialog = false
         }
     )
 }
@@ -227,11 +253,6 @@ private fun SearchContent(
         onValueChange = { onIntent(ChangeChapterSourceIntent.UpdateQuery(it)) },
         label = stringResource(R.string.screen),
         modifier = Modifier.fillMaxWidth()
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    ChangeSourceWordCountFilter(
-        minWordCount = state.minWordCount,
-        onMinWordCountChange = { onIntent(ChangeChapterSourceIntent.SetMinWordCount(it)) },
     )
     Spacer(modifier = Modifier.height(12.dp))
     if (state.isSearching) {
