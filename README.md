@@ -7,12 +7,17 @@
 
 ## 📖 介绍
 
-**Legado Novel** 是只保留小说阅读闭环的精简版，基于开源项目 [阅读（Legado）](https://github.com/gedoor/legado)
-开发，并沿用 [HapeLee/legado-with-MD3](https://github.com/HapeLee/legado-with-MD3) 的 Material 3 界面与
-Jetpack Compose 迁移成果。
+**Legado Novel** 是一款以小说阅读为主线的精简版 Android 阅读器，支持 Android 8.0 及以上。它基于开源项目
+[阅读（Legado）](https://github.com/gedoor/legado) 开发，沿用
+[HapeLee/legado-with-MD3](https://github.com/HapeLee/legado-with-MD3) 的 Material 3 界面与 Jetpack Compose
+迁移成果；工程是 Android-first 的渐进迁移，KMP/CMP 为长期目标。
 
-本项目移除漫画、听书/TTS、AI 对话、词典翻译、首页发现、关联书籍、知识库、欢迎页等模块，保留书架、书源、
-正文阅读、缓存下载、备份恢复与本地/网络导入等小说主链路，目标是更轻、更稳的个人阅读器。
+**保留的是完整小说阅读链路：** 书架与分组、书籍详情、书源管理与书源发现、全局搜书、正文阅读与翻页手势、目录、
+正文搜索、换源、缓存下载、本地导入（TXT、EPUB、UMD、压缩包）与网络导入（规则链接、在线书籍网址、WebDAV
+远程书籍）、阅读进度与书签高亮、替换净化、阅读设置与主题、备份恢复（含 WebDAV）。
+
+**没有的是非小说模块：** 漫画、听书与朗读、AI 对话、翻译、RSS 订阅、知识库、首页自定义模块。相关功能已移除，
+内置 Web 服务也已归档，不再随 APK 构建。如果你只需要书架、书源和阅读，这个版本就够用。
 
 > [!NOTE]
 > **上游关系：**[gedoor/legado](https://github.com/gedoor/legado) →
@@ -21,9 +26,9 @@ Jetpack Compose 迁移成果。
 
 ## ⬇️ 下载
 
-编译好的 APK 在 [Releases](https://github.com/wyouwd1/legado-novel/releases)：
-`app-app-arm64-v8a-release.apk`（绝大多数手机）、`app-app-armeabi-v7a-release.apk`、
-`app-app-universal-release.apk`（不确定机型时用）。包名 `io.legadonovel`，可与其它阅读分支共存。
+编译好的 APK 在 [Releases](https://github.com/wyouwd1/legado-novel/releases)，文件名形如
+`legado-novel-<version>-arm64-v8a.apk`（绝大多数手机）、`legado-novel-<version>-armeabi-v7a.apk`
+和 `legado-novel-<version>.apk`（通用包，不确定机型时用）。包名 `io.legadonovel`，可与其它阅读分支共存。
 
 > [!CAUTION]
 > **注意事项：**
@@ -37,12 +42,11 @@ Jetpack Compose 迁移成果。
 
 ## ✨ 分支特性
 
-相比于官方版本，本项目具有以下独有特性：
+与官方版本（gedoor/legado）相比，本项目的差异主要在功能范围收敛与界面体验：
 
-* **全新主题：** 全新 Material Design 3 设计界面，支持 **预测性返回手势** 与 **共享元素动画**。
+* **界面：** 沿用 Material Design 3 与 Jetpack Compose 的界面成果，支持 **预测性返回手势** 与 **共享元素动画**。
 * **阅读界面：** 更加个性化的阅读界面与菜单配置。
 * **阅读记录：** 提供详尽的阅读记录，支持 **时间轴** 与 **章节维度** 统计。
-* **体验增强：** 更健全的 **漫画阅读** 、 **有声书** 与 **发现** 等界面体验。
 * **书架布局：** 更多的书架布局选择，针对 **平板端** 进行了专门的界面优化。
 * **实用功能：** 新增书籍备注、智能伴生分组（自动归类已读/未读），支持**手柄**上下**翻页**。
 
